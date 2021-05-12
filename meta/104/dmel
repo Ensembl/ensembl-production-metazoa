@@ -1,0 +1,138 @@
+#CONF	DB_PFX	premz
+#CONF	ASM_VERSION	10
+
+# updated, prev was drosophila_melanogaster_core_51_104_9 BDGP6.34  now  dmel_r6.38_FB2021_01
+species.production_name	drosophila_melanogaster
+species.common_name	fruit fly
+genebuild.version	dmel_r6.38_FB2021_01
+assembly.default	dmel_r6.38
+assembly.name	dmel_r6.38
+
+
+# Assembly metadata
+assembly.accession	GCA_000001215.4
+#no CONF	GCF_TO_GCA	1
+
+# assembly
+#CONF	ASM_URL	ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r6.38_FB2021_01
+#CONF	FNA_FILE	fasta/dmel-all-chromosome-r6.38.fasta.gz
+
+#CONF	GFF_FILE	gff/dmel-all-no-analysis-r6.38.gff.gz
+#CONF	PEP_FILE	fasta/dmel-all-translation-r6.38.fasta.gz
+
+#   add-ons from NCBI
+#CONF	ASM_SINGLE	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/215/GCA_000001215.4_Release_6_plus_ISO1_MT/GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gbff.gz
+#CONF	GBFF_FILE	GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gbff.gz
+
+#CONF	ASM_SINGLE	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/215/GCA_000001215.4_Release_6_plus_ISO1_MT/GCA_000001215.4_Release_6_plus_ISO1_MT_assembly_report.txt
+#CONF	ASM_REP_FILE	GCA_000001215.4_Release_6_plus_ISO1_MT_assembly_report.txt
+
+#CONF	ASM_SINGLE	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/215/GCA_000001215.4_Release_6_plus_ISO1_MT/GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gff.gz
+#CONF	SR_GFF_FILE	GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gff.gz
+
+# stats and metadata generatio options
+#CONF	IGNORE_UNVALID_SOURCE_GFF	YES
+#CONF	STOP_AFTER_GFF_STATS	NO
+#CONF	STOP_AFTER_CONF NO
+
+#CONF	GFF_STATS_OPTIONS	--rule_options flybase
+
+#CONF	GFF_PARSER_CONF	gff_metaparser/flybase.conf
+#CONF	GFF_PARSER_PFX_TRIM	NO
+
+#CONF	GFF3_LOAD_LOGIC_NAME	flybase
+
+#CONF	SR_GFF_PARSER_CONF_PATCH	gff_metaparser/regions_no_syns.patch
+
+#CONF	GFF_LOADER_OPTIONS	--external_db_map_name external_db_map_flybase.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
+
+# update stable ids
+#CONF	UPDATE_STABLE_IDS	NO
+
+
+# mark trans_spliced transcripts 503
+# you can find list of them like this:
+# echo "SELECT f.uniquename, f.name, cvt.name || '; ' || cv.name || ':' || dbx.accession
+#    FROM feature f join feature_cvterm fcvt on f.feature_id=fcvt.feature_id
+#    JOIN pub ON fcvt.pub_id=pub.pub_id
+#    JOIN cvterm cvt ON fcvt.cvterm_id=cvt.cvterm_id
+#    JOIN organism o ON f.organism_id=o.organism_id
+#    JOIN cv ON cvt.cv_id=cv.cv_id
+#    JOIN dbxref dbx ON cvt.dbxref_id=dbx.dbxref_id
+#  WHERE cvt.name='trans_spliced_transcript'
+#    AND o.abbreviation='Dmel'
+#    AND f.is_obsolete = False
+#    AND f.is_analysis = False
+#    AND f.uniquename ~ '^FBtr\d+$';
+#" | psql -h chado.flybase.org -U flybase flybase -F $'\t' --no-align
+ 
+#CONF	TR_TRANS_SPLICED	FBtr0084079,FBtr0084080,FBtr0084081,FBtr0084082,FBtr0084083,FBtr0084084,FBtr0084085,FBtr0307759,FBtr0307760,FBtr0089347
+
+
+# Provider metadata
+#CONF	GFF3_LOAD_SOURCE_NAME	FlyBase
+
+assembly.provider_name	FlyBase
+assembly.provider_url	https://www.flybase.org
+
+annotation.provider_name	FlyBase
+annotation.provider_url	https://www.flybase.org
+
+#no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
+#no CONF	REP_LIB_RAW	/path/to/raw/drosophila_melanogaster.rm.lib
+
+
+# rna features and genes
+#CONF	RNA_FEAT_PARAMS	-cmscan_threshold 1e-6 -taxonomic_lca 1
+
+#CONF	RUN_RNA_GENES	NO
+
+# or
+# using 'vb' context, otherwise ('eg' context) needs special "ena*" database
+#no CONF	RNA_GENE_PARAMS	-run_context vb -score_threshold 65
+#               m.b. updated maximum_per_hit_name { 'pre_miRNA' => 100, 'ribozyme' => 100 }
+# species.stable_id_prefix	ENSLOC
+
+
+# load UniProt gene names and descriptions
+#CONF	XREF_PARAMS	-refseq_dna -refseq_peptide 1 -refseq_tax_level invertebrate
+
+
+# Add sample data
+sample.gene_param	FBgn0052693
+sample.gene_text	FBgn0052693
+sample.location_param	2L:8430000-8440000
+sample.location_text	2L:8430000-8440000
+sample.search_text	Mucin
+sample.transcript_param	FBtr0072021
+sample.transcript_text	FBtr0072021
+sample.variation_param	ENSVDME00048193
+sample.variation_text	ENSVDME00048193
+
+
+# FINALIZE
+#
+# copy premzrs_drosophila_melanogaster_core_49_102_9 drosophila_melanogaster_core_50_103_9
+#
+#
+# QRP
+# copy premzrs_drosophila_melanogaster_core_49_102_9 drosophila_melanogaster_core_101_1
+#
+# ${CMD} -D drosophila_melanogaster_core_101_1 -e 'select * from meta' | grep schema
+# ${CMD_W} -D drosophila_melanogaster_core_101_1 -e 'update meta set meta_value = 101 where meta_key = "schema_version"'
+# ${CMD_W} -D drosophila_melanogaster_core_101_1 -e 'update meta set meta_value = "patch_100_101_a.sql|schema_version" where meta_key = "patch" and meta_value = "patch_101_102_a.sql|schema_version"'
+#
+# OLD
+#
+# copy premzrs_drosophila_melanogaster_core_49_102_9 drosophila_melanogaster_core_100_9 
+#
+# ${CMD} -D drosophila_melanogaster_core_100_9 -e 'select * from meta' | grep schema
+# ${CMD_W} -D drosophila_melanogaster_core_100_9 -e 'update meta set meta_value = 100 where meta_key = "schema_version"'
+# ${CMD_W} -D drosophila_melanogaster_core_100_9 -e 'update meta set meta_value = "patch_99_100_a.sql|schema_version" where meta_key = "patch" and meta_value = "patch_101_102_a.sql|schema_version"'
+# ${CMD_W} -D drosophila_melanogaster_core_100_9 -e 'INSERT INTO meta (species_id, meta_key, meta_value) VALUES (NULL, "patch", "patch_99_100_b.sql|schema_version");'
+# ${CMD_W} -D drosophila_melanogaster_core_100_9 -e 'INSERT INTO meta (species_id, meta_key, meta_value) VALUES (NULL, "patch", "patch_99_100_c.sql|schema_version");'
+# 
+# ${CMD_W} -D drosophila_melanogaster_core_100_9 -e 'INSERT INTO meta (species_id, meta_key, meta_value) VALUES (1, "species.common_name", "fruit fly");'
+# ${CMD_W} -D drosophila_melanogaster_core_100_9 -e 'update meta set meta_value = "dmel_r6.38_FB2021_01" where meta_key = "genebuild.version" and meta_value = "GCA000001215v4.0"'
+# ${CMD} -D drosophila_melanogaster_core_100_9 -e 'select * from meta' | grep -e name -e version
+#

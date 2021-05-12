@@ -1,0 +1,29 @@
+#	name	descr	values	example
+1	GENE	tag	GENE	GENE
+2	STATUS	"status of projection (or the  part of the splitted, prefixed by PART_)"	"OK -- all transcripts were successfully projected; CHANGED -- all transcripts were changed;  CHANGED_FEW_TR -- some changed, some OK, no fails;   FAIL_NO_TR -- no transcipts projected"	CHANGED
+3	SRC_NAME	source gene name		ISCW000001
+4	TRG_NAME	"gene name (with ""p#"" suffix for splitted)"		ISCW000001
+5	SPLITTED_STATUS	was splitted	WAS_SPLITTED; NOT_SPLITTED	NOT_SPLITTED
+6	PARTS	# of parts gene was splitted into		1
+7	PART	part #		1
+8	SRC_ID	source gene id		1
+9	SRC_CTG	source ctg		DS632564
+10	SRC_START	source start		26249
+11	SRC_END	source end		26698
+12	SRC_STRAND	source strand		+
+13	SRC_TR_NUM	source gene transcripts		1
+14	TRG_TR_NUM	number of projected transcripts		1
+15	TR_STATUS	same number of transripts in source and projection (for all parts)	TR_OK -- same number of transcripts; TR_NUM_DIFF -- diferent number	TR_OK
+16	CANON_TR_STATUS	status of the canonical transcript	CANON_TR_OK -- OK;  CANON_TR_CHANGED -- was CHANGED; CANON_TR_OTHER_PART -- is in the other part for splitted	CANON_TR_CHANGED
+17	SRC_TRA_NUM	source number of transcripts with translation for all parts		1
+18	TRG_TRA_NUM	target number of transcripts with translation for all parts		1
+19	TRG_TRA_OK	number of target translation that are OK (same len or intact) for all parts		0
+20	TRG_TRA_CHANGED	number of target translation that are CHANGED (different len) for all parts		1
+21	TRA_STATUS	if source number of translations differs from target for all gene parts	TRA_OK -- same number of translations; TRA_NUM_DIFF --different	TRA_OK
+22	TRG_CTG	target gene (or part) ctg		PKSA02003186
+23	TRG_START	target gene (or part) start		187273
+24	TRG_END	target gene (or part) end		187719
+25	TRG_STRAND	target gene (or part) strand		-
+26	TRG_TR_OK	number of target transcripts that are OK (same len or intact translation) (this part only)		0
+27	TRG_TR_CHANGED	number of target transcripts  that are CHANGED (different translation len) (this part only)		1
+28	TRG_TR_FAILED	number of target transcripts  that are FAILED to project (this part only)		0

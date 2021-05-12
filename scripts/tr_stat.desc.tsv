@@ -1,0 +1,48 @@
+#	name	descr	values	example
+1	TRANSCRIPT	any text tag	TRANSCRIPT	TRANSCRIPT
+2	STATUS	status of projection	CHANGED -- translation length changed; FAIL_NO_TRG_TR -- no projection; OK -- intact or same len translation 	CHANGED
+3	SRC_NAME	source stable name		AFUN001454-RA
+4	SRC_ID	source dbID		1
+5	SRC_GENE_NAME	source stable gene name		AFUN001454
+6	SRC_GENE_ID	source gene dbID		1
+7	SRC_CTG	source sequence name		KB668221
+8	SRC_START	source start		90960
+9	SRC_END	source end		92519
+10	SRC_STRAND	source strand		-
+11	SRC_EXONS	source exon #		1
+12	SRC_SPLICED_LEN	source spliced len		1560
+13	SRC_CDS_LEN	source CDS len		1560
+14	SRC_TRA_LEN	source translation len		519
+15	TRG_CTG	projection target  sequence name		CM012071
+16	TRG_START	target start		44933
+17	TRG_END	target end		46495
+18	TRG_STRAND	target strand		+
+19	TRG_EXONS	target exon #		1
+20	TRG_SPLICED_LEN	target spliced len		1563
+21	TRG_CDS_LEN	target CDS len		1563
+22	TRG_TRA_LEN	target translation len		520
+23	SRC_5_UTR_LEN	source 5' UTR len		0
+24	SRC_3_UTR_LEN	source 3' UTR len		0
+25	TRG_5_UTR_LEN	target 5' UTR len		0
+26	TRG_3_UTR_LEN	target 3' UTR len		0
+27	TRA_STATUS	"status of the projected translation  ( when STATUS != ""FAIL_NO_TRG_TR""  )"	OK -- intact protein sequence;  OK_TRA_LEN_SAME -- translation of the same length; TRA_CHANGED  -- translation length modifie upon projection	TRA_CHANGED
+28	UTR_5_STATUS	status of the projected 5' UTR (same STATUS values)	UTR_5_OK --intact 5' UTR; UTR_5_LOST -- 5' UTR was lost during projecting;  UTR_5_OK_EMPTY -- no 5' UTR for projection and source too; UTR_5_GAINED -- no 5' UTR for source an 5' UTR for projection 	UTR_5_OK_EMPTY
+29	UTR_3_STATUS	status of the projected 3' UTR (same STATUS values)	UTR_3_OK --intact 3' UTR; UTR_3_LOST -- 3' UTR was lost during projecting;  UTR_3_OK_EMPTY -- no 3' UTR for projection and source too; UTR_3_GAINED -- no 3' UTR for source an 3' UTR for projection 	UTR_3_OK_EMPTY
+30	TRA_DIST	Levenshtein-Damerau (edits with transpositions) distance between translations		3
+31	TRA_DIST_REL	TRA_DIST / TRA_LEN_SUM		0.002887392
+32	TRA_LEN_SUM	SRC_TRA_LEN + TRG_TRA_LEN		1039
+33	UTR_5_DIST	Levenshtein-Damerau distance  between source and target  5' UTRs		0
+34	UTR_5_DIST_REL	UTR_5_DIST / UTR_5_LEN_SUM		0
+35	UTR_5_LEN_SUM	SRC_5_UTR_LEN + TRG_5_UTR_LEN		0
+36	UTR_3_DIST	Levenshtein-Damerau distance between source and target  3' UTRs		0
+37	UTR_3_DIST_REL	UTR_3_DIST / UTR_3_LEN_SUM		0
+38	UTR_3_LEN_SUM	SRC_3_UTR_LEN + TRG_3_UTR_LEN		0
+39	TR_SPLICED_DIST	Levenshtein-Damerau distance between source and target spliced sequences 		15
+40	TR_SPLICED_DIST_REL	TR_SPLICED_DIST / TR_SPLICED_LEN_SUM		0.004803074
+41	TR_SPLICED_LEN_SUM	SRC_SPLICED_LEN + TRG_SPLICED_LEN		3123
+42	SRC_TRA	"source translation peptide sequence (or empty if src eq trg, or one is missing)"		MAIVKDSATFFQHGNSAQFDYVLKLYPKALKLKAETRGNGKKADKLLRLEKWYQNELPKLIKNRGRDAHLLHEELVQTMEWKQTRGKFYPQLSYLIKINTPRAVVMETKKAFRKLPNLEQALNALSNLKGVGITMASALLAAAAPESAPFMADECLMAIPDIEGIDYTTKEYLKFVTHIQQTMERLNLEEDSNGAAEESANEKKDNTANGGGGVVDGGGRADDGAADGEGSESAAKEAVVKEGKGDTAENGASGKTAAAATAAAAAGPKPKKWSAHSVELALWTHYVVSDLQPELLGGMPGNGNGVAATVDDDAAQNGISKEEGGDDEDEDDVGDEEEIDGDNGIAEDEGNTNDENSRTAMMESSESESNEAAVAGVAVVSNGKSTSGSSGSAQDEEEKLADDTEDTSKDATDNSSTAVTLTELTNNGTSVVEPVATSHTQESTLVDDGTKASVECLGGGALGTKAALSTDSSVADSTESEAPISTTDGSSNGSNKRPLCCEDNGEDNPELSAPKLIKL
+43	TRG_TRA	"target translation peptide sequence (or empty if src eq trg, or one is missing)"		MAIVKDSATFFQHGNSAQFDYVLKLYPKALKLKAETRGNGKKADKLLRLEKWYQNELPKLIKNRGRDAHLLHEELVQTMEWKQTRGKFYPQLSYLIKINTPRAVVMETKKAFRKLPNLEQALNALSNLKGVGITMASALLAAAAPESAPFMADECLMAIPDIEGIDYTTKEYLKFVTHIQQTMERLNLEEDSNGAAEESANEKKDNTANGGGGVVDGGRRADDGAADGEGSESAAKEAVVKEGKGDTAENGASGKTAAAATAAAAAAGPKPKKWSAHSVELALWTHYVVSDLQPELLGGMPGNGNGVAATVDDDAAQNGISKEEGGDDEDEDDVGDEEEIDGDNGIAEDEGNTNDENSRTAMMESSESESNEAAVAGVAVVSNGKSTSGSSGSAQDEEEKLADDTEDTSKDATDNSSTAVTLTELTNNGTSVVEPVATSHTQESTLVDDGTKASVECLGGGALGTKAALSTDSSVADSTESEAPINTTDGSSNGSNKRPLCCEDNGEDNPELSAPKLIKL
+44	SRC_5_UTR	"source 5' UTR nucleotide sequence (or empty if src eq trg, or one is missing)"		
+45	SRC_3_UTR	"source 3' UTR nucleotide sequence (or empty if src eq trg, or one is missing)"		
+46	TRG_5_UTR	"target 5' UTR nucleotide sequence (or empty if src eq trg, or one is missing)"		
+47	TRG_3_UTR	"target 3' UTR nucleotide sequence (or empty if src eq trg, or one is missing)"		
