@@ -1,0 +1,222 @@
+#CMT	prod_name	ann_ver	asm_ver	accession	db_ver
+#SPEC	drosophila_ananassae	dana_r1.06_FB2018_04	dana_caf1	GCA_000005115.1	2
+#SPEC	drosophila_erecta	dere_r1.05_FB2016_05	dere_caf1	GCA_000005135.1	2
+#SPEC	drosophila_grimshawi	dgri_r1.05_FB2017_02	dgri_caf1	GCA_000005155.1	2
+#SPEC	drosophila_mojavensis	dmoj_r1.04_FB2016_05	dmoj_caf1	GCA_000005175.1	2
+#SPEC	drosophila_persimilis	dper_r1.3_FB2016_05	dper_caf1	GCA_000005195.1	2
+#SPEC	drosophila_pseudoobscura	dpse_r3.04_FB2018_05	Dpse_3.0	GCA_000001765.2	4
+#SPEC	drosophila_sechellia	dsec_r1.3_FB2016_05	dsec_caf1	GCA_000005215.1	2
+#SPEC	drosophila_simulans	dsim_r2.02_FB2017_04	ASM75419v3	GCA_000754195.3	3
+#SPEC	drosophila_virilis	dvir_r1.07_FB2018_05	dvir_caf1	GCA_000005245.1	2
+#SPEC	drosophila_willistoni	dwil_r1.05_FB2016_05	dwil_caf1	GCA_000005925.1	2
+#SPEC	drosophila_yakuba	dyak_r1.05_FB2016_05	dyak_caf1	GCA_000005975.1	2
+
+
+# dsec
+# rule UNSEEN for gene/pseudogene/CDS: [('gene', 'FBgn0178048', 'scaffold_337:+:9591-10039'), ('pseudogene', 'FBtr0206166', 'scaffold_337:+:9591-10039'), ('CDS', '.', 'scaffold_337:+:9823-10039')]
+# fixed in loader stats conf
+
+# dsim
+# gt gff3: error: range (14,220) of feature on line 356015 in file ".../mz103/fbft_dsim/metadata/pre_validated.gff3" is not contained in range (1,218) of corresponding sequence region on line 356011
+# cat pre_validated.gff3 | grep -n '' | grep -A 7 ^356011:
+# 356011:##sequence-region Scf_NODE_108665 1 218
+# 356012:Scf_NODE_108665	FlyBase	golden_path_region	1	218	.	.	.	Dbxref=GB:JPYS01000467;ID=Scf_NODE_108665;Name=Scf_NODE_108665
+# 356013:Scf_NODE_108665	FlyBase	gene	14	217	.	+	.	Alias=GD27366;Dbxref=GNOMON:Dsim_gnomon_101_gene.31685897,FlyBase_Annotation_IDs:GD27366;ID=FBgn0268656;Name=Dsim%5CGD27366;Ontology_term=SO:0000087,SO:0000010
+# 356014:Scf_NODE_108665	FlyBase	mRNA	14	217	.	+	.	Alias=Dsim%5CGD27366-RA,GD27366-RA;Dbxref=GNOMON:Dsim_gnomon_101_rna.16011544,FlyBase_Annotation_IDs:GD27366-RA;ID=FBtr0363209;Name=Dsim%5CGD27366-RA;Parent=FBgn0268656
+# 356015:Scf_NODE_108665	FlyBase	CDS	14	220	.	+	0	Parent=FBtr0363209
+# 356016:Scf_NODE_108665	FlyBase	exon	14	217	.	+	.	Parent=FBtr0363209
+# 356017:Scf_NODE_108665	FlyBase	protein	14	217	.	+	.	Alias=Dsim%5CGD27366-PA,GD27366-PA;Dbxref=GNOMON:Dsim_gnomon_101_16011544.p,FlyBase_Annotation_IDs:GD27366-PA;Derives_from=FBtr0363209;ID=FBpp0326768;Name=Dsim%5CGD27366-PA;derived_isoelectric_point=4.60;derived_molecular_weight=7582.6
+# fix (add to fbft_dsim):
+# cat .../mz103/fbft_dsim/data/raw/asm/gff/dsim-all-no-analysis-r2.02.gff.gz | perl -pe 's/\t220\t/\t217\t/ if (m/Parent=FBtr0363209/ && m/^Scf_NODE_108665\tFlyBase\tCDS\t14\t220\t/)' | gzip - > .../mz103/fbft_dsim/data/fixed.gff3.gz
+
+
+# gen parser.pl
+cat > parser.pl << 'EOF'
+use strict;
+
+while (<STDIN>) {
+  chomp;
+  next if !m/#SPEC\t/;
+  my ($cmt, $prod_name, $ann_ver, $asm_ver, $acc, $db_ver) = split /\t/;
+  my ($fb_abbr, $fb_r, $fb_year, $fb_year_rel) = split /_/, $ann_ver;
+  my ($acc1, $acc2, $acc3, $acc4) = ($1, $2, $3, $4) if ($acc =~ m/^(\w{3})_(\d{3})(\d{3})(\d{3})/);
+
+  my $ncbi_url_all = "ftp://ftp.ncbi.nlm.nih.gov/genomes/all/$acc1/$acc2/$acc3/$acc4/";
+  my $ncbi_cmd_all = "ls -d ${acc}*; bye";
+  my $ncbi_dir_raw = `lftp -e '$ncbi_cmd_all' $ncbi_url_all`;
+
+  chomp $ncbi_dir_raw;
+  my $ncbi_dir = (split /\s+/, $ncbi_dir_raw)[-1]; 
+  my $ncbi_url_dir = $ncbi_url_all."$ncbi_dir/";
+  my $ncbi_cmd_dir = 'nlist; bye';
+
+  my $ncbi_dir_lst = `lftp -e '$ncbi_cmd_dir' $ncbi_url_dir`;
+
+  my $ncbi_url = $ncbi_url_dir; 
+  my ($ncbi_gbff) = grep /_genomic.gbff(?:\.gz)?$/, split /\s+/, $ncbi_dir_lst;
+  my ($ncbi_rep) = grep /_assembly_report\.txt$/, split /\s+/, $ncbi_dir_lst;
+  my ($ncbi_gff) = grep /_genomic.gff(?:\.gz)?$/, split /\s+/, $ncbi_dir_lst;
+
+  print join("\t", $prod_name, "_DB_VER_", $db_ver), "\n";
+  print join("\t", $prod_name, "_PROD_NAME_", $prod_name), "\n";
+  print join("\t", $prod_name, "_ANN_VER_", $ann_ver), "\n";
+  print join("\t", $prod_name, "_ASM_VER_", $asm_ver), "\n";
+  print join("\t", $prod_name, "_ACCESSION_", $acc), "\n";
+  print join("\t", $prod_name, "_FB_ABBR_", $fb_abbr), "\n";
+  print join("\t", $prod_name, "_FB_R_", $fb_r), "\n";
+  print join("\t", $prod_name, "_NCBI_URL_", $ncbi_url), "\n";
+  print join("\t", $prod_name, "_NCBI_GBFF_", $ncbi_gbff), "\n";
+  print join("\t", $prod_name, "_NCBI_REP_", $ncbi_rep), "\n";
+  print join("\t", $prod_name, "_NCBI_GFF_", $ncbi_gff), "\n";
+}
+EOF
+
+# params
+cat flybase.tmpl | grep -P '^#SPEC\t' | perl ./parser.pl > _fb_params 
+
+# sample data
+st3 -e 'show databases' | grep droso | grep core | xargs -n 1 -I XXX st3 -D XXX -Ne 'select  "XXX", meta_key, meta_value from meta where meta_key like "sample.%"' | perl -pe 's/_core(.+?)\t/\t/' > _fb_samples
+
+cat > ./replace.py << 'EOF'
+import sys
+
+prod_name = sys.argv[1]
+
+params = dict()
+with open(sys.argv[2], 'r') as pf:
+  for line in pf:
+    if not line: continue
+    pn, tag, val = line.rstrip().split("\t")
+    if pn != prod_name: continue
+    params[tag] = val
+
+samples = []
+with open(sys.argv[3], 'r') as sf:
+  for line in sf:
+    if not line: continue
+    pn, tag, val = line.rstrip().split("\t")
+    if pn != prod_name: continue
+    samples.append("\t".join([tag, val]))
+
+params["_SAMPLE_DATA_"] = "\n".join(samples)
+
+for line in sys.stdin:
+  line = line.rstrip()
+  for (tag, val) in params.items():
+    line = line.replace(tag, val)
+  print(line)
+
+EOF
+
+
+for prod_name in $(cat flybase.tmpl | grep -P '^#SPEC\t' | cut -f 2) ; do
+  abbrev=$(awk -F "\t" -v p="$prod_name" '$1 == p && $2 == "_FB_ABBR_" {print $3}' _fb_params)
+  cat  flybase.tmpl |
+    grep -P '^#TEMPLATE_START' -A 1000 | tail -n +2 |
+    python3 ./replace.py "$prod_name" _fb_params _fb_samples |
+    cat - > fbft_${abbrev} 
+done
+
+
+[ -z "$METACONF_DIR"] &&
+  export METACONF_DIR=ensembl-production-metazoa-private/meta/102
+
+ls -1 $METACONF_DIR/fbft_d* |
+  perl -pe 's,.*/,,' |
+  xargs -n 1 -I XXX ./ensembl-production-metazoa/scripts/mz_generic.sh XXX
+
+LSF_QUEUE='<production_queue_name>'
+
+mkdir -p logs
+ls -1 $METACONF_DIR/fbft_d* |
+  perl -pe 's,.*/,,' |
+  xargs -n 1 echo |
+  xargs -n 1 -I XXX  -- sh -c \
+    "sleep 10; bsub -J load_XXX -q '$LSF_QUEUE' -M 32000 -R 'rusage[mem=32000]' -n 1 -o logs/XXX.stdout -e logs/XXX.stderr ./ensembl-production-metazoa/scripts/mz_generic.sh XXX; sleep 60"
+# give sometime, as it uses registry now
+
+# FINALIZE
+#   dsim: adding seq_region_names without "Scf_" prefix
+# CMD='<DB_ALIAS>'
+# $CMD -D premzfb_drosophila_simulans_core_49_102_3 -e 'select sr.seq_region_id, sr.name as synonym, edb.external_db_id from seq_region as sr, external_db as edb where edb.db_name = "INSDC_submitted_name" and sr.name like "Scf_%"'
+# $CMD -D premzfb_drosophila_simulans_core_49_102_3 -e 'insert ignore into seq_region_synonym (seq_region_id, synonym, external_db_id) select sr.seq_region_id, sr.name as synonym, edb.external_db_id from seq_region as sr, external_db as edb where edb.db_name = "INSDC_submitted_name" and sr.name like "Scf_%"'
+# $CMD -D premzfb_drosophila_simulans_core_49_102_3 -e 'update seq_region set name = replace(name, "Scf_", "") where name like "Scf_%"'
+
+
+#  template below
+#TEMPLATE_START
+
+
+#CONF	DB_PFX	premzfb
+#CONF	ASM_VERSION	_DB_VER_
+
+species.production_name	_PROD_NAME_
+genebuild.version	_ANN_VER_
+assembly.default	_ASM_VER_
+assembly.name	_ASM_VER_
+
+# Assembly metadata
+assembly.accession	_ACCESSION_
+
+# assembly
+#CONF	ASM_URL	ftp://ftp.flybase.net/genomes/_FB_ABBR_/_ANN_VER_
+#CONF	FNA_FILE	fasta/_FB_ABBR_-all-chromosome-_FB_R_.fasta.gz
+
+#CONF	GFF_FILE	gff/_FB_ABBR_-all-no-analysis-_FB_R_.gff.gz
+#CONF	PEP_FILE	fasta/_FB_ABBR_-all-translation-_FB_R_.fasta.gz
+
+#   add-ons from NCBI
+#CONF	ASM_SINGLE	_NCBI_URL_/_NCBI_GBFF_
+#CONF	GBFF_FILE	_NCBI_GBFF_
+
+#CONF	ASM_SINGLE	_NCBI_URL_/_NCBI_REP_
+#CONF	ASM_REP_FILE	_NCBI_REP_
+
+#CONF	ASM_SINGLE	_NCBI_URL_/_NCBI_GFF_
+#CONF	SR_GFF_FILE	_NCBI_GFF_
+
+# stats and metadata generatio options
+#CONF	IGNORE_UNVALID_SOURCE_GFF	1
+#CONF	STOP_AFTER_GFF_STATS	NO
+#CONF	STOP_AFTER_CONF NO
+
+#CONF	GFF_STATS_OPTIONS	--rule_options flybase
+
+#CONF	GFF_PARSER_CONF	gff_metaparser/flybase.conf
+#CONF	GFF_PARSER_PFX_TRIM	NO
+
+#CONF	GFF3_LOAD_LOGIC_NAME	flybase
+
+#CONF	SR_GFF_PARSER_CONF_PATCH	gff_metaparser/regions_no_syns.patch
+
+#CONF	GFF_LOADER_OPTIONS	--external_db_map_name external_db_map_flybase.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
+
+# update stable ids
+#CONF	UPDATE_STABLE_IDS	NO
+
+
+# Provider metadata
+#CONF	GFF3_LOAD_SOURCE_NAME	FlyBase
+
+# like in previous cores
+assembly.provider_name	FlyBase
+assembly.provider_url	https://www.flybase.org
+
+annotation.provider_name	FlyBase
+annotation.provider_url	https://www.flybase.org
+
+# no custom repeat libraries
+#CONF	REP_LIB	NO
+
+
+# rna features and genes
+#CONF	RNA_FEAT_PARAMS	-cmscan_threshold 1e-6 -taxonomic_lca 1
+
+#CONF	RUN_RNA_GENES	NO
+
+# load UniProt gene names and descriptions
+#CONF	XREF_PARAMS	-refseq_dna -refseq_peptide 1 -refseq_tax_level invertebrate
+
+
+# Add sample data
+_SAMPLE_DATA_

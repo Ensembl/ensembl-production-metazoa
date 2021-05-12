@@ -1,0 +1,69 @@
+#CONF	DB_PFX	premz
+#CONF	ASM_VERSION	3
+
+# updated, prev was apis_mellifera_core_49_102_45  Amel_4.5  now  HAv3.1
+species.production_name	 apis_mellifera
+
+#CONF	ASM_URL		ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/254/395/GCF_003254395.2_Amel_HAv3.1
+#CONF	GBFF_FILE	GCF_003254395.2_Amel_HAv3.1_genomic.gbff.gz
+#CONF	FNA_FILE	GCF_003254395.2_Amel_HAv3.1_genomic.fna.gz
+#CONF	ASM_REP_FILE	GCF_003254395.2_Amel_HAv3.1_assembly_report.txt
+
+#CONF	GFF_FILE	GCF_003254395.2_Amel_HAv3.1_genomic.gff.gz
+#CONF	TR_FILE		GCF_003254395.2_Amel_HAv3.1_rna_from_genomic.fna.gz
+#CONF	PEP_FILE	GCF_003254395.2_Amel_HAv3.1_protein.faa.gz
+
+
+#CONF	ORDERED_CS_TAG	linkage_group
+#CONF	GFF_PARSER_CONF_PATCH	NO
+
+#no CONF	GFF_PARSER_PFX_TRIM	NO
+#no CONF	GFF_LOADER_OPTIONS	--gff3_autoapply_manual_seq_edits 0
+
+# update stable ids
+#CONF	UPDATE_STABLE_IDS	1
+
+
+# Assembly metadata
+assembly.accession	GCA_003254395.2
+#CONF	GCF_TO_GCA	1
+
+# Provider metadata
+#CONF	GFF3_LOAD_SOURCE_NAME	RefSeq
+
+assembly.provider_name	Uppsala University
+assembly.provider_url	http://www.imbim.uu.se/forskargrupper/genetik-och-genomik/Webster_Matthew
+
+annotation.provider_name	NCBI
+annotation.provider_url	https://www.ncbi.nlm.nih.gov/
+
+#no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
+
+
+# rna features and genes
+#CONF	RNA_FEAT_PARAMS	-cmscan_threshold 1e-6 -taxonomic_lca 1
+
+#CONF	RUN_RNA_GENES	NO
+
+# or
+# using 'vb' context, otherwise ('eg' context) needs special "ena*" database
+#no CONF	RNA_GENE_PARAMS	-run_context vb -score_threshold 65
+#               m.b. updated maximum_per_hit_name { 'pre_miRNA' => 100, 'ribozyme' => 100 }
+# species.stable_id_prefix	ENSLOC
+
+
+# load UniProt gene names and descriptions
+#CONF	XREF_PARAMS	-description_source reviewed -description_source unreviewed -gene_name_source reviewed
+#no -overwrite_description 1
+
+#
+# FINALIZE
+#
+# echo NP_001071290.1 | perl ensembl-production-imported/scripts/misc_scripts/remove_entities.pl $($CMD_W details script) -dbname $DBNAME -object 'Translation'
+#
+# $CMD -D premz_apis_mellifera_core_49_101_3 -e 'SELECT * FROM
+# dependent_xref t1 LEFT JOIN object_xref t2 ON t1.object_xref_id = t2.object_xref_id
+# WHERE t1.object_xref_id IS NOT NULL AND t2.object_xref_id IS NULL'
+#
+# $CMD_W -D premz_apis_mellifera_core_49_101_3 -e 'delete from dependent_xref where object_xref_id in (197841, 240122, 240124)'
+#
