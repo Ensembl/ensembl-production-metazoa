@@ -31,12 +31,6 @@ if [ ! -e "$dir" ]; then
 fi
 
 
-## Used to find BioPerl
-if [ -z "$EG_APIS" ]; then
-    echo EG_APIS not defined. not possible to find bioperl libs. exiting...
-    exit 1
-fi
-
 
 
 ## BEGIN
@@ -48,16 +42,16 @@ echo -n > setup.sh
 echo "#%Module1.0" > setup.module
 echo 'module-whatis "enviromment for EnsEMBL databases"' >>setup.module
 
-echo "setenv EG_APIS $EG_APIS" >> setup.module
 echo "setenv ENSEMBL_ROOT_DIR $dir" >> setup.module
 echo "setenv ENSEMBL_CVS_ROOT_DIR $dir" >> setup.module
 
-echo "EG_APIS=$EG_APIS" >> setup.sh
 echo "ENSEMBL_ROOT_DIR=$dir" >> setup.sh
 echo "ENSEMBL_CVS_ROOT_DIR=$dir" >> setup.sh
 
-echo "prepend-path PERL5LIB \$env(EG_APIS)/bioperl/ensembl-stable" >> setup.module
-echo 'PERL5LIB=$EG_APIS/bioperl/ensembl-stable${PERL5LIB:+:$PERL5LIB}' >> setup.sh
+echo "# add bioperl, see setup.sh" >> setup.module
+
+echo 'export PERL5LIB=$(brew --prefix bioperl-169)/libexec:$PERL5LIB' >> setup.sh
+echo 'export PERL5LIB=$(brew --prefix bioperl-run-169)/libexec/lib:$PERL5LIB' >> setup.sh
 
 for module in $(ls -d */); do
     # Get full path from relative
@@ -84,6 +78,6 @@ for module in $(ls -d */); do
     fi
 done
 
-echo "export PERL5LIB EG_APIS ENSEMBL_ROOT_DIR ENSEMBL_CVS_ROOT_DIR PATH" >> setup.sh
+echo "export PERL5LIB ENSEMBL_ROOT_DIR ENSEMBL_CVS_ROOT_DIR PATH" >> setup.sh
 
 echo "To set up your environment run '. $dir/setup.sh' or 'module load $dir/setup.module'"

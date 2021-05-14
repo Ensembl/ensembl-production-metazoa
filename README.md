@@ -25,7 +25,6 @@ Simple actions:
 4. Run either locally (under either `tmux` or `screen`)
 ```
     ENS_VERSION=105 MZ_RELEASE=52 \
-    EG_APIS=/path/to/the/dir/with/bioperl_parents_parent_dir \
     CMD=<DB server alias to build at> \
       ./ensembl-production-metazoa/scripts/mz_generic.sh ensembl-production-metazoa/meta/105/dmel
 ```
@@ -36,7 +35,6 @@ Simple actions:
 ```
 export ENS_VERSION=105
 export MZ_RELEASE=52
-export EG_APIS=/path/to/the/dir/with/bioperl_parents_parent_dir
 export CMD=<DB server alias to build at>
 export LSF_QUEUE=<lsf_queue_name>
 ```
