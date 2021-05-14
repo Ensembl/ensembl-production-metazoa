@@ -1,0 +1,69 @@
+#CONF	DB_PFX	premz
+#CONF	ASM_VERSION	1
+
+#? not sure yet, if going to be updated or had in addition to the old one
+#? updated, prev was cimex_lectularius_core_51_104_1	GCA_000648675.1 now GCA_000648675.3
+#? species.production_name	cimex_lectularius
+species.common_name	bed bug
+
+
+# https://www.ncbi.nlm.nih.gov/assembly/GCA_000648675.3
+# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/648/675/GCF_000648675.2_Clec_2.1  
+
+
+#CONF	ASM_URL		ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/648/675/GCF_000648675.2_Clec_2.1
+#CONF	GBFF_FILE	GCF_000648675.2_Clec_2.1_genomic.gbff.gz
+#CONF	FNA_FILE	GCF_000648675.2_Clec_2.1_genomic.fna.gz
+#CONF	ASM_REP_FILE	GCF_000648675.2_Clec_2.1_assembly_report.txt
+
+#CONF	GFF_FILE	GCF_000648675.2_Clec_2.1_genomic.gff.gz
+#CONF	TR_FILE		GCF_000648675.2_Clec_2.1_rna_from_genomic.fna.gz
+#CONF	PEP_FILE	GCF_000648675.2_Clec_2.1_protein.faa.gz
+
+
+#no CONF	ORDERED_CS_TAG	chromosome
+#CONF	GFF_PARSER_CONF_PATCH	NO
+
+#no CONF	GFF_PARSER_PFX_TRIM	NO
+#no CONF	GFF_LOADER_OPTIONS	--gff3_autoapply_manual_seq_edits 0
+
+# update stable ids
+#CONF	UPDATE_STABLE_IDS	1
+
+
+# Assembly metadata
+assembly.accession	GCA_000648675.3
+#CONF	GCF_TO_GCA	1
+
+# Provider metadata
+#CONF	GFF3_LOAD_SOURCE_NAME	RefSeq
+
+assembly.provider_name	Baylor i5k Initiative Pilot Project
+assembly.provider_url	https://www.hgsc.bcm.edu/arthropods/bed-bug-genome-project
+
+annotation.provider_name	NCBI
+annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Cimex_lectularius/101/
+
+#no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
+
+
+# rna features and genes
+#CONF	RNA_FEAT_PARAMS	-cmscan_threshold 1e-6 -taxonomic_lca 1
+
+#CONF	RUN_RNA_GENES	NO
+
+# or
+# using 'vb' context, otherwise ('eg' context) needs special "ena*" database
+#no CONF	RNA_GENE_PARAMS	-run_context vb -score_threshold 65
+#               m.b. updated maximum_per_hit_name { 'pre_miRNA' => 100, 'ribozyme' => 100 }
+# species.stable_id_prefix	ENSLOC
+
+
+# load UniProt gene names and descriptions
+#CONF	XREF_PARAMS	-description_source reviewed -description_source unreviewed -gene_name_source reviewed
+#no -overwrite_description 1
+
+#
+# FINALIZE
+#
+#
