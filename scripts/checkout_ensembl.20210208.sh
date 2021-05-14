@@ -207,7 +207,7 @@ echo 'export PYTHONPATH='${dir_full_path}'/ensembl-production-imported/lib/pytho
 echo 'export PERL5LIB='${dir_full_path}'/ensembl-production-imported-private/lib/perl:$PERL5LIB' >> $dir/setup.sh
 echo 'export PYTHONPATH='${dir_full_path}'/ensembl-production-imported-private/lib/python:$PYTHONPATH' >> $dir/setup.sh
 
-echo 'export PERL5LIB EG_APIS ENSEMBL_ROOT_DIR ENSEMBL_CVS_ROOT_DIR PYTHONPATH PATH' >> $dir/setup.sh
+echo 'export PERL5LIB ENSEMBL_ROOT_DIR ENSEMBL_CVS_ROOT_DIR PYTHONPATH PATH' >> $dir/setup.sh
 
 
 echo

@@ -29,10 +29,7 @@ if [ -z "$TAXONOMY_DBNAME" ]; then
   TAXONOMY_DBNAME=ncbi_taxonomy
 fi
 
-if [ -n "$REPUTIL_PATH" ]; then
-  REPUTIL_PATH="${REPUTIL_PATH}/"
-fi
-
+REPUTIL_PATH="$(brew --prefix repeatmasker)"/libexec/util
 
 # utils
 
@@ -3434,7 +3431,7 @@ function get_repbase_lib () {
   local OUT_DIR="$4"
   local TAG="$5"
 
-  local REPUTIL="$REPUTIL_PATH"queryRepeatDatabase.pl
+  local REPUTIL="$REPUTIL_PATH"/queryRepeatDatabase.pl
 
   local DONE_TAG='_get_repbase'"$TAG"
   if ! check_done "$DONE_TAG"; then

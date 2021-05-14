@@ -18,8 +18,6 @@ There are few ways to specify these parameters.
 `ENS_VERSION` | 104 | Ensembl (core db schema) release version
 `CMD` | cmd_server_alias | SQL DB server alias, to create *core DB* at and put *e-hive* DBs for running pipelines
 `PROD_SERVER` | prod_server_alias | Production SQL DB server alias to get `ensembl_production` and `ncbi_taxonomy` databases from | Should be exported within config file (`export PROD_SERVER`)
-`EG_APIS` | /path/to/the/dir/with/bioperl_parents_parent_dir | Path to the BioPerl parent's parent directory to look for `bioperl/ensembl-stable`. In other words, the *BioPerl* library root should be `$EG_APIS/bioperl/ensembl-stable`. | Should be exported within config file (`export EG_APIS`).
-`REPUTIL_PATH` | /path/to/repeatmasker/libexec/utildir' | Path where RepeatMasker utility script `queryRepeatDatabase.pl` is located. |  Should be exported within config file (`export REPUTIL_PATH`).
 
 ## Ad-hoc environment setup
 Sometimes there's a need to have Ensembl environment, that can be used by unrelated pipelines / workflows.
