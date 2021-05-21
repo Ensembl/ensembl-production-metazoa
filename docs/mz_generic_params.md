@@ -50,4 +50,7 @@ bash get_env.sh
 
 cd ${configs_dir}
 ln -s ensembl.prod.${ENS_VERSION} ensembl.prod
+
+# source environment settings
+source ${configs_dir}/ensembl.prod.${ENS_VERSION}/setup.sh
 ```
