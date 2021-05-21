@@ -314,7 +314,7 @@ if [ -n "$GFF_FILE" ]; then
 
   if [ -z "$(get_meta_str $META_FILE 'sample.location_param')" ]; then
     SAMPLE_GENE="$(get_meta_conf $META_FILE 'SAMPLE_GENE')"
-    set_core_random_samples $CMD_W $DBNAME $SAMPLE_GENE $ENSEMBL_ROOT_DIR
+    set_core_random_samples $CMD_W $DBNAME "$SAMPLE_GENE" $ENSEMBL_ROOT_DIR
     backup_relink $DBNAME $CMD random_samples $DATA_DIR/bup
   fi
 

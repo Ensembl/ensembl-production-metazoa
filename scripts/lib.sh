@@ -1875,7 +1875,7 @@ function set_core_random_samples () {
 
     if [ -z "$SAMPLE_GENE" ]; then
       local RAND_GENE=$($CMD -D "$DBNAME" -N -e 'select stable_id from gene order by rand() limit 1;')
-      echo "usind $RAND_GENE as sample" > /dev/stderr
+      echo "using $RAND_GENE as sample" > /dev/stderr
       SAMPLE_GENE="$RAND_GENE"
     fi
 
