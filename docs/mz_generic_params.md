@@ -34,7 +34,6 @@ git clone git@github.com:Ensembl/ensembl-production-metazoa.git
 # and/or 
 
 ENS_VERSION=105
-EG_APIS=/path/to/the/dir/with/bioperl_parents_parent_dir
 
 cat > get_env.sh << EOF
 set -o errexit
