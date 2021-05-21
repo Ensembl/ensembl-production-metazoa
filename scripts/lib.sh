@@ -3733,9 +3733,10 @@ function update_stable_ids () {
   local CMD="$1"
   local DBNAME="$2"
   local PREV_XREF_FILE="$3"
-  local SCRIPTS="$4"
-  local OUT_DIR="$5"
-  local TAG="$6"
+  local ADDITIONAL_OPTIONS="$4"
+  local SCRIPTS="$5"
+  local OUT_DIR="$6"
+  local TAG="$7"
 
   local DONE_TAG='_update_stable_ids'"$TAG"
   if ! check_done "$DONE_TAG"; then
@@ -3745,7 +3746,7 @@ function update_stable_ids () {
     pushd $OUT_DIR
 
     if [ -f "$PREV_XREF_FILE"  ] ; then
-      local OPTIONS=" -type GeneID -dry_run 0 "
+      local OPTIONS=" -type GeneID -dry_run 0 ${ADDITIONAL_OPTIONS}"
       less "$PREV_XREF_FILE" |
         perl $SCRIPTS/ensembl-production-metazoa/scripts/update_stable_ids_from_xref.pl \
           $($CMD details script) \

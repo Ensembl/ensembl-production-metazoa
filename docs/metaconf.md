@@ -145,7 +145,8 @@ The raw, uncommemted data from meta config file is loaded into the core's DB met
 | Option | Example | Type: possible values | Action | Comment|
 | - | - | - | -  | - |
 `TR_TRANS_SPLICED`| FBtr0084079,FBtr0084080 | `str`: `, separated` list of `transcipt stable ID`s, no spaces| Sets `trans_spliced` transcript  attrib using `mark_tr_trans_spliced` [`lib.sh`](scripts/lib.sh) wrapper |  Used only for the [D. melanogaster](meta/104/dmel) as for now
-`UPDATE_STABLE_IDS` |	NO/1 | `str:` `NO` or empty -- don't update; anything else -- updated |  Try to infer valid stable IDs for genes and transcripts with [`update_stable_ids_from_xref.pl`](scripts/update_stable_ids_from_xref.pl). Uses *GeneID* xref to replace not-uniq ones (like, i.e., *TRNAM-CAU-5*). Trims ID's version (`STABLE_ID.V`) and stores it into the separate field | Stage is run after `run_xref`, only if `GFF_FILE` is present
+`UPDATE_STABLE_IDS` |	NO/1 | `str:` `NO` or empty -- don't update; anything else -- updated |  Try to infer valid stable IDs for genes and transcripts with [`update_stable_ids_from_xref.pl`](scripts/update_stable_ids_from_xref.pl). Uses *GeneID* xref to replace not-uniq ones (like, i.e., *TRNAM-CAU-5*). Additional scripts options are taken from `UPDATE_STABLE_IDS_OPTIONS` variable (see below)
+`UPDATE_STABLE_IDS_OPTIONS` | | `str:` [`update_stable_ids_from_xref.pl`](scripts/update_stable_ids_from_xref.pl) additional options | Pass options to the stable IDs updater script. If `-fix_version 1` -- trims ID's version (`STABLE_ID.V`) and stores it into the separate field | Keep the default `-fix_version 0`
 
 ### Repeat modelling / finding options
 Options for `get_repbase_lib`, `construct_repeat_libraries`, `filter_repeat_library` and `run_repeat_masking`

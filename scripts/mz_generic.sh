@@ -301,9 +301,10 @@ if [ -n "$GFF_FILE" ]; then
 
   # fix gene and transcript stable ids, update xrefs name
   UPDATE_STABLE_IDS="$(get_meta_conf $META_FILE_RAW 'UPDATE_STABLE_IDS')"
+  UPDATE_STABLE_IDS_OPTIONS="$(get_meta_conf $META_FILE_RAW 'UPDATE_STABLE_IDS_OPTIONS')"
   if [ -n "$UPDATE_STABLE_IDS" -a "x$UPDATE_STABLE_IDS" != "xNO" ]; then
     PREV_XREF_FILE="$DATA_DIR/data/pipeline_out/xrefs/all/prev_xrefs/${DBNAME}.ids_xref.txt"
-    update_stable_ids $CMD_W $DBNAME $PREV_XREF_FILE $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/update_stable_ids
+    update_stable_ids $CMD_W $DBNAME $PREV_XREF_FILE "${UPDATE_STABLE_IDS_OPTIONS}" $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/update_stable_ids
     backup_relink $DBNAME $CMD update_stable_ids $DATA_DIR/bup
   fi
 

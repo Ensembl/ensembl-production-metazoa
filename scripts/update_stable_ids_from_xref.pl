@@ -41,6 +41,8 @@
          -valid_gene_re '\d{6,}'
          -valid_transcript_re '\d{6,}'
          -store_as_xref 'Ensembl_Metazoa'
+         -dry_run
+         -fix_versions
 
 =head1 EXAMPLE
 
@@ -63,6 +65,7 @@ my $valid_gene_re = '\d{6,}';
 my $valid_tr_re = '\d{6,}';
 my $store_as_xref = "Ensembl_Metazoa";
 my $dry_run = 1;
+my $fix_versions = 0;
 
 my $help = 0;
 
@@ -78,6 +81,7 @@ my $help = 0;
   'valid_tr_re:s'    => \$valid_tr_re,
   'store_as_xref:s'  => \$store_as_xref,
   'dry_run:s'    => \$dry_run,
+  'fix_versions:s'    => \$fix_versions,
 
   'help|?'      => \$help,
 ) or pod2usage(-message => "use -help", -verbose => 1);
@@ -127,7 +131,7 @@ while(<STDIN>) {
       warn "no valid xref id for gene $gene_name ($gene_id) transcript $tr_name ($tr_id). skiping...\n";
       next;
     }
-    my $name_subst = "${type}_${xref_id}"; 
+    my $name_subst = "${type}_${xref_id}";
     $sub4gene_id->{$gene_id} = $name_subst;
     if ($common_pfx) {
       $new_gene_name = $gene_name;
@@ -137,7 +141,7 @@ while(<STDIN>) {
     } else {
       $new_gene_name = $name_subst;
     }
-  }  # gene_name 
+  }  # gene_name
 
   if ($tr_name !~ m/$valid_tr_re/ && !$new_tr_name) {
     if ($common_pfx && exists $sub4gene_id->{$gene_id}) {
@@ -148,7 +152,7 @@ while(<STDIN>) {
       # process individually
       my $xref_id = $xreftr_id;
       $xref_id = $xrefg_id if (!$xref_id || $xref_id eq ".");
-      $new_tr_name = "${type}_${xref_id}_${tr_name}"; 
+      $new_tr_name = "${type}_${xref_id}_${tr_name}";
       warn "individual transcript new name $new_tr_name for transcript $tr_name ($tr_id) gene $gene_name ($gene_id)\n";
     }
   }
@@ -162,18 +166,13 @@ while(<STDIN>) {
 } # <STDIN>
 
 
-if ($dry_run) {
+if ($dry_run || !$fix_versions) {
   warn "not fixing transcript and translation versions. exiting...";
   exit(0);
 }
 
 fix_stable_id_versions("transcript", $ta);
 fix_stable_id_versions("translation", $pepa);
-
-if (!$ta) {
-  warn "no transcript adaptor. exiting...";
-  exit(0);
-}
 
 
 sub fix_stable_id_versions {
@@ -185,7 +184,7 @@ sub fix_stable_id_versions {
     return;
   }
 
-  my $objects = $ad->fetch_all(); 
+  my $objects = $ad->fetch_all();
   return if !$objects;
 
   while (my $obj = shift @{$objects}) {
@@ -197,8 +196,9 @@ sub fix_stable_id_versions {
       $stable_id =~ s/\.(\d+)$//;
       my $version = $1;
       warn "updating $type $stable_id_raw with $stable_id version $version\n";
-      _update_stable_id_impl($core_db, $type, $obj, $stable_id);
+      $obj->stable_id($stable_id);
       $obj->version($version);
+      _update_stable_id_impl($core_db, $type, $obj, $stable_id);
       eval { $ad->update($obj) };
       if ($@) {
         warn "failed to update $type $stable_id_raw with $stable_id version $version\n";
@@ -211,7 +211,7 @@ sub fix_stable_id_versions {
 sub update_stable_id {
   my ($type, $ad, $new_name, $name, $id) = @_;
   
-  return if !$new_name; 
+  return if !$new_name;
 
   my $obj = $ad->fetch_by_dbID($id);
   if (!$obj) {
@@ -225,7 +225,7 @@ sub update_stable_id {
     return;
   }
 
-  $obj->stable_id($new_name);  
+  $obj->stable_id($new_name);
   _update_stable_id_impl($core_db, $type, $obj, $new_name);
   update_xref($obj, $name, $type);
 
@@ -237,7 +237,7 @@ sub update_stable_id {
 
 
 sub get_all_xrefs {
-  my ($obj) = @_;   
+  my ($obj) = @_;
   my $res = {};
   for my $ent (@{$obj->get_all_DBEntries()}) {
     my $dsp_id = $ent->display_id();
@@ -248,7 +248,7 @@ sub get_all_xrefs {
 
 
 sub update_xref {
-  my ($obj, $name, $type) = @_;   
+  my ($obj, $name, $type) = @_;
   my $all_xrefs = get_all_xrefs($obj);
   if (exists $all_xrefs->{$name}) {
     $obj->display_xref($all_xrefs->{$name});
