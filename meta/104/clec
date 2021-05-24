@@ -21,11 +21,19 @@ species.common_name	bed bug
 #CONF	PEP_FILE	GCF_000648675.2_Clec_2.1_protein.faa.gz
 
 
-#no CONF	ORDERED_CS_TAG	chromosome
+# stats and metadata generatio options
+#CONF	STOP_AFTER_CONF	NO
+
 #CONF	GFF_PARSER_CONF_PATCH	NO
+
+# disabling default [transcript -> mRNA] gff3 feature type convesion
+#CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna
 
 #no CONF	GFF_PARSER_PFX_TRIM	NO
 #no CONF	GFF_LOADER_OPTIONS	--gff3_autoapply_manual_seq_edits 0
+
+#no CONF	ORDERED_CS_TAG	chromosome
+
 
 # update stable ids
 #CONF	UPDATE_STABLE_IDS	1
