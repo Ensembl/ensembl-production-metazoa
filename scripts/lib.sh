@@ -3294,6 +3294,7 @@ function run_new_loader () {
   local DONE_TAG='_load_new'"$TAG"
   if ! check_done "$DONE_TAG"; then
     echo "loading new species based on metadata fromr$META_DIR..." > /dev/stderr
+    [ -d "$OUT_DIR" ] && mkdir -p "$OUT_DIR"/old && mv -f "$OUT_DIR"/* "$OUT_DIR"/old || true
     mkdir -p $OUT_DIR
 
     local META_FILE=$META_DIR/meta
