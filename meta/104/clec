@@ -30,7 +30,9 @@ species.common_name	bed bug
 #CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna
 
 #no CONF	GFF_PARSER_PFX_TRIM	NO
-#no CONF	GFF_LOADER_OPTIONS	--gff3_autoapply_manual_seq_edits 0
+#CONF	GFF_LOADER_OPTIONS	--external_db_map_name external_db_map_metazoa.txt
+#  FlyBase: --external_db_map_name external_db_map_metazoa.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
+#  minimal: --external_db_map_name external_db_map_minimal.txt --skip_unknown_xref_source 1
 
 #no CONF	ORDERED_CS_TAG	chromosome
 
