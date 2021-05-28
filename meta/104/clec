@@ -77,5 +77,10 @@ annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Cimex
 
 #
 # FINALIZE
+# #CMD_W=....
+# $CMD_W -e 'create database cimex_lectularius_gca000648675v3_core_52_105_1';
+# zcat data/clec/bup/premz_cimex_lectularius_gca000648675v3_core_52_104_1.gz | $CMD_W -D cimex_lectularius_gca000648675v3_core_52_105_1
 #
+# # $CMD_W -e 'drop database premz_cimex_lectularius_gca000648675v3_core_52_104_1;'
 #
+# $CMD details url cimex_lectularius_gca000648675v3_core_52_105_1
