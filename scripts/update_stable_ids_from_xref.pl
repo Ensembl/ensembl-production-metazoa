@@ -40,7 +40,7 @@
          -type GeneID
          -valid_gene_re '\d{6,}'
          -valid_transcript_re '\d{6,}'
-         -store_as_xref 'Ensembl_Metazoa'
+         -store_as_xref_prefix 'Ensembl_Metazoa'
          -dry_run
          -fix_versions
 
@@ -63,7 +63,7 @@ my $type = "GeneID";
 my $analysis_name = "refseq_import_visible";
 my $valid_gene_re = '\d{6,}';
 my $valid_tr_re = '\d{6,}';
-my $store_as_xref = "Ensembl_Metazoa";
+my $store_as_xref_prefix = "Ensembl_Metazoa";
 my $dry_run = 1;
 my $fix_versions = 0;
 
@@ -79,7 +79,7 @@ my $help = 0;
   'analysis_name:s'          => \$analysis_name,
   'valid_gene_re:s'    => \$valid_gene_re,
   'valid_tr_re:s'    => \$valid_tr_re,
-  'store_as_xref:s'  => \$store_as_xref,
+  'store_as_xref_prefix:s'  => \$store_as_xref_prefix,
   'dry_run:s'    => \$dry_run,
   'fix_versions:s'    => \$fix_versions,
 
@@ -257,11 +257,14 @@ sub update_xref {
   
   my $dbea = $core_db->get_DBEntryAdaptor;
 
+  my $lc_type = lc($type);
+  my $dbname = $store_as_xref_prefix . ($lc_type ne 'gene' ? "_$lc_type" : "" );
+
   my $entry = new Bio::EnsEMBL::DBEntry(
     -adaptor     => $dbea,
     -primary_id  => $name,
     -display_id  => $name,
-    -dbname      => $store_as_xref,
+    -dbname      => $dbname,
     -info_type   => 'DIRECT',
     -analysis    => $analysis,
   );
