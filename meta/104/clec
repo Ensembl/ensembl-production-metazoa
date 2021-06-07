@@ -1,9 +1,12 @@
 #CONF	DB_PFX	premz
-#CONF	ASM_VERSION	1
+#updated CONF	ASM_VERSION	1
+#CONF	ASM_VERSION	2
 
 #? not sure yet, if going to be updated or had in addition to the old one
 #? updated, prev was cimex_lectularius_core_51_104_1	GCA_000648675.1 now GCA_000648675.3
 #? species.production_name	cimex_lectularius
+
+#CONF	species.production_name	cimex_lectularius
 species.common_name	bed bug
 
 
@@ -84,3 +87,25 @@ annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Cimex
 # # $CMD_W -e 'drop database premz_cimex_lectularius_gca000648675v3_core_52_104_1;'
 #
 # $CMD details url cimex_lectularius_gca000648675v3_core_52_105_1
+#
+# renaming
+# $CMD mysqldump --max_allowed_packet=1024M cimex_lectularius_gca000648675v3_core_52_105_1 |
+#   gzip - > data/clec/cimex_lectularius_gca000648675v3_core_52_105_1.gz
+#
+# $CMD_W -e 'create database cimex_lectularius_core_52_105_2'
+# zcat data/clec/cimex_lectularius_gca000648675v3_core_52_105_1.gz |
+#   $CMD_W -D cimex_lectularius_core_52_105_2
+# 
+# $CMD_W -D cimex_lectularius_core_52_105_2 -e 'select * from meta' | grep -i cimex
+# 
+# $CMD_W -D cimex_lectularius_core_52_105_2 -e '
+#   update meta set meta_value=replace(meta_value, "_gca000648675v3", "")
+#     where meta_key in ("species.production_name", "species.url")'
+#
+# $CMD_W -e 'drop database cimex_lectularius_gca000648675v3_core_52_105_1'
+#
+# $CMD mysqldump --max_allowed_packet=1024M cimex_lectularius_core_52_105_2 |
+#  gzip - > data/clec/cimex_lectularius_core_52_105_2.gz
+#
+# $CMD details url cimex_lectularius_core_52_105_2
+
