@@ -326,6 +326,8 @@ fi # "GFF_FILE"
 run_core_stats_new $CMD_W $DBNAME $SPECIES $DATA_DIR/data/pipeline_out/core_stats
 backup_relink $DBNAME $CMD core_stats $DATA_DIR/bup
 
+# run_dc $CMD_W $DBNAME $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/dc _pre_prod_sync
+
 update_prod_tables_new $CMD_W $DBNAME $SPECIES $DATA_DIR/data/pipeline_out/update_prod_tables
 
 backup_relink $DBNAME $CMD prodsync_new $DATA_DIR/bup
@@ -346,9 +348,16 @@ patch_db_schema $CMD_W $DBNAME \
 backup_relink $DBNAME $CMD patched_shema $DATA_DIR/bup
 
 # use conf instead???
+# exit 0
+
+# add metakey
 DBNAME_FIN=$DBNAME
+
+update_prod_tables_new $CMD_W $DBNAME_FIN $SPECIES \
+  $DATA_DIR/data/pipeline_out/update_prod_tables_fin _fin
+
 run_dc $CMD_W $DBNAME_FIN \
-  $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/dc
+  $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/dc _fin
 
 echo done additional > /dev/stderr
 
