@@ -1,0 +1,80 @@
+#CONF	DB_PFX	premz
+#CONF	ASM_VERSION	2
+
+# updated, prev was anoplophora_glabripennis_core_52_105_1 
+
+#CONF	species.production_name	anoplophora_glabripennis
+species.common_name	Asian long-horned beetle
+
+# GCA_000390285.2
+# https://www.ncbi.nlm.nih.gov/assembly/GCA_000390285.2
+# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/390/285/GCF_000390285.2_Agla_2.0
+
+
+#CONF	ASM_URL		ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/390/285/GCF_000390285.2_Agla_2.0
+#CONF	GBFF_FILE	GCF_000390285.2_Agla_2.0_genomic.gbff.gz
+#CONF	FNA_FILE	GCF_000390285.2_Agla_2.0_genomic.fna.gz
+#CONF	ASM_REP_FILE	GCF_000390285.2_Agla_2.0_assembly_report.txt
+
+#CONF	GFF_FILE	GCF_000390285.2_Agla_2.0_genomic.gff.gz
+#CONF	TR_FILE		GCF_000390285.2_Agla_2.0_rna_from_genomic.fna.gz
+#CONF	PEP_FILE	GCF_000390285.2_Agla_2.0_protein.faa.gz
+
+
+# stats and metadata generation options
+#CONF	STOP_AFTER_CONF	NO
+
+#CONF	GFF_PARSER_CONF_PATCH	NO
+
+# disabling default [transcript -> mRNA] gff3 feature type convesion
+#CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna
+
+#no CONF	GFF_PARSER_PFX_TRIM	NO
+#CONF	GFF_LOADER_OPTIONS	--external_db_map_name external_db_map_metazoa.txt
+#  FlyBase: --external_db_map_name external_db_map_metazoa.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
+#  minimal: --external_db_map_name external_db_map_minimal.txt --skip_unknown_xref_source 1
+
+#no CONF	ORDERED_CS_TAG	chromosome
+
+
+# update stable ids
+#CONF	UPDATE_STABLE_IDS	1
+# it's better not to split version ('-fix_version 0' by default)
+#no CONF	UPDATE_STABLE_IDS_OPTIONS	-fix_version 1
+
+
+# Assembly metadata
+assembly.accession	GCA_000390285.2
+#CONF	GCF_TO_GCA	1
+
+# Provider metadata
+#CONF	GFF3_LOAD_SOURCE_NAME	RefSeq
+
+assembly.provider_name	Baylor i5k Initiative Pilot Project
+assembly.provider_url	https://www.hgsc.bcm.edu/arthropods/i5k
+
+annotation.provider_name	NCBI
+annotation.provider_url https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Anoplophora_glabripennis/101/
+
+#no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
+
+
+# rna features and genes
+#CONF	RNA_FEAT_PARAMS	-cmscan_threshold 1e-6 -taxonomic_lca 1
+
+#CONF	RUN_RNA_GENES	NO
+
+# or
+# using 'vb' context, otherwise ('eg' context) needs special "ena*" database
+#no CONF	RNA_GENE_PARAMS	-run_context vb -score_threshold 65
+#               m.b. updated maximum_per_hit_name { 'pre_miRNA' => 100, 'ribozyme' => 100 }
+# species.stable_id_prefix	ENSLOC
+
+
+# load UniProt gene names and descriptions
+#CONF	XREF_PARAMS	-description_source reviewed -description_source unreviewed -gene_name_source reviewed
+#no -overwrite_description 1
+
+#
+# FINALIZE
+#
