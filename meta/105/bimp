@@ -12,15 +12,15 @@ species.common_name	Common eastern bumblebee
 # https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Bombus_impatiens/103/
 
 
-#CONF	ASM_URL		ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/390/285/GCF_000390285.2_Agla_2.0
+#CONF	ASM_URL		ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/188/095/GCF_000188095.3_BIMP_2.2
 
-#CONF	GBFF_FILE	GCF_000390285.2_Agla_2.0_genomic.gbff.gz
-#CONF	FNA_FILE	GCF_000390285.2_Agla_2.0_genomic.fna.gz
-#CONF	ASM_REP_FILE	GCF_000390285.2_Agla_2.0_assembly_report.txt
+#CONF	GBFF_FILE	GCF_000188095.3_BIMP_2.2_genomic.gbff.gz
+#CONF	FNA_FILE	GCF_000188095.3_BIMP_2.2_genomic.fna.gz
+#CONF	ASM_REP_FILE	GCF_000188095.3_BIMP_2.2_assembly_report.txt
 
-#CONF	GFF_FILE	GCF_000390285.2_Agla_2.0_genomic.gff.gz
-#CONF	TR_FILE		GCF_000390285.2_Agla_2.0_rna_from_genomic.fna.gz
-#CONF	PEP_FILE	GCF_000390285.2_Agla_2.0_protein.faa.gz
+#CONF	GFF_FILE	GCF_000188095.3_BIMP_2.2_genomic.gff.gz
+#CONF	TR_FILE		GCF_000188095.3_BIMP_2.2_rna_from_genomic.fna.gz
+#CONF	PEP_FILE	GCF_000188095.3_BIMP_2.2_protein.faa.gz
 
 
 # stats and metadata generation options
