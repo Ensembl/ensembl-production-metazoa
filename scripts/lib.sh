@@ -3047,6 +3047,35 @@ function fopt_from_meta () {
   fi
 }
 
+function conf_from_refseq_url () {
+  local META_RAW="$1"
+
+  local ASM_URL=$(get_meta_conf $META_RAW ASM_URL)
+  local REFSEQ_NAME=$(echo "$ASM_URL" | grep 'ftp.ncbi.nlm.nih.gov/genomes/all/GCF' | perl -ne 'print $1 if m,/([^/]+)\s*$,')
+  if [ -z "$REFSEQ_NAME" ]; then
+    return
+  fi
+
+  local FNA_FILE=$(get_meta_conf $META_RAW FNA_FILE)
+  if [ -n "$FNA_FILE" ]; then
+    return
+  fi
+
+  cat > "$META_RAW.refseq_tmplt" << 'EOF'
+#CONF	GBFF_FILE	_FILENAME__genomic.gbff.gz
+#CONF	FNA_FILE	_FILENAME__genomic.fna.gz
+#CONF	ASM_REP_FILE	_FILENAME__assembly_report.txt
+
+#CONF	GFF_FILE	_FILENAME__genomic.gff.gz
+#CONF	TR_FILE		_FILENAME__rna_from_genomic.fna.gz
+#CONF	PEP_FILE	_FILENAME__protein.faa.gz
+EOF
+
+  cat "$META_RAW.refseq_tmplt" |
+    perl -pe 's,_FILENAME_,'"${REFSEQ_NAME}"',g' |
+    cat >> "$META_RAW"
+}
+
 function prepare_metada () {
   local META_RAW="$1"
   local ASM_DIR="$2"
@@ -3058,6 +3087,10 @@ function prepare_metada () {
   if ! check_done "$DONE_TAG"; then
     echo "generating metadata from raw $META_RAW..." > /dev/stderr
     mkdir -p $OUT_DIR
+
+    cat "$META_RAW" > "${OUT_DIR}"/meta.raw
+
+    conf_from_refseq_url "${OUT_DIR}"/meta.raw
 
     local BRC4_LOAD=$BRC4_LOAD
     if [ -z "$BRC4_LOAD" ]; then

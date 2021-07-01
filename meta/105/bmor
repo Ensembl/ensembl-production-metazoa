@@ -13,14 +13,6 @@ species.common_name	Domestic silkworm
 
 #CONF	ASM_URL		ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/014/905/235/GCF_014905235.1_Bmori_2016v1.0
 
-#CONF	GBFF_FILE	GCF_014905235.1_Bmori_2016v1.0_genomic.gbff.gz
-#CONF	FNA_FILE	GCF_014905235.1_Bmori_2016v1.0_genomic.fna.gz
-#CONF	ASM_REP_FILE	GCF_014905235.1_Bmori_2016v1.0_assembly_report.txt
-
-#CONF	GFF_FILE	GCF_014905235.1_Bmori_2016v1.0_genomic.gff.gz
-#CONF	TR_FILE		GCF_014905235.1_Bmori_2016v1.0_rna_from_genomic.fna.gz
-#CONF	PEP_FILE	GCF_014905235.1_Bmori_2016v1.0_protein.faa.gz
-
 
 # stats and metadata generation options
 #CONF	STOP_AFTER_CONF	NO
