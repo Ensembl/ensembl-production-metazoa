@@ -3,7 +3,7 @@
 
 # updated, prev was glossina_fuscipes_core_52_105_1
 
-#CONF	species.production_name	glossina_fuscipes
+species.production_name	glossina_fuscipes
 species.common_name	Tsetse fly
 
 # GCA_014805625.1

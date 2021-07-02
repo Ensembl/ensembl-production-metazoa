@@ -3,7 +3,7 @@
 
 # updated, prev was anoplophora_glabripennis_core_52_105_1 
 
-#CONF	species.production_name	anoplophora_glabripennis
+species.production_name	anoplophora_glabripennis
 species.common_name	Asian long-horned beetle
 
 # GCA_000390285.2

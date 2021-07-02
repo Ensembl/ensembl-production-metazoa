@@ -5,7 +5,7 @@
 # updated, prev was culex_quinquefasciatus_core_52_105_3
 #   but keeping old one as having, variation as for now
 
-#not_yet CONF	species.production_name	culex_quinquefasciatus
+#not_yet species.production_name	culex_quinquefasciatus
 species.common_name	Southern house mosquito
 
 # GCA_015732765.1

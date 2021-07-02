@@ -3,7 +3,7 @@
 
 # updated, prev was solenopsis_invicta_core_52_105_7
 
-#CONF	species.production_name	solenopsis_invicta
+species.production_name	solenopsis_invicta
 species.common_name	Red fire ant
 
 # GCA_016802725.1

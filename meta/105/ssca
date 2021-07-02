@@ -3,7 +3,7 @@
 
 # updated, prev was sarcoptes_scabiei_core_52_105_1
 
-#CONF	species.production_name teleopsis_dalmanni
+species.production_name teleopsis_dalmanni
 species.common_name	Itch mite
 
 # GCA_014595675.1

@@ -3,7 +3,7 @@
 
 # updated, prev was bombus_impatiens_core_52_105_2
 
-#CONF	species.production_name	bombus_impatiens
+species.production_name	bombus_impatiens
 species.common_name	Common eastern bumblebee
 
 # GCA_000188095.4

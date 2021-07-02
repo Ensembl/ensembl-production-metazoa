@@ -3,7 +3,7 @@
 
 # updated, prev was danaus_plexippus_core_52_105_3
 
-#CONF	species.production_name	danaus_plexippus
+species.production_name	danaus_plexippus
 species.common_name	Monarch butterfly
 
 # GCA_009731565.1

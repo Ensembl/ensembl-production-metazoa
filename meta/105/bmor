@@ -3,7 +3,7 @@
 
 # updated, prev was bombyx_mori_core_52_105_1
 
-#CONF	species.production_name	bombyx_mori
+species.production_name	bombyx_mori
 species.common_name	Domestic silkworm
 
 # GCA_014905235.2

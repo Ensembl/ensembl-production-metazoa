@@ -3,7 +3,7 @@
 
 # updated, prev was teleopsis_dalmanni_core_52_105_1
 
-#CONF	species.production_name teleopsis_dalmanni
+species.production_name teleopsis_dalmanni
 species.common_name	Malaysian stalk-eyed fly
 
 # GCA_002237135.2
