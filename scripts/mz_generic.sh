@@ -103,9 +103,6 @@ echo 'ENSEMBL_ROOT_DIR='"${ENSEMBL_ROOT_DIR}" > /dev/stderr
 export DATA_DIR=$WD/$SPEC_SHORT
 populate_dirs $DATA_DIR
 
-flock -n ${DATA_DIR}/_processing.lock ||
-  echo "processing in progress in $DATA_DIR, exiting..." > /dev/stderr && exit 1
-
 export DONE_TAGS_DIR=$DATA_DIR/done
 export PIPELINE_OUT_DIR=$DATA_DIR/data/pipeline_out
 
