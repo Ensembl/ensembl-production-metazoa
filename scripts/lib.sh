@@ -3089,8 +3089,9 @@ function prepare_metada () {
     mkdir -p $OUT_DIR
 
     cat "$META_RAW" > "${OUT_DIR}"/meta.raw
-
     conf_from_refseq_url "${OUT_DIR}"/meta.raw
+    META_RAW="${OUT_DIR}"/meta.raw
+    echo "switching to metadata from raw copy $META_RAW..." > /dev/stderr
 
     local BRC4_LOAD=$BRC4_LOAD
     if [ -z "$BRC4_LOAD" ]; then
