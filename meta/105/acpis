@@ -10,7 +10,7 @@ species.common_name	Pea aphid
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_005508785.1
 # https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/005/508/785/GCF_005508785.1_pea_aphid_22Mar2018_4r6ur
 
-#CONF	ASM_URL		ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/005/508/785/GCF_005508785.1_pea_aphid_22Mar2018_4r6ur
+#CONF	ASM_URL	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/005/508/785/GCF_005508785.1_pea_aphid_22Mar2018_4r6ur
 
 
 # stats and metadata generation options

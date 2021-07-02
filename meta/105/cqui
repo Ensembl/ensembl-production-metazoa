@@ -13,7 +13,7 @@ species.common_name	Southern house mosquito
 # https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/015/732/765/GCF_015732765.1_VPISU_Cqui_1.0_pri_paternal
 # https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Culex_quinquefasciatus/100/
 
-#CONF	ASM_URL		ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/015/732/765/GCF_015732765.1_VPISU_Cqui_1.0_pri_paternal
+#CONF	ASM_URL	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/015/732/765/GCF_015732765.1_VPISU_Cqui_1.0_pri_paternal
 
 
 # stats and metadata generation options

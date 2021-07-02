@@ -11,7 +11,7 @@ species.common_name	Monarch butterfly
 # https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/731/565/GCF_009731565.1_Dplex_v4
 # https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Danaus_plexippus_plexippus/100/
 
-#CONF	ASM_URL		ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/731/565/GCF_009731565.1_Dplex_v4
+#CONF	ASM_URL	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/731/565/GCF_009731565.1_Dplex_v4
 
 
 # stats and metadata generation options

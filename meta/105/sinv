@@ -1,17 +1,17 @@
 #CONF	DB_PFX	premz
-#CONF	ASM_VERSION	3
+#CONF	ASM_VERSION	8
 
-# updated, prev was bombus_impatiens_core_52_105_2
+# updated, prev was solenopsis_invicta_core_52_105_7
 
-#CONF	species.production_name	bombus_impatiens
-species.common_name	Common eastern bumblebee
+#CONF	species.production_name	solenopsis_invicta
+species.common_name	Red fire ant
 
-# GCA_000188095.4
-# https://www.ncbi.nlm.nih.gov/assembly/GCA_000188095.4
-# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/188/095/GCF_000188095.3_BIMP_2.2
-# https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Bombus_impatiens/103/
+# GCA_016802725.1
+# https://www.ncbi.nlm.nih.gov/assembly/GCA_016802725.1
+# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/016/802/725/GCF_016802725.1_UNIL_Sinv_3.0
+# https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Solenopsis_invicta/104/
 
-#CONF	ASM_URL	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/188/095/GCF_000188095.3_BIMP_2.2
+#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/016/802/725/GCF_016802725.1_UNIL_Sinv_3.0
 
 
 # stats and metadata generation options
@@ -37,17 +37,17 @@ species.common_name	Common eastern bumblebee
 
 
 # Assembly metadata
-assembly.accession	GCA_000188095.4
+assembly.accession	GCA_016802725.1
 #CONF	GCF_TO_GCA	1
 
 # Provider metadata
 #CONF	GFF3_LOAD_SOURCE_NAME	RefSeq
 
-assembly.provider_name	Biotechnology Center, University of Illinois (BCUI)
-assembly.provider_url	https://biotech.illinois.edu
+assembly.provider_name	University of Lausanne
+assembly.provider_url	https://www.unil.ch
 
 annotation.provider_name	NCBI
-annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Bombus_impatiens/103/
+annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Solenopsis_invicta/104/
 
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
 

@@ -11,7 +11,7 @@ species.common_name	Domestic silkworm
 # https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/014/905/235/GCF_014905235.1_Bmori_2016v1.0
 # https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Bombyx_mori/103/
 
-#CONF	ASM_URL		ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/014/905/235/GCF_014905235.1_Bmori_2016v1.0
+#CONF	ASM_URL	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/014/905/235/GCF_014905235.1_Bmori_2016v1.0
 
 
 # stats and metadata generation options

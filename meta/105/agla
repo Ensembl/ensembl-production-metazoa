@@ -10,7 +10,7 @@ species.common_name	Asian long-horned beetle
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_000390285.2
 # https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/390/285/GCF_000390285.2_Agla_2.0
 
-#CONF	ASM_URL		ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/390/285/GCF_000390285.2_Agla_2.0
+#CONF	ASM_URL	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/390/285/GCF_000390285.2_Agla_2.0
 
 
 # stats and metadata generation options
