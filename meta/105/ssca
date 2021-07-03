@@ -3,7 +3,7 @@
 
 # updated, prev was sarcoptes_scabiei_core_52_105_1
 
-species.production_name teleopsis_dalmanni
+species.production_name	sarcoptes_scabiei
 species.common_name	Itch mite
 
 # GCA_014595675.1
@@ -69,4 +69,3 @@ annotation.provider_url	https://fvas.unimelb.edu.au
 #
 # FINALIZE
 #
-
