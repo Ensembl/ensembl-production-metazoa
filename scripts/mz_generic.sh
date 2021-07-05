@@ -332,6 +332,8 @@ update_prod_tables_new $CMD_W $DBNAME $SPECIES $DATA_DIR/data/pipeline_out/updat
 
 backup_relink $DBNAME $CMD prodsync_new $DATA_DIR/bup
 
+# run_dc $CMD_W $DBNAME $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/dc _pre_final
+
 false; fail
 # backup_relink $DBNAME $CMD final $DATA_DIR/bup
 
