@@ -270,7 +270,7 @@ function restore () {
   echo restore > /dev/stderr
     ls -lt $BUP_DIR/ > /dev/stderr
   echo "uploading $BUP_DIR/${DBNAME}.gz to $DBNAME"
-    echo "drop database if exists $DBNAME; create database $DBNAME;" |
+    echo "drop database if exists $DBNAME; create database $DBNAME; SET GLOBAL max_allowed_packet=2147483648;" |
       $CMD
     zcat $BUP_DIR/${DBNAME}.gz |
       $CMD -D $DBNAME
