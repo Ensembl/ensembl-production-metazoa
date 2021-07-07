@@ -108,6 +108,7 @@ if (!$dry_run)  {
   warn("not altering db: dry_run $dry_run\n");
 }
 
+my $seen_names = {};
 
 my $sub4gene_id = {};
 while(<STDIN>) {
@@ -115,9 +116,12 @@ while(<STDIN>) {
   # 30      TRNAM-CAU-5     64      TRNAM-CAU-5_t1  TRNAM-CAU-5     GeneID  107964931       GeneID  107964931
   # 54      Per     133     XM_026444131.1  .       GeneID  406112  GeneID  406112
   # 54      Per     135     XM_026444130.1  .       GeneID  406112  GeneID  406112
+  # NB: common prefix -- common among gene and transcript stable_ids
   my ($gene_id, $gene_name, $tr_id, $tr_name, $common_pfx, $xrefg, $xrefg_id, $xreftr, $xreftr_id) = split /\t/;
   next if ($gene_name =~ m/$valid_gene_re/ && $tr_name =~ m/$valid_tr_re/);
   next if ($xrefg ne $type or $xreftr ne $type);
+
+  $seen_names->{$gene_name} = int($seen_names->{$gene_name} // 0) + 1;
 
   $common_pfx = "" if ($common_pfx eq ".");
 
@@ -132,6 +136,14 @@ while(<STDIN>) {
       next;
     }
     my $name_subst = "${type}_${xref_id}";
+
+    # check if suggested names is already used and append _# suffix if so
+    $seen_names->{$name_subst} = int($seen_names->{$name_subst} // 0) + 1;
+    if ($seen_names->{$name_subst} > 1) {
+      warn "already seen suggested substitution '$name_subst' for prefix '$common_pfx' gene $gene_name ($gene_id) transcript $tr_name ($tr_id)\n";
+      $name_subst .=  "_". int($seen_names->{$name_subst});
+    }
+
     $sub4gene_id->{$gene_id} = $name_subst;
     if ($common_pfx) {
       $new_gene_name = $gene_name;
