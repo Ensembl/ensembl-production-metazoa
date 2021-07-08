@@ -3528,6 +3528,10 @@ function update_prod_tables_new () {
       -division "metazoa" \
       -group core \
       -backup_dir $OUT_DIR \
+      -pipeline_dir $OUT_DIR/sync_${SPECIES_TAG} \
+      -scratch_large_dir $OUT_DIR/scratch \
+      -scratch_small_dir $OUT_DIR/scratch \
+      -scratch_dir $OUT_DIR/scratch \
       2> $OUT_DIR/init.stderr \
       1> $OUT_DIR/init.stdout
     tail $OUT_DIR/init.stderr $OUT_DIR/init.stdout
@@ -3723,6 +3727,10 @@ function run_core_stats_new () {
       -registry $REG_FILE \
       -division "metazoa" \
       -history_file $OUT_DIR/hist.json \
+      -pipeline_dir $OUT_DIR/stats_${SPECIES_TAG} \
+      -scratch_large_dir $OUT_DIR/scratch \
+      -scratch_small_dir $OUT_DIR/scratch \
+      -scratch_dir $OUT_DIR/scratch \
       -skip_metadata_check 1 \
       2> $OUT_DIR/init.stderr \
       1> $OUT_DIR/init.stdout
