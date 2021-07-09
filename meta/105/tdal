@@ -43,8 +43,8 @@ assembly.accession	GCA_002237135.2
 # Provider metadata
 #CONF	GFF3_LOAD_SOURCE_NAME	RefSeq
 
-assembly.provider_name
-assembly.provider_url
+assembly.provider_name	University of Maryland
+assembly.provider_url	https://science.umd.edu/faculty/wilkinson/
 
 annotation.provider_name	NCBI
 annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Teleopsis_dalmanni/100/
