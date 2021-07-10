@@ -71,3 +71,10 @@ annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Teleo
 #
 # FINALIZE
 #
+# # fix missing assembly.provider_*
+# ${CMD_W} -D premz_teleopsis_dalmanni_core_53_105_2 -e '
+# insert into meta (species_id, meta_key, meta_value) values
+#   (1, "assembly.provider_name", "University of Maryland"),
+#   (1, "assembly.provider_url", "https://science.umd.edu/faculty/wilkinson/");
+# '
+#
