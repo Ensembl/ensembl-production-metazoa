@@ -131,7 +131,7 @@ while(<STDIN>) {
   if ($gene_name !~ m/$valid_gene_re/ && !exists $sub4gene_id->{$gene_id} ) {
     my $xref_id = $xrefg_id;
     $xref_id = $xreftr_id if (!$xref_id || $xref_id eq ".");
-    $xref_id = s/,.*$//;
+    $xref_id =~ s/,.*$//;
     if (!$xref_id || $xref_id eq ".") {
       warn "no valid xref id for gene $gene_name ($gene_id) transcript $tr_name ($tr_id). skiping...\n";
       next;
@@ -165,7 +165,7 @@ while(<STDIN>) {
       # process individually
       my $xref_id = $xreftr_id;
       $xref_id = $xrefg_id if (!$xref_id || $xref_id eq ".");
-      $xref_id = s/,.*$//;
+      $xref_id =~ s/,.*$//;
       $new_tr_name = "${type}_${xref_id}_${tr_name}";
       warn "individual transcript new name $new_tr_name for transcript $tr_name ($tr_id) gene $gene_name ($gene_id)\n";
     }
