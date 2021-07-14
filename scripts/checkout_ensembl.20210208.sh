@@ -90,7 +90,8 @@ done
 
 
 ## Now checkout Hive
-branch="version/2.5"
+#branch="version/2.5"
+branch="master"
 for module in \
     ensembl-hive
 do
