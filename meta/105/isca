@@ -56,6 +56,7 @@ annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Ixode
 
 # rna features and genes
 #CONF	RNA_FEAT_PARAMS	-cmscan_threshold 1e-6 -taxonomic_lca 1
+#  default -max_seq_length 10_000_000
 
 #CONF	RUN_RNA_GENES	NO
 
