@@ -19,6 +19,7 @@ set -o errexit
 set -o xtrace
 
 SPEC_PATH="$1"
+SPECIAL_ACTION="$2"
 
 
 # load _mz.conf
@@ -150,8 +151,10 @@ echo "using SPECIES_SCI_ $SPECIES_SCI_" > /dev/stderr
 
 backup_relink $DBNAME $CMD new_loader $DATA_DIR/bup
 
-# RESTORE / UNCOMMENT TO USE
-# echo "!!! RESTORING DB !!!" > /dev/stderr; restore $DBNAME $CMD_W $DATA_DIR/bup; echo ok > /dev/stderr; false; fail
+if [ z"${SPECIAL_ACTION}" = z"restore" ]; then
+  # RESTORE / UNCOMMENT TO USE
+  echo "!!! RESTORING DB !!!" > /dev/stderr; restore $DBNAME $CMD_W $DATA_DIR/bup; echo ok > /dev/stderr; false; fail
+fi
 
 
 # initial test, uncomment for the first run, if not sure
@@ -282,20 +285,20 @@ if [ -n "$GFF_FILE" ]; then
 
   # RNA features
   run_rna_features $CMD_W $DBNAME $SPECIES $ENSEMBL_ROOT_DIR \
-    $DATA_DIR/data/pipeline_out/rna_features '_opt' "$(get_meta_conf $META_FILE RNA_FEAT_PARAMS)"
+    $DATA_DIR/data/pipeline_out/rna_features '_opt' "$(get_meta_conf $META_FILE_RAW RNA_FEAT_PARAMS)"
   backup_relink $DBNAME $CMD rna_features $DATA_DIR/bup
 
   # RNA genes
   RUN_RNA_GENES=$(get_meta_conf $META_FILE_RAW RUN_RNA_GENES)
   if [ -z "$RUN_RNA_GENES" -o "x$RUN_RNA_GENES" != "xNO" ]; then
     run_rna_genes $CMD_W $DBNAME $SPECIES $ENSEMBL_ROOT_DIR \
-      $DATA_DIR/data/pipeline_out/rna_features '_opt' "$(get_meta_conf $META_FILE RNA_GENE_PARAMS)"
+      $DATA_DIR/data/pipeline_out/rna_features '_opt' "$(get_meta_conf $META_FILE_RAW RNA_GENE_PARAMS)"
     backup_relink $DBNAME $CMD rna_genes $DATA_DIR/bup
   fi
 
 
   # run xref pipelines
-  run_xref $CMD_W $DBNAME $SPECIES $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/xrefs/all "$(get_meta_conf $META_FILE XREF_PARAMS)"
+  run_xref $CMD_W $DBNAME $SPECIES $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/xrefs/all "$(get_meta_conf $META_FILE_RAW XREF_PARAMS)"
   backup_relink $DBNAME $CMD run_xref $DATA_DIR/bup
 
 
@@ -332,13 +335,16 @@ update_prod_tables_new $CMD_W $DBNAME $SPECIES $DATA_DIR/data/pipeline_out/updat
 
 backup_relink $DBNAME $CMD prodsync_new $DATA_DIR/bup
 
-# run_dc $CMD_W $DBNAME $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/dc _pre_final
+if [ z"${SPECIAL_ACTION}" = z"pre_final_dc" ]; then
+  run_dc $CMD_W $DBNAME $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/dc _pre_final
+fi
 
-false; fail
-# backup_relink $DBNAME $CMD final $DATA_DIR/bup
-
-echo done > /dev/stderr
-
+if [ z"${SPECIAL_ACTION}" = z"finalise" ]; then
+  backup_relink $DBNAME $CMD final $DATA_DIR/bup
+  echo done > /dev/stderr
+else
+  false; fail
+fi
 
 # additioanal staff
 exit 0
