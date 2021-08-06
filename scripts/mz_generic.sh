@@ -118,6 +118,8 @@ export ASM_DIR=$DATA_DIR/data/raw/asm
 # get adhoc data
 get_individual_files_to_asm $ASM_DIR $META_FILE_RAW
 
+# run data preprocessing commands (DATA_INIT meta tag)
+run_data_init $META_FILE_RAW $ASM_DIR
 
 # get metadata from gbff
 prepare_metada $META_FILE_RAW $ASM_DIR $ENSEMBL_ROOT_DIR $DATA_DIR/metadata
