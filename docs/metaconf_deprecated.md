@@ -5,11 +5,6 @@
 
 ### Pre-initialise
 ```
-DATA_INIT	cp /.../old/assemblies/canu/canu4_A_ref.fa data.pre/aatro
-DATA_INIT	gzip -r data.pre/aatro
-DATA_INIT	mkdir -p data.pre/aatro
-```
-```
 INIT_CMD	cp /.../canu4_assembly/canu4_A_alt.fa.gz data.pre/aatro_alt
 INIT_CMD	gzip -r data.pre/aatro_alt
 INIT_CMD	mkdir -p data.pre/aatro_alt
