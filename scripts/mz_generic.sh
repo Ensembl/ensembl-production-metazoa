@@ -131,7 +131,7 @@ if [ -z "${STOP_AFTER_CONF}" ]; then
   STOP_AFTER_CONF=$(get_meta_conf $META_FILE_RAW 'STOP_AFTER_CONF')
 fi
 if [ -n "${STOP_AFTER_CONF}" -a "x${STOP_AFTER_CONF}" != "xNO" ]; then
-  echo see stats > /dev/stderr
+  echo 'stopping after config generation (STOP_AFTER_CONF). see stats...' > /dev/stderr
   exit 0
   false
 fi
