@@ -3298,6 +3298,14 @@ function prepare_metada () {
       MCFG_GFF_CAUSED_OPTS="$MCFG_GFF_CAUSED_OPTS --seq_region_genbank $OUT_DIR/seq_region_raw.ad_hoc.json"
     fi # ad hoc seq regions gff
 
+    # ad hoc seq regions synonyms file
+    local MCFG_SR_SYNS_OPT=""
+    local SR_SYNS_FILE=$(fopt_from_meta $META_RAW SR_SYNS_FILE $ASM_DIR '' true)
+    if [ -n "$SR_SYNS_FILE" -a -f "$SR_SYNS_FILE" ]; then
+      echo using additional region synonyms data from $SR_SYNS_FILE > /dev/stderr
+      MCFG_SR_SYNS_OPT="--seq_region_syns $SR_SYNS_FILE"
+    fi # ad hoc seq regions synonyms file
+
     local SEQ_REGION_SOURCE_DEFAULT=$(get_meta_conf $META_RAW SEQ_REGION_SOURCE_DEFAULT)
     if [ -z "$SEQ_REGION_SOURCE_DEFAULT" ]; then
       SEQ_REGION_SOURCE_DEFAULT="GenBank"
@@ -3311,6 +3319,7 @@ function prepare_metada () {
       $MCFG_GBFF_OPTS \
       $MCFG_ASM_REP_OPTS \
       $MCFG_GFF_CAUSED_OPTS \
+      $MCFG_SR_SYNS_OPT \
       --syns_src $SEQ_REGION_SOURCE_DEFAULT \
       --genome_conf  $OUT_DIR/genome.json \
       --seq_region_conf $OUT_DIR/seq_region.json \
