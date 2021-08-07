@@ -2440,8 +2440,12 @@ function run_data_init() {
 
     pushd $OUT_DIR
       local init_cmd=$(get_meta_conf $META_FILE DATA_INIT | perl -pe 's/$/;/ if $_ !~ m/^\s*$/')
+      if [ -z "$init_cmd" ]; then
+        init_cmd='true'
+      fi
       echo "running data init commands: '$init_cmd'" > /dev/stderr
-      sh -c "$init_cmd"
+
+      sh -c "$init_cmd" || false
     popd
 
     touch_done "$DONE_TAG"
