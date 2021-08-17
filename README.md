@@ -41,7 +41,7 @@ export LSF_QUEUE=<lsf_queue_name>
 ```
 METACONF_DIR=ensembl-production-metazoa/meta/105
 
-mkdir -p logs
+mkdir -p logs locks
 ls -1 $METACONF_DIR/d* |
   perl -pe 's,.*/,,' |
   xargs -n 1 echo |
@@ -49,8 +49,13 @@ ls -1 $METACONF_DIR/d* |
     "sleep 10; \
      bsub -J load_XXX -q '$LSF_QUEUE' -M 32000 -R 'rusage[mem=32000]' -n 1 \
           -o logs/XXX.stdout -e logs/XXX.stderr \
-          ./ensembl-production-metazoa/scripts/mz_generic.sh ${METACONF_DIR}/XXX; \
+          flock -n locks/XXX \
+            ./ensembl-production-metazoa/scripts/mz_generic.sh ${METACONF_DIR}/XXX ; \
      sleep 60"
+
+# N.B. A second argument can be passed to/mz_generic.sh, i.e. one of the following:
+#        restore pre_final_dc finalise
+#      (see docs/mz_generic_params.md for the full list)
 ```
   In this case you'll have to use `tail -f logs/*.stderr` or any other way to peek into logs.
 
@@ -79,13 +84,11 @@ ls -1 $METACONF_DIR/d* |
 7. If anything fails script terminates by default.
   * You can either continue pipeline. Source `${SCRIPTS_DIR}/ensembl.prod.${ENS_VERSION}/setup.sh`, use the corresponding `_continue_pipeline` file. (Don't forget to finalise accomplished stage with corresponding `_done_tag` as written in the file).
   * Drop as many `${DATA_DIR}/<meta_name>/done` tags as you need (use `ls -lt` to sort tags by time). Drop as many `${DATA_DIR}/<meta_name>/bup` snapshots as you need (none, ideally) and don't forget to refresh the sym link to point to the latest good one.
-  Edit [`ensembl-production-metazoa/scripts/mz_generic.sh`](scripts/mz_generic.sh) file by uncommenting
+  Run [`ensembl-production-metazoa/scripts/mz_generic.sh`](scripts/mz_generic.sh) with additional second command line option `restore`:
   ```
-  # echo "!!! RESTORING DB !!!" ...
+  ./ensembl-production-metazoa/scripts/mz_generic.sh ${METACONF_DIR}/<meta_conf_file> restore
   ```
-  line. Rerun the initial (same) build command. The core will be restored. Comment that line back.
-
-  Now you can rerun the initial (same) build command once again.
+  Now you can rerun the initial (without `restore`) build command once again.
 
 8. Sometimes the script stops as planned.
 In this case edit the raw metadata file by updating stats and metadata generation options (!N.B. tab separated lines, see below for details). I.e. for ensembl-production-metazoa/meta/105/dmel:

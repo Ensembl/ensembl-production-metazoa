@@ -10,7 +10,7 @@ There are few ways to specify these parameters.
 * By specifying/setting a single shell variable `MZ_CONFIG=<path_to_conf_file>` with the patch to config file
 
 
-## Parameters
+## Environmental  parameters (variables)
 | Parameter | Example | Description | Comment |
 | - | - | - | - |
 `MZ_CONFIG` | /path/to/_mz.conf | Paths to the config files with the listed below options, sourced by `mz_generic.sh`
@@ -18,6 +18,27 @@ There are few ways to specify these parameters.
 `ENS_VERSION` | 104 | Ensembl (core db schema) release version
 `CMD` | cmd_server_alias | SQL DB server alias, to create *core DB* at and put *e-hive* DBs for running pipelines
 `PROD_SERVER` | prod_server_alias | Production SQL DB server alias to get `ensembl_production` and `ncbi_taxonomy` databases from | Should be exported within config file (`export PROD_SERVER`)
+
+## Commnad line arguments
+### First parameter -- [meta configuration file](../(docs/metaconf.md)
+Always provide meta configuration file as the first option:
+```
+./ensembl-production-metazoa/scripts/mz_generic.sh ${METACONF_DIR}/<meta_conf_file>
+```
+You can use either:
+ * abs-path
+ * or relative to the dir you're running scripts fromi
+ * or just name of the meta configuration file to be searched for in
+  `./ensembl-production-metazoa/meta/${ENS_VERSION}` dir
+
+### Second (optional) parameter
+In addition to the meta conf paramete you can provide additional option, that controls the generic loader `scripts/mz_generic.sh` behaviour:
+| Option | Description | Comments |
+| - | - | - | 
+| restore | restore from the latest back up | move `bup` symlink, if you need something older than the last saved
+| pre_final_dc | run datachecks before patching to the new schema stage | active, only if the goal is reachable |
+| finalise | create back up with the `final` tag |  active, only if the goal is reachable
+
 
 ## Ad-hoc environment setup
 Sometimes there's a need to have Ensembl environment, that can be used by unrelated pipelines / workflows.
