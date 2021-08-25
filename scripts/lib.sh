@@ -1760,6 +1760,7 @@ function run_repeat_masking () {
       -redatrepeatmasker 0 \
       -always_use_repbase 1 \
       -repeatmasker_timer '10H' \
+      -repeatmasker_resource_class 24Gb_mem \
       $REP_LIB_OPT \
       -repeatmasker_repbase_species "$REPBASE_SPECIES_NAME" \
       -max_seq_length 300000 \
