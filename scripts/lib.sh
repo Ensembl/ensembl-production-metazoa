@@ -3093,9 +3093,10 @@ function prepare_metada () {
     echo "generating metadata from raw $META_RAW..." > /dev/stderr
     mkdir -p $OUT_DIR
 
+    local META_RAW_ORIG="${META_RAW}"
     cat "$META_RAW" > "${OUT_DIR}"/meta.raw
     conf_from_refseq_url "${OUT_DIR}"/meta.raw
-    META_RAW="${OUT_DIR}"/meta.raw
+    local META_RAW="${OUT_DIR}"/meta.raw
     echo "switching to metadata from raw copy $META_RAW..." > /dev/stderr
 
     local BRC4_LOAD=$BRC4_LOAD
@@ -3315,7 +3316,7 @@ function prepare_metada () {
     python $SCRIPTS/new_genome_loader/scripts/gff_metaparser/gen_meta_conf.py \
       --assembly_version $ASM_VERSION \
       --data_out_dir $OUT_DIR \
-      --raw_meta_conf $META_RAW \
+      --raw_meta_conf $META_RAW_ORIG \
       --fasta_dna $ASM_DIR/$FNA_FILE \
       $MCFG_GBFF_OPTS \
       $MCFG_ASM_REP_OPTS \
@@ -3394,8 +3395,10 @@ function run_new_loader () {
     fi
 
     local GCF_TO_GCA=$(get_meta_conf $META_FILE_RAW 'GCF_TO_GCA')
-    if [ -n "$GCF_TO_GCA" ]; then
+    if [ -n "$GCF_TO_GCA" -a "$GCF_TO_GCA" != "0" -a "$GCF_TO_GCA" != "NO" ]; then
       GCF_TO_GCA="--swap_gcf_gca 1"
+    else
+      GCF_TO_GCA=""
     fi
 
     local ADHOC_OPTIONS="--load_pseudogene_with_CDS 0 --no_brc4_stuff 1 --ignore_final_stops 1 --xref_display_db_default Ensembl_Metazoa --xref_load_logic_name $GFF3_LOAD_LOGIC_NAME"
@@ -3408,7 +3411,7 @@ function run_new_loader () {
       ADHOC_OPTIONS=""
     fi
 
-    local GFF_LOADER_OPTIONS=$(get_meta_conf $META_FILE_RAW 'GFF_LOADER_OPTIONS')
+    local GFF_LOADER_OPTIONS="$(get_meta_conf $META_FILE_RAW 'GFF_LOADER_OPTIONS')"
 
     # gen registry
     local REG_FILE=$OUT_DIR/prereqs/reg.conf
@@ -3416,6 +3419,8 @@ function run_new_loader () {
 
     # try to set max_allowed_packet size
     $CMD_W -e 'SET GLOBAL max_allowed_packet=2147483648;' || true
+
+    echo GFF_LOADER_OPTIONS ${GFF_LOADER_OPTIONS} > /dev/stderr
 
     init_pipeline.pl Bio::EnsEMBL::Pipeline::PipeConfig::BRC4_genome_loader_conf \
       $($CMD_W details hive) \
@@ -3429,7 +3434,6 @@ function run_new_loader () {
       --data_dir $META_DIR \
       --pipeline_dir $OUT_DIR \
       --release $RELEASE_V \
-      --check_manifest 1 \
       --prune_agp 0 \
       --unversion_scaffolds 1 \
       --cs_tag_for_ordered "$ORDERED_CS_TAG" \
