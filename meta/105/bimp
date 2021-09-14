@@ -71,3 +71,8 @@ annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Bombu
 #
 # FINALIZE
 #
+# fixing the wrong assembly name retrieved from the GenBank gbff header
+#  ${CMD_W} -D bombus_impatiens_core_53_106_3 -e 'update meta set meta_value = "BIMP_2.2" where meta_value = "BIMP_2.0"'
+#  ${CMD_W} -D bombus_impatiens_core_53_106_3 -e 'update meta set meta_value = "BIMP2v2.0" where meta_value = "BIMP2v0.0"'
+#  ${CMD_W} -D bombus_impatiens_core_53_106_3 -e 'update coord_system set version = "BIMP_2.2" where version = "BIMP_2.0"'
+#
