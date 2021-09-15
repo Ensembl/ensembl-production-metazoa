@@ -94,4 +94,24 @@ species.stable_id_prefix	ENSLOCGWHAMMH
 #
 # FINALIZE
 #
-
+# Removing translation for non-coding genes
+#
+# $CMD_W -D premz_ixodes_persulcatus_gca013358835v1_core_53_105_1 -e '
+#   DELETE tn FROM
+#     translation tn INNER JOIN
+#     transcript t USING (transcript_id)
+#   WHERE t.biotype = "nontranslating_CDS"'
+#
+# $CMD_W -D premz_ixodes_persulcatus_gca013358835v1_core_53_105_1 -e '
+#   DELETE ta FROM
+#     translation_attrib ta LEFT JOIN
+#     translation tra ON ta.translation_id = tra.translation_id
+#   WHERE ta.translation_id IS NOT NULL AND tra.translation_id IS NULL'
+#
+# $CMD_W -D premz_ixodes_persulcatus_gca013358835v1_core_53_105_1 -e '
+#   UPDATE
+#     transcript tr LEFT JOIN
+#     translation tra ON tr.canonical_translation_id = tra.translation_id
+#   SET tr.canonical_translation_id = NULL
+#   WHERE tr.canonical_translation_id IS NOT NULL AND tra.translation_id IS NULL'
+#
