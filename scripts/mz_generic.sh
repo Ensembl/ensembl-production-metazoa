@@ -344,18 +344,19 @@ fi
 if [ z"${SPECIAL_ACTION}" = z"finalise" ]; then
   backup_relink $DBNAME $CMD final $DATA_DIR/bup
   echo done > /dev/stderr
-else
-  false; fail
+fi
+
+if [ z"${SPECIAL_ACTION}" = z"patch_schema" ]; then
+  echo running additional steps. not backing them  up > /dev/stderr
+  patch_db_schema $CMD_W $DBNAME \
+    $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/patch_schema
+
+  backup_relink $DBNAME $CMD patched_shema $DATA_DIR/bup
+  echo schema patched > /dev/stderr
 fi
 
 # additioanal staff
 exit 0
-
-echo running additional steps. not backing them  up > /dev/stderr
-patch_db_schema $CMD_W $DBNAME \
-  $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/patch_schema
-
-backup_relink $DBNAME $CMD patched_shema $DATA_DIR/bup
 
 # use conf instead???
 # exit 0
