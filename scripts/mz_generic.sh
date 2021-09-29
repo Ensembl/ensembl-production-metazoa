@@ -351,7 +351,7 @@ if [ z"${SPECIAL_ACTION}" = z"patch_schema" ]; then
   patch_db_schema $CMD_W $DBNAME \
     $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/patch_schema
 
-  backup_relink $DBNAME $CMD patched_shema $DATA_DIR/bup
+  backup_relink $DBNAME $CMD patched_schema $DATA_DIR/bup
   echo schema patched > /dev/stderr
 fi
 
