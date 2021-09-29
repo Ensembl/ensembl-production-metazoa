@@ -280,14 +280,19 @@ function get_asm_ftp () {
   local URL="$1"
   local RAW_DIR="$2"
 
-  ftp_prefix=$(dirname "$URL")
-  asm_name=$(basename "$URL")
   if ! check_done _get_asm_ftp; then
     echo getting "$URL" into "$RAW_DIR" > /dev/stderr
     pushd $RAW_DIR
-    lftp -e 'mirror '"$asm_name"' ; bye' "$ftp_prefix"
-    ln -s "$asm_name" asm
-    chmod u+w "$asm_name"
+    ftp_prefix=$(dirname "$URL")
+    asm_name=$(basename "$URL")
+    if [ -n "$URL" ]; then
+      lftp -e 'mirror '"$asm_name"' ; bye' "$ftp_prefix"
+      ln -s "$asm_name" asm
+      chmod u+w "$asm_name"
+    else
+      echo no ASM_URL, creating asm dir in "$RAW_DIR" > /dev/stderr
+      mkdir -p asm
+    fi
     popd
 
     touch_done _get_asm_ftp
@@ -3313,6 +3318,8 @@ function prepare_metada () {
       SEQ_REGION_SOURCE_DEFAULT="GenBank"
     fi
 
+    local GEN_META_CONF_OPTIONS="$(get_meta_conf $META_RAW GEN_META_CONF_OPTIONS)"
+
     python $SCRIPTS/new_genome_loader/scripts/gff_metaparser/gen_meta_conf.py \
       --assembly_version $ASM_VERSION \
       --data_out_dir $OUT_DIR \
@@ -3322,6 +3329,7 @@ function prepare_metada () {
       $MCFG_ASM_REP_OPTS \
       $MCFG_GFF_CAUSED_OPTS \
       $MCFG_SR_SYNS_OPT \
+      $GEN_META_CONF_OPTIONS \
       --syns_src $SEQ_REGION_SOURCE_DEFAULT \
       --genome_conf  $OUT_DIR/genome.json \
       --seq_region_conf $OUT_DIR/seq_region.json \
