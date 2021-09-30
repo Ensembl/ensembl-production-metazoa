@@ -37,7 +37,7 @@ species.common_name	Human gut metagenome
 # stats and metadata generation options
 #CONF	IGNORE_UNVALID_SOURCE_GFF	YES
 #or IGNORE_UNVALID_SOURCE_GFF       NO
-#CONF	STOP_AFTER_CONF	YES
+#CONF	STOP_AFTER_CONF	NO
 
 #CONF	GFF_PARSER_CONF_PATCH	NO
 
