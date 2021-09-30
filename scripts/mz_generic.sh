@@ -158,14 +158,6 @@ if [ z"${SPECIAL_ACTION}" = z"restore" ]; then
   echo "!!! RESTORING DB !!!" > /dev/stderr; restore $DBNAME $CMD_W $DATA_DIR/bup; echo ok > /dev/stderr; false; fail
 fi
 
-
-# initial test, uncomment for the first run, if not sure
-# TODO: add an option to run, similar tot the STOP_AFTER_CONF
-# run_core_stats_new $CMD_W $DBNAME $SPECIES $DATA_DIR/data/pipeline_out/core_stats _initial
-# run_dc $CMD_W $DBNAME $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/dc _initial
-# exit 0
-
-
 # fill meta
 fill_meta $CMD_W $DBNAME $META_FILE $DATA_DIR/data/pipeline_out/fill_meta
 backup_relink $DBNAME $CMD with_meta $DATA_DIR/bup
@@ -178,6 +170,13 @@ if [ -n "$TR_TRANS_SPLICED" ]; then
   backup_relink $DBNAME $CMD tr_spliced_marks $DATA_DIR/bup
 fi
 
+
+# initial test, uncomment for the first run, if not sure
+if [ z"${SPECIAL_ACTION}" = z"stop_after_load" ]; then
+  run_core_stats_new $CMD_W $DBNAME $SPECIES $DATA_DIR/data/pipeline_out/core_stats _initial
+  run_dc $CMD_W $DBNAME $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/dc _initial
+  exit 0
+fi
 
 GFF_FILE=$(get_meta_conf $META_FILE 'GFF_FILE')
 
