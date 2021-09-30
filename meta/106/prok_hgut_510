@@ -28,22 +28,23 @@ species.common_name	Human gut metagenome
 # getting seq_region synonyms from GenBank fsa_nt
 #   >CABQEK010000001.1 TPA_asm: uncultured Ruminococcaceae bacterium isolate MGYG-HGUT-00510 genome assembly, contig: GUT_GENOME013963_1, whole genome shotgun sequence
 
-#CONF	DATA_INIT	zgrep '^>' CABQEK01.1.fsa_nt.gz | perl -pe 's/>([\.\w]+)\s+.*contig: (\w+).*/$1\t$2\tINSDC_submitted_name/;' > orig2ena.sr_syns
+#CONF	DATA_INIT	zgrep '^>' CABQEK01.1.fsa_nt.gz | perl -pe 's/>([\.\w]+)\s+.*contig: (\w+).*/$1\t$2\tINSDC_submitted_name/;' > orig2mgnify.sr_syns
 
-#CONF	SR_SYNS_FILE	orig2ngdc.sr_syns
+#CONF	SR_SYNS_FILE	orig2mgnify.sr_syns
 
-#CONF	GEN_META_CONF_OPTIONS	-species_division EnsemblBacteria
+#CONF	GEN_META_CONF_OPTIONS	--species_division EnsemblBacteria --default_genetic_code 11
 
 # stats and metadata generation options
-#CONF	IGNORE_UNVALID_SOURCE_GFF	NO
-#CONF	STOP_AFTER_CONF	NO
+#CONF	IGNORE_UNVALID_SOURCE_GFF	YES
+#or IGNORE_UNVALID_SOURCE_GFF       NO
+#CONF	STOP_AFTER_CONF	YES
 
 #CONF	GFF_PARSER_CONF_PATCH	NO
 
 # disabling default [transcript -> mRNA] gff3 feature type convesion
-#CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna
+#CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna,mgnify_prodig
 
-#CONF	GFF_PARSER_CONF	gff_metaparser/ebi_mgm_prodig.conf
+#CONF	GFF_PARSER_CONF	gff_metaparser/mgnify_prodig.conf
 #CONF	GFF_PARSER_PFX_TRIM	NO
 
 #CONF	GFF3_LOAD_LOGIC_NAME	gff3_import_raw
