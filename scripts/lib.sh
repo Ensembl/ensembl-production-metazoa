@@ -2451,7 +2451,7 @@ function run_data_init() {
       fi
       echo "running data init commands: '$init_cmd'" > /dev/stderr
 
-      sh -c "$init_cmd" || false
+      bash -c "set -xeo pipefail; $init_cmd" || false
     popd
 
     touch_done "$DONE_TAG"
