@@ -1,0 +1,107 @@
+#CONF	DB_PFX	premz
+#CONF	ASM_VERSION	2
+
+# updated, prev was crassostrea_gigas_core_53_106_1
+
+species.production_name	crassostrea_gigas
+species.common_name	Pacific oyster
+
+# GCA_902806645.1
+# https://www.ncbi.nlm.nih.gov/assembly/GCA_902806645.1/
+# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/902/806/645/GCA_902806645.1_cgigas_uk_roslin_v1
+#
+# ./cgigas_uk_roslin_v1/cgigas_uk_roslin_v1_annotation.gff3.gz
+# ./cgigas_uk_roslin_v1/cgigas_uk_roslin_v1_annotation.pep.fa.gz
+#
+# https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=fasta&id=MZ497416.1
+# https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=MZ497416.1
+# https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gbwithparts&save=file&id=MZ497416.1&withparts=on&showgi=1&tool=portal
+# https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=fasta_cds_aa&save=file&id=MZ497416.1&withparts=on&conwithfeat=on&hide-cdd=on&tool=portal
+
+#CONF	ASM_URL	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/902/806/645/GCA_902806645.1_cgigas_uk_roslin_v1
+ 
+#CONF	DATA_INIT	wget 'https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=fasta&id=MZ497416.1' -O MZ497416.1.fna
+#CONF	DATA_INIT	wget 'https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=MZ497416.1' -O MZ497416.1.gff3
+#CONF	DATA_INIT	wget 'https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=fasta_cds_aa&save=file&id=MZ497416.1&withparts=on&conwithfeat=on&hide-cdd=on&tool=portal' -O MZ497416.1.faa
+
+#CONF	DATA_INIT	cp ../../../../../cgigas_uk_roslin_v1/cgigas_uk_roslin_v1_annotation.gff3.gz .
+#CONF	DATA_INIT	cp ../../../../../cgigas_uk_roslin_v1/cgigas_uk_roslin_v1_annotation.pep.fa.gz .
+#CONF	DATA_INIT	cp ../../../../../cgigas_uk_roslin_v1/cgigas_uk_roslin_v1.repmod.db-families.fa.gz .
+
+#CONF	DATA_INIT	zcat GCA_902806645.1_cgigas_uk_roslin_v1_genomic.fna.gz | cat - MZ497416.1.fna  > fna.fna
+#CONF	DATA_INIT	(zcat cgigas_uk_roslin_v1_annotation.gff3.gz; grep -v '#' MZ497416.1.gff3)  > gff3.gff3
+#CONF	DATA_INIT	zcat cgigas_uk_roslin_v1_annotation.pep.fa.gz  | cat - MZ497416.1.faa  > faa.faa
+
+#CONF	GBFF_FILE	GCA_902806645.1_cgigas_uk_roslin_v1_genomic.gbff.gz
+#CONF	FNA_FILE	fna.fna
+#CONF	ASM_REP_FILE	GCA_902806645.1_cgigas_uk_roslin_v1_assembly_report.txt
+
+#CONF	GFF_FILE	gff3.gff3
+#CONF	PEP_FILE	pep.faa
+
+# refseq syns ?
+#no CONF	SR_SYNS_FILE	report2refseq.sr_syns
+
+
+# stats and metadata generation options
+#CONF	STOP_AFTER_CONF	NO
+
+#CONF	GFF_PARSER_CONF_PATCH	NO
+
+# disabling default [transcript -> mRNA] gff3 feature type convesion
+#CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna
+
+#no CONF	GFF_PARSER_PFX_TRIM	NO
+#CONF	GFF_LOADER_OPTIONS	--external_db_map_name external_db_map_metazoa.txt
+#  FlyBase: --external_db_map_name external_db_map_metazoa.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
+#  minimal: --external_db_map_name external_db_map_minimal.txt --skip_unknown_xref_source 1
+
+#no CONF	ORDERED_CS_TAG	chromosome
+
+
+# update stable ids
+#CONF	UPDATE_STABLE_IDS	1
+# it's better not to split version ('-fix_version 0' by default)
+#no CONF	UPDATE_STABLE_IDS_OPTIONS	-fix_version 1
+
+
+# Assembly metadata
+assembly.accession	GCA_902806645.1
+#CONF	GCF_TO_GCA	0
+
+# Provider metadata
+#CONF	GFF3_LOAD_SOURCE_NAME	ROSLIN_INST
+
+assembly.provider_name	The Roslin Institute, The University of Edinburgh
+assembly.provider_url	https://www.ed.ac.uk/roslin
+
+annotation.provider_name	The Roslin Institute, The University of Edinburgh
+annotation.provider_url	https://www.ed.ac.uk/roslin
+
+# use custom rep lib !!!
+
+#no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
+
+
+# rna features and genes
+#CONF	RNA_FEAT_PARAMS	-cmscan_threshold 1e-6 -taxonomic_lca 1
+
+#no CONF	RUN_RNA_GENES	NO
+
+# or
+# using 'vb' context, otherwise ('eg' context) needs special "ena*" database
+#CONF	RNA_GENE_PARAMS	-run_context vb -score_threshold 65
+#               m.b. updated maximum_per_hit_name { 'pre_miRNA' => 100, 'ribozyme' => 100 }
+species.stable_id_prefix	ENSLOC
+
+# NB unset/set toplevel for the MT
+
+
+# load UniProt gene names and descriptions
+#CONF	XREF_PARAMS	-description_source reviewed -description_source unreviewed -gene_name_source reviewed
+#no -overwrite_description 1
+
+#
+# FINALIZE
+#
+
