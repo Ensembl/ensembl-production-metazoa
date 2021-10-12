@@ -19,6 +19,8 @@ species.common_name	Pacific oyster
 # https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=fasta_cds_aa&save=file&id=MZ497416.1&withparts=on&conwithfeat=on&hide-cdd=on&tool=portal
 
 #CONF	ASM_URL	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/902/806/645/GCA_902806645.1_cgigas_uk_roslin_v1
+
+#CONF	ASM_SINGLE	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/902/806/645/GCF_902806645.1_cgigas_uk_roslin_v1/GCF_902806645.1_cgigas_uk_roslin_v1_genomic.fna.gz
  
 #CONF	DATA_INIT	wget 'https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=fasta&id=MZ497416.1' -O MZ497416.1.fna
 #CONF	DATA_INIT	wget 'https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=MZ497416.1' -O MZ497416.1.gff3
@@ -30,17 +32,26 @@ species.common_name	Pacific oyster
 
 #CONF	DATA_INIT	zcat GCA_902806645.1_cgigas_uk_roslin_v1_genomic.fna.gz | cat - MZ497416.1.fna  > fna.fna
 #CONF	DATA_INIT	(zcat cgigas_uk_roslin_v1_annotation.gff3.gz; grep -v '#' MZ497416.1.gff3)  > gff3.gff3
-#CONF	DATA_INIT	zcat cgigas_uk_roslin_v1_annotation.pep.fa.gz  | cat - MZ497416.1.faa  > faa.faa
+#CONF	DATA_INIT	zcat cgigas_uk_roslin_v1_annotation.pep.fa.gz  | cat - MZ497416.1.faa  > pep.faa
 
 #CONF	GBFF_FILE	GCA_902806645.1_cgigas_uk_roslin_v1_genomic.gbff.gz
 #CONF	FNA_FILE	fna.fna
-#CONF	ASM_REP_FILE	GCA_902806645.1_cgigas_uk_roslin_v1_assembly_report.txt
+#CONF	ASM_REP_FILE	patched_report.txt
 
 #CONF	GFF_FILE	gff3.gff3
 #CONF	PEP_FILE	pep.faa
 
 # refseq syns ?
-#no CONF	SR_SYNS_FILE	report2refseq.sr_syns
+#resolving issues with GenBank <> RefSeq string in assembly_report
+#CONF	DATA_INIT	zcat GCA_902806645.1_cgigas_uk_roslin_v1_genomic.fna.gz GCF_902806645.1_cgigas_uk_roslin_v1_genomic.fna.gz | python -c 'import sys; import hashlib; from Bio import SeqIO; print("\n".join(map(lambda seq: seq.id +"\t" + hashlib.md5(bytes(seq.seq).upper()).hexdigest(), SeqIO.FastaIO.FastaIterator(sys.stdin))))' > fna.md5
+#CONF	DATA_INIT	cat GCA_902806645.1_cgigas_uk_roslin_v1_assembly_report.txt | awk -F "\t" '!/<>/;  $5 == "na" && /<>/ {refseq[$1] = $7 } $7 == "na" && /<>/ {OFS="\t";  $7 = refseq[$1]; print}'  > pre_patched_report.txt 
+#CONF	DATA_INIT	cat fna.md5 pre_patched_report.txt | perl -pe 's/\s*$/\n/' | awk -F "\t" '/#/ {print} NF==2 {md5[$1] = $2} (!/#/ && NF > 7 && md5[$5] == md5[$7]) {OFS="\t"; $6 = "="; print}  (!/#/ && NF > 7 && md5[$5] != md5[$7]) {OFS="\t"; $6 = "<>"; print "#FAILED", $0, md5[$5], md5[$7]}' > patched_report.txt
+#CONF	DATA_INIT	grep '^#FAILED' patched_report.txt && false
+
+# adding additional syns
+#CONF	DATA_INIT	cat patched_report.txt  | grep -v '#'  | grep '^LG' | perl -pe 's/[;=]/_/g;s/_pilon//' | awk -F "\t" '{OFS="\t"; print $5, $3, "ROSLIN_INST"; print $5, $1, "ROSLIN_INST"}' > roslin.sr_syns
+#CONF	SR_SYNS_FILE	roslin.sr_syns
+
 
 
 # stats and metadata generation options
@@ -56,7 +67,7 @@ species.common_name	Pacific oyster
 #  FlyBase: --external_db_map_name external_db_map_metazoa.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
 #  minimal: --external_db_map_name external_db_map_minimal.txt --skip_unknown_xref_source 1
 
-#no CONF	ORDERED_CS_TAG	chromosome
+#no CONF	ORDERED_CS_TAG	linkage_group
 
 
 # update stable ids
