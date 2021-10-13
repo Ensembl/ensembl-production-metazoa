@@ -31,8 +31,9 @@ species.common_name	Pacific oyster
 #CONF	DATA_INIT	cp ../../../../../cgigas_uk_roslin_v1/cgigas_uk_roslin_v1.repmod.db-families.fa.gz .
 
 #CONF	DATA_INIT	zcat GCA_902806645.1_cgigas_uk_roslin_v1_genomic.fna.gz | cat - MZ497416.1.fna  > fna.fna
-#CONF	DATA_INIT	(zcat cgigas_uk_roslin_v1_annotation.gff3.gz; grep -v '#' MZ497416.1.gff3)  > gff3.gff3
-#CONF	DATA_INIT	zcat cgigas_uk_roslin_v1_annotation.pep.fa.gz  | cat - MZ497416.1.faa  > pep.faa
+#CONF	DATA_INIT	(zcat cgigas_uk_roslin_v1_annotation.gff3.gz  | perl -pe 's/ID=([\w\.]+).cds.\d+;/ID=$1:cds;/ if m/\tCDS\t/'; grep -v '#' MZ497416.1.gff3)  > gff3.gff3
+#CONF	DATA_INIT	( zcat cgigas_uk_roslin_v1_annotation.pep.fa.gz | perl -pe 's/^>([^\s]+)/>$1:cds/'; cat MZ497416.1.faa | perl -pe 'if (m/\[protein_id=(\w+\.\d+)\]/) {my $a = $1; s/^>/>$a / }' )  > pep.faa
+
 
 #CONF	GBFF_FILE	GCA_902806645.1_cgigas_uk_roslin_v1_genomic.gbff.gz
 #CONF	FNA_FILE	fna.fna
