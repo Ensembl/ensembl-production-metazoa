@@ -34,4 +34,7 @@ Eastern oyster	cvig	GCA_002022765.4	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/022
 Deep sea snail	gaeg	GCA_016097555.1	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/016/097/555/GCF_016097555.1_Gae_host_genome/	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Gigantopelta_aegis/100/	Hong Kong University of Science and Technology	https://hkust.edu.hk/
 East Asian common octopus	osin	GCA_006345805.1	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/006/345/805/GCF_006345805.1_ASM634580v1/	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Octopus_sinensis/101/	Yellow Sea Fisheries Research Institute, Chinese Academy of Fishery Sciences	http://www.ysfri.ac.cn/
 Apple snail	pcan	GCA_003073045.1	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/073/045/GCF_003073045.1_ASM307304v1/	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Pomacea_canaliculata/100/	Agricultural Genomics Institute at Shenzhen, Chinese Academy of Agricultural Sciences	http://agis.caas.cn/
+
 # cat _refseq_106.lst | grep -vF '#' | awk -F "\t" '{print NF}' | sort | uniq -c
+# cd ../../
+# python3 ./scripts/tmpl2meta.py --template meta/refseq.tmpl --param_table meta/106/_refseq_107.lst --output_dir meta/106 --out_file_pfx rst_
