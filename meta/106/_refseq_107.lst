@@ -43,6 +43,6 @@ Parasitoid wasp	tpre	GCA_000599845.3	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/59
 Parasitoid wasp	cflo	GCA_000648655.2	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/648/655/GCF_000648655.2_Cflo_2.0	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Copidosoma_floridanum/101/	The BCM-HGSC i5K pilot project	https://www.hgsc.bcm.edu/
 Mediterranean fruit fly	ccap	GCA_000347755.4	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/347/755/GCF_000347755.3_Ccap_2.1	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Ceratitis_capitata/103/	The BCM-HGSC i5K pilot project	https://www.hgsc.bcm.edu/arthropods/i5k
 
-# cat _refseq_106.lst | grep -vF '#' | awk -F "\t" '{print NF}' | sort | uniq -c
+# cat _refseq_107.lst | grep -vF '#' | grep -vP '^\s*$' | awk -F "\t" '{print NF}' | sort | uniq -c
 # cd ../../
 # python3 ./scripts/tmpl2meta.py --template meta/refseq.tmpl --param_table meta/106/_refseq_107.lst --output_dir meta/106 --out_file_pfx rst_
