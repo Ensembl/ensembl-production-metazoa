@@ -10,9 +10,9 @@ species.common_name	East Asian common octopus
 
 # GCA_006345805.1
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_006345805.1
-# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/006/345/805/GCF_006345805.1_ASM634580v1/
+# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/006/345/805/GCF_006345805.1_ASM634580v1
 
-#CONF	ASM_URL	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/006/345/805/GCF_006345805.1_ASM634580v1/
+#CONF	ASM_URL	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/006/345/805/GCF_006345805.1_ASM634580v1
 
 
 # stats and metadata generation options

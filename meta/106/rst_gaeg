@@ -10,9 +10,9 @@ species.common_name	Deep sea snail
 
 # GCA_016097555.1
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_016097555.1
-# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/016/097/555/GCF_016097555.1_Gae_host_genome/
+# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/016/097/555/GCF_016097555.1_Gae_host_genome
 
-#CONF	ASM_URL	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/016/097/555/GCF_016097555.1_Gae_host_genome/
+#CONF	ASM_URL	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/016/097/555/GCF_016097555.1_Gae_host_genome
 
 
 # stats and metadata generation options

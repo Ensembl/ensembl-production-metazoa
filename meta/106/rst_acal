@@ -10,9 +10,9 @@ species.common_name	California sea hare
 
 # GCA_000002075.2
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_000002075.2
-# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/002/075/GCF_000002075.1_AplCal3.0/
+# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/002/075/GCF_000002075.1_AplCal3.0
 
-#CONF	ASM_URL	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/002/075/GCF_000002075.1_AplCal3.0/
+#CONF	ASM_URL	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/002/075/GCF_000002075.1_AplCal3.0
 
 
 # stats and metadata generation options
