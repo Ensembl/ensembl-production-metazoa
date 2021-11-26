@@ -35,6 +35,14 @@ Deep sea snail	gaeg	GCA_016097555.1	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/016/097
 East Asian common octopus	osin	GCA_006345805.1	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/006/345/805/GCF_006345805.1_ASM634580v1	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Octopus_sinensis/101/	Yellow Sea Fisheries Research Institute, Chinese Academy of Fishery Sciences	http://www.ysfri.ac.cn/
 Apple snail	pcan	GCA_003073045.1	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/073/045/GCF_003073045.1_ASM307304v1	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Pomacea_canaliculata/100/	Agricultural Genomics Institute at Shenzhen, Chinese Academy of Agricultural Sciences	http://agis.caas.cn/
 
+Dung beetle	otau	GCA_000648695.2	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/648/695/GCF_000648695.1_Otau_2.0	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Onthophagus_taurus/100/	The BCM-HGSC i5K pilot project	https://www.hgsc.bcm.edu/
+Coleseed sawfly	aros	GCA_000344095.2	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/344/095/GCF_000344095.2_Aros_2.0	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Athalia_rosae/102/	The BCM-HGSC i5K pilot project	https://www.hgsc.bcm.edu/
+Western predatory mite	gocc	GCA_000255335.1	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/255/335/GCF_000255335.1_Mocc_1.0	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Galendromus_occidentalis/102/	The BCM-HGSC i5K pilot project	https://www.hgsc.bcm.edu/
+Parasitic wood wasp	oabi	GCA_000612105.2	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/612/105/GCF_000612105.2_Oabi_2.0	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Orussus_abietinus/101/	The BCM-HGSC i5K pilot project	https://www.hgsc.bcm.edu/
+Parasitoid wasp	tpre	GCA_000599845.3	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/599/845/GCF_000599845.2_Tpre_2.0	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Trichogramma_pretiosum/101/	The BCM-HGSC i5K pilot project	https://www.hgsc.bcm.edu/
+Parasitoid wasp	cflo	GCA_000648655.2	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/648/655/GCF_000648655.2_Cflo_2.0	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Copidosoma_floridanum/101/	The BCM-HGSC i5K pilot project	https://www.hgsc.bcm.edu/
+Mediterranean fruit fly	ccap	GCA_000347755.4	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/347/755/GCF_000347755.3_Ccap_2.1	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Ceratitis_capitata/103/	The BCM-HGSC i5K pilot project	https://www.hgsc.bcm.edu/arthropods/i5k
+
 # cat _refseq_106.lst | grep -vF '#' | awk -F "\t" '{print NF}' | sort | uniq -c
 # cd ../../
 # python3 ./scripts/tmpl2meta.py --template meta/refseq.tmpl --param_table meta/106/_refseq_107.lst --output_dir meta/106 --out_file_pfx rst_
