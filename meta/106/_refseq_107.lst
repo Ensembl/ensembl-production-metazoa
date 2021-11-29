@@ -32,7 +32,6 @@ Emerald ash borer	apla	GCA_000699045.2	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/
 California sea hare	acal	GCA_000002075.2	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/002/075/GCF_000002075.1_AplCal3.0	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Aplysia_californica/102/	Broad Institute	https://www.broadinstitute.org/
 Eastern oyster	cvig	GCA_002022765.4	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/022/765/GCF_002022765.2_C_virginica-3.0	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Crassostrea_virginica/100/	McDonnell Genome Institute	https://www.genome.wustl.edu/
 Deep sea snail	gaeg	GCA_016097555.1	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/016/097/555/GCF_016097555.1_Gae_host_genome	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Gigantopelta_aegis/100/	Hong Kong University of Science and Technology	https://hkust.edu.hk/
-East Asian common octopus	osin	GCA_006345805.1	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/006/345/805/GCF_006345805.1_ASM634580v1	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Octopus_sinensis/101/	Yellow Sea Fisheries Research Institute, Chinese Academy of Fishery Sciences	http://www.ysfri.ac.cn/
 Apple snail	pcan	GCA_003073045.1	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/073/045/GCF_003073045.1_ASM307304v1	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Pomacea_canaliculata/100/	Agricultural Genomics Institute at Shenzhen, Chinese Academy of Agricultural Sciences	http://agis.caas.cn/
 
 Dung beetle	otau	GCA_000648695.2	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/648/695/GCF_000648695.1_Otau_2.0	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Onthophagus_taurus/100/	The BCM-HGSC i5K pilot project	https://www.hgsc.bcm.edu/
@@ -42,6 +41,12 @@ Parasitic wood wasp	oabi	GCA_000612105.2	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/00
 Parasitoid wasp	tpre	GCA_000599845.3	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/599/845/GCF_000599845.2_Tpre_2.0	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Trichogramma_pretiosum/101/	The BCM-HGSC i5K pilot project	https://www.hgsc.bcm.edu/
 Parasitoid wasp	cflo	GCA_000648655.2	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/648/655/GCF_000648655.2_Cflo_2.0	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Copidosoma_floridanum/101/	The BCM-HGSC i5K pilot project	https://www.hgsc.bcm.edu/
 Mediterranean fruit fly	ccap	GCA_000347755.4	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/347/755/GCF_000347755.3_Ccap_2.1	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Ceratitis_capitata/103/	The BCM-HGSC i5K pilot project	https://www.hgsc.bcm.edu/arthropods/i5k
+
+
+# Octopus confuision -- excluded:
+#  GCA_006345805.1 has "taxon:2607531" (Octopus sinensis),
+#  GCF_006345805.1 gbff has "taxon:6645" (Octopus vulgaris)
+#East Asian common octopus	osin	GCA_006345805.1	ftp.ncbi.nlm.nih.gov/genomes/all/GCF/006/345/805/GCF_006345805.1_ASM634580v1	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Octopus_sinensis/101/	Yellow Sea Fisheries Research Institute, Chinese Academy of Fishery Sciences	http://www.ysfri.ac.cn/
 
 # cat _refseq_107.lst | grep -vF '#' | grep -vP '^\s*$' | awk -F "\t" '{print NF}' | sort | uniq -c
 # cd ../../
