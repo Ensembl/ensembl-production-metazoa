@@ -99,6 +99,12 @@ source ${SCRIPTS}/ensembl.prod.${ENS_VERSION}/setup.sh
 export PROD_DB_SCRIPTS=${ENSEMBL_ROOT_DIR}/ensembl.prod.${ENS_VERSION}uction/scripts/production_database
 echo 'ENSEMBL_ROOT_DIR='"${ENSEMBL_ROOT_DIR}" > /dev/stderr
 
+# exit after env setup, if you wish to
+if [ z"${SPECIAL_ACTION}" = z"env_setup_only" ]; then
+  echo environment is set up. exiting... > /dev/stderr
+  exit 0
+fi
+
 
 # prepared data dir
 export DATA_DIR=$WD/$SPEC_SHORT
@@ -171,7 +177,7 @@ if [ -n "$TR_TRANS_SPLICED" ]; then
 fi
 
 
-# initial test, uncomment for the first run, if not sure
+# initial test, use "stop_after_load" as the second arg for the first run, if not sure
 if [ z"${SPECIAL_ACTION}" = z"stop_after_load" ]; then
   run_core_stats_new $CMD_W $DBNAME $SPECIES $DATA_DIR/data/pipeline_out/core_stats _initial
   run_dc $CMD_W $DBNAME $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/dc _initial
