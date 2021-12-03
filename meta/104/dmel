@@ -7,6 +7,8 @@ species.common_name	fruit fly
 genebuild.version	dmel_r6.38_FB2021_01
 assembly.default	dmel_r6.38
 assembly.name	dmel_r6.38
+genebuild.initial_release_date	2021-03
+genebuild.last_geneset_update	2021-03
 
 
 # Assembly metadata
@@ -40,6 +42,7 @@ assembly.accession	GCA_000001215.4
 #CONF	GFF_PARSER_CONF	gff_metaparser/flybase.conf
 #CONF	GFF_PARSER_PFX_TRIM	NO
 
+#CONF	GFF_GENE_SOURCE	FlyBase
 #CONF	GFF3_LOAD_LOGIC_NAME	flybase
 
 #CONF	SR_GFF_PARSER_CONF_PATCH	gff_metaparser/regions_no_syns.patch
