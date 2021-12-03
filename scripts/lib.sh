@@ -3066,20 +3066,38 @@ function conf_from_refseq_url () {
     return
   fi
 
-  local FNA_FILE=$(get_meta_conf $META_RAW FNA_FILE)
-  if [ -n "$FNA_FILE" ]; then
-    return
-  fi
+echo -n > "$META_RAW.refseq_tmplt"
 
-  cat > "$META_RAW.refseq_tmplt" << 'EOF'
-#CONF	GBFF_FILE	_FILENAME__genomic.gbff.gz
+local FNA_FILE=$(get_meta_conf $META_RAW FNA_FILE)
+  [ -z "$FNA_FILE" ] && cat >> "$META_RAW.refseq_tmplt" << 'EOF'
 #CONF	FNA_FILE	_FILENAME__genomic.fna.gz
-#CONF	ASM_REP_FILE	_FILENAME__assembly_report.txt
+EOF
 
+local GBFF_FILE=$(get_meta_conf $META_RAW GBFF_FILE)
+  [ -z "$GBFF_FILE" ] && cat >> "$META_RAW.refseq_tmplt" << 'EOF'
+#CONF	GBFF_FILE	_FILENAME__genomic.gbff.gz
+EOF
+
+local ASM_REP_FILE=$(get_meta_conf $META_RAW ASM_REP_FILE)
+  [ -z "$ASM_REP_FILE" ] && cat >> "$META_RAW.refseq_tmplt" << 'EOF'
+#CONF	ASM_REP_FILE	_FILENAME__assembly_report.txt
+EOF
+
+local GFF_FILE=$(get_meta_conf $META_RAW GFF_FILE)
+  [ -z "$GFF_FILE" ] && cat >> "$META_RAW.refseq_tmplt" << 'EOF'
 #CONF	GFF_FILE	_FILENAME__genomic.gff.gz
+EOF
+
+local TR_FILE=$(get_meta_conf $META_RAW TR_FILE)
+  [ -z "$TR_FILE" ] && cat >> "$META_RAW.refseq_tmplt" << 'EOF'
 #CONF	TR_FILE		_FILENAME__rna_from_genomic.fna.gz
+EOF
+
+local PEP_FILE=$(get_meta_conf $META_RAW PEP_FILE)
+  [ -z "$PEP_FILE" ] && cat >> "$META_RAW.refseq_tmplt" << 'EOF'
 #CONF	PEP_FILE	_FILENAME__protein.faa.gz
 EOF
+
 
   cat "$META_RAW.refseq_tmplt" |
     perl -pe 's,_FILENAME_,'"${REFSEQ_NAME}"',g' |
@@ -3323,7 +3341,7 @@ function prepare_metada () {
     python $SCRIPTS/new_genome_loader/scripts/gff_metaparser/gen_meta_conf.py \
       --assembly_version $ASM_VERSION \
       --data_out_dir $OUT_DIR \
-      --raw_meta_conf $META_RAW_ORIG \
+      --raw_meta_conf $META_RAW \
       --fasta_dna $ASM_DIR/$FNA_FILE \
       $MCFG_GBFF_OPTS \
       $MCFG_ASM_REP_OPTS \
