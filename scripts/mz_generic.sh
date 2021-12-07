@@ -20,6 +20,7 @@ set -o xtrace
 
 SPEC_PATH="$1"
 SPECIAL_ACTION="$2"
+SPECIAL_ACTION_ARG="$3"
 
 
 # load _mz.conf
@@ -161,7 +162,7 @@ backup_relink $DBNAME $CMD new_loader $DATA_DIR/bup
 
 if [ z"${SPECIAL_ACTION}" = z"restore" ]; then
   # RESTORE / UNCOMMENT TO USE
-  echo "!!! RESTORING DB !!!" > /dev/stderr; restore $DBNAME $CMD_W $DATA_DIR/bup; echo ok > /dev/stderr; false; fail
+  echo "!!! RESTORING DB (tag: '${SPECIAL_ACTION_ARG}')!!!" > /dev/stderr; restore $DBNAME $CMD_W $DATA_DIR/bup "$SPECIAL_ACTION_ARG"; echo ok > /dev/stderr; exit 0; false; fail
 fi
 
 # fill meta
