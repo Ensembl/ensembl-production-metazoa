@@ -266,13 +266,18 @@ function restore () {
   local DBNAME="$1"
   local CMD="$2"
   local BUP_DIR="$3"
+  local TAG_TO_USE="$4"
 
   echo restore > /dev/stderr
     ls -lt $BUP_DIR/ > /dev/stderr
   echo "uploading $BUP_DIR/${DBNAME}.gz to $DBNAME"
     echo "drop database if exists $DBNAME; create database $DBNAME; SET GLOBAL max_allowed_packet=2147483648;" |
       $CMD
-    zcat $BUP_DIR/${DBNAME}.gz |
+    local db_name="$DBNAME"
+    if [ -n "${TAG_TO_USE}" ]; then
+      # TODO
+    fi
+    zcat "$BUP_DIR/${db_name}.gz" |
       $CMD -D $DBNAME
 }
 
@@ -1390,6 +1395,9 @@ function run_xref () {
       2> $OUT_DIR/loop.stderr \
       1> $OUT_DIR/loop.stdout
     tail $OUT_DIR/loop.stderr $OUT_DIR/loop.stdout
+
+    rm -f ${OUT_DIR}/uniprot/uniprot_trembl.fasta* || true
+    rm -f ${OUT_DIR}/all/uniprot/uniprot_sprot.fasta* || true
 
     touch_done _run_xref
   fi
