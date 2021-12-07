@@ -275,7 +275,7 @@ function restore () {
       $CMD
     local db_name="$DBNAME"
     if [ -n "${TAG_TO_USE}" ]; then
-      # TODO
+      echo "using tag '{$TAG_TO_USE}' for loading..." > /dev/stderr
     fi
     zcat "$BUP_DIR/${db_name}.gz" |
       $CMD -D $DBNAME
