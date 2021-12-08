@@ -268,15 +268,43 @@ function restore () {
   local BUP_DIR="$3"
   local TAG_TO_USE="$4"
 
-  echo restore > /dev/stderr
-    ls -lt $BUP_DIR/ > /dev/stderr
+  echo restore >> /dev/stderr
+    ls -lt $BUP_DIR/ >> /dev/stderr
   echo "uploading $BUP_DIR/${DBNAME}.gz to $DBNAME"
     echo "drop database if exists $DBNAME; create database $DBNAME; SET GLOBAL max_allowed_packet=2147483648;" |
       $CMD
     local db_name="$DBNAME"
     if [ -n "${TAG_TO_USE}" ]; then
-      echo "using tag '{$TAG_TO_USE}' for loading..." > /dev/stderr
-    fi
+      echo "using tag '{$TAG_TO_USE}' for loading..." >> /dev/stderr
+      local bup_files=$(ls -1td ${BUP_DIR}/*gz)
+      local restore_from=$(echo $bup_files |
+        xargs -rn 1 |
+        grep -P "${db_name}\.\d+\.${TAG_TO_USE}\.gz"
+      )
+      if [ -z "$restore_from" ]; then
+        echo "no such tag '${TAG_TO_USE}' to restore from. failing...'"  >> /dev/stderr
+        false
+        fail
+        return
+      fi  # -z "$restore_from"
+
+      mkdir -p $BUP_DIR/obsolete
+      (
+        echo $bup_files |
+          xargs -rn 1 |
+          cat |
+          sed "/${db_name}\.[0-9]\+.${TAG_TO_USE}\.gz/q" |
+          grep -vF "$restore_from" |
+          xargs -rtn 1 -I XXX \
+            mv XXX $BUP_DIR/obsolete
+      ) || true
+
+      [ -f $BUP_DIR/${db_name}.gz ] && rm $BUP_DIR/${db_name}.gz
+      echo "using $restore_from to restore from" >> /dev/stderr
+
+      ln -s "$restore_from" $BUP_DIR/${db_name}.gz
+    fi # -n "${TAG_TO_USE}"
+
     zcat "$BUP_DIR/${db_name}.gz" |
       $CMD -D $DBNAME
 }
@@ -1754,6 +1782,9 @@ function run_repeat_masking () {
   if ! check_done "$DONE_TAG"; then
     echo "running repeat masking on $DBNAME" > /dev/stderr
     echo "using repeatmasker_repbase_species '$REPBASE_SPECIES_NAME'" > /dev/stderr
+
+    [ -d ${OUT_DIR}.old ] && rm -rf ${OUT_DIR}.old
+    [ -d ${OUT_DIR} ] && mv ${OUT_DIR} ${OUT_DIR}.old
 
     mkdir -p $OUT_DIR
     mkdir -p $OUT_DIR/reports
