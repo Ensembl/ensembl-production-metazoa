@@ -53,7 +53,7 @@ mkdir -p "$WD"
 
 # db server alias
 if [ -z "$CMD" ]; then 
-  echo 'no db server alias "$CMD" is provided' > /dev/stderr
+  echo 'no db server alias "$CMD" is provided' >> /dev/stderr
   exit 1
 fi
 if [ -z "$CMD_W" ]; then 
@@ -98,11 +98,11 @@ flock ${SCRIPTS}/ensembl.prod.${ENS_VERSION}.lock -c "
 
 source ${SCRIPTS}/ensembl.prod.${ENS_VERSION}/setup.sh
 export PROD_DB_SCRIPTS=${ENSEMBL_ROOT_DIR}/ensembl.prod.${ENS_VERSION}uction/scripts/production_database
-echo 'ENSEMBL_ROOT_DIR='"${ENSEMBL_ROOT_DIR}" > /dev/stderr
+echo 'ENSEMBL_ROOT_DIR='"${ENSEMBL_ROOT_DIR}" >> /dev/stderr
 
 # exit after env setup, if you wish to
 if [ z"${SPECIAL_ACTION}" = z"env_setup_only" ]; then
-  echo environment is set up. exiting... > /dev/stderr
+  echo environment is set up. exiting... >> /dev/stderr
   exit 0
 fi
 
@@ -114,7 +114,7 @@ populate_dirs $DATA_DIR
 export DONE_TAGS_DIR=$DATA_DIR/done
 export PIPELINE_OUT_DIR=$DATA_DIR/data/pipeline_out
 
-echo DATA_DIR="'${DATA_DIR}'" > /dev/stderr
+echo DATA_DIR="'${DATA_DIR}'" >> /dev/stderr
 
 
 # get data
@@ -138,7 +138,7 @@ if [ -z "${STOP_AFTER_CONF}" ]; then
   STOP_AFTER_CONF=$(get_meta_conf $META_FILE_RAW 'STOP_AFTER_CONF')
 fi
 if [ -n "${STOP_AFTER_CONF}" -a "x${STOP_AFTER_CONF}" != "xNO" -o z"${SPECIAL_ACTION}" = z"stop_after_conf" ]; then
-  echo 'stopping after config generation (STOP_AFTER_CONF). see stats...' > /dev/stderr
+  echo 'stopping after config generation (STOP_AFTER_CONF). see stats...' >> /dev/stderr
   exit 0
   false
 fi
@@ -154,15 +154,15 @@ SPECIES=$(get_meta_str $META_FILE "species.production_name")
 SPECIES_SCI=$(get_meta_str $META_FILE "species.scientific_name")
 SPECIES_SCI_=$(echo $SPECIES_SCI | perl -pe 's/[ _]+/_/g')
 
-echo "using DBNAME $DBNAME" > /dev/stderr
-echo "using SPECIES $SPECIES" > /dev/stderr
-echo "using SPECIES_SCI_ $SPECIES_SCI_" > /dev/stderr
+echo "using DBNAME $DBNAME" >> /dev/stderr
+echo "using SPECIES $SPECIES" >> /dev/stderr
+echo "using SPECIES_SCI_ $SPECIES_SCI_" >> /dev/stderr
 
 backup_relink $DBNAME $CMD new_loader $DATA_DIR/bup
 
 if [ z"${SPECIAL_ACTION}" = z"restore" ]; then
   # RESTORE / UNCOMMENT TO USE
-  echo "!!! RESTORING DB (tag: '${SPECIAL_ACTION_ARG}')!!!" > /dev/stderr; restore $DBNAME $CMD_W $DATA_DIR/bup "$SPECIAL_ACTION_ARG"; echo ok > /dev/stderr; exit 0; false; fail
+  echo "!!! RESTORING DB (tag: '${SPECIAL_ACTION_ARG}')!!!" >> /dev/stderr; restore $DBNAME $CMD_W $DATA_DIR/bup "$SPECIAL_ACTION_ARG"; echo ok > /dev/stderr; exit 0; false; fail
 fi
 
 # fill meta
@@ -271,13 +271,13 @@ if [ -n "$REP_LIB" -a "x$REP_LIB" != "xNO" ]; then
   rep_lib_size=$(grep -c '>' $REP_LIB)
 
   if [ "$rep_lib_size" -lt "1" ]; then
-    echo "empty repeat library ${REP_LIB}" > /dev/stderr
+    echo "empty repeat library ${REP_LIB}" >> /dev/stderr
     IGNORE_EMPTY_REP_LIB=$(get_meta_conf $META_FILE_RAW IGNORE_EMPTY_REP_LIB)
     if [ -n "$IGNORE_EMPTY_REP_LIB" ]; then
       REP_LIB="NO"
-      echo "  ignoring. (IGNORE_EMPTY_REP_LIB=${IGNORE_EMPTY_REP_LIB})" > /dev/stderr
+      echo "  ignoring. (IGNORE_EMPTY_REP_LIB=${IGNORE_EMPTY_REP_LIB})" >> /dev/stderr
     else
-      echo "  failing. set IGNORE_EMPTY_REP_LIB=1 to ignore" > /dev/stderr
+      echo "  failing. set IGNORE_EMPTY_REP_LIB=1 to ignore" >> /dev/stderr
       fail
     fi
   fi
@@ -349,16 +349,16 @@ fi
 
 if [ z"${SPECIAL_ACTION}" = z"finalise" ]; then
   backup_relink $DBNAME $CMD final $DATA_DIR/bup
-  echo done > /dev/stderr
+  echo done >> /dev/stderr
 fi
 
 if [ z"${SPECIAL_ACTION}" = z"patch_schema" ]; then
-  echo running additional steps. not backing them  up > /dev/stderr
+  echo running additional steps. not backing them  up >> /dev/stderr
   patch_db_schema $CMD_W $DBNAME \
     $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/patch_schema
 
   backup_relink $DBNAME $CMD patched_schema $DATA_DIR/bup
-  echo schema patched > /dev/stderr
+  echo schema patched >> /dev/stderr
 fi
 
 # additioanal staff
@@ -376,5 +376,5 @@ update_prod_tables_new $CMD_W $DBNAME_FIN $SPECIES \
 run_dc $CMD_W $DBNAME_FIN \
   $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/dc _fin
 
-echo done additional > /dev/stderr
+echo done additional >> /dev/stderr
 

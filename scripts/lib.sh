@@ -16,7 +16,7 @@
 
 # globals
 if [ -z "$PROD_SERVER" ]; then
-  echo 'no db server alias "$PROD_SERVER" is provided' > /dev/stderr
+  echo 'no db server alias "$PROD_SERVER" is provided' >> /dev/stderr
   false
   exit 1
 fi
@@ -87,8 +87,8 @@ function get_ensembl_prod () {
     popd
 
 # legacy
-#    echo "patching $BASE/ensembl-production-imported/modules/Bio/EnsEMBL/EGPipeline/FileDump/GenomicFeatureDumper.pm line 88" > /dev/stderr
-#    echo "commenting \$seq_obj->add_keyword('.');" > /dev/stderr
+#    echo "patching $BASE/ensembl-production-imported/modules/Bio/EnsEMBL/EGPipeline/FileDump/GenomicFeatureDumper.pm line 88" >> /dev/stderr
+#    echo "commenting \$seq_obj->add_keyword('.');" >> /dev/stderr
 #
 #    cat "$BASE"/ensembl-production-imported/modules/Bio/EnsEMBL/EGPipeline/FileDump/GenomicFeatureDumper.pm |
 #      perl -pe 's/^/#COMMENTED: / if m/seq_obj->add_keyword\('\''\.'\''\)/' > "$BASE/tmp"
@@ -190,7 +190,7 @@ function create_db_stub () {
 
   if ! check_done _create_db_stub; then
     # CREATE DB STUB
-    echo creating stub for $DBNAME at $CMD > /dev/stderr
+    echo creating stub for $DBNAME at $CMD >> /dev/stderr
 
     $CMD -e "DROP DATABASE IF EXISTS $DBNAME;"
     $CMD -e "CREATE DATABASE IF NOT EXISTS $DBNAME;"
@@ -219,10 +219,10 @@ function backup_relink () {
   # probable race and not full backing up
 
   local bup_name=$DBNAME.$(date +'%Y%m%d').$TAG.gz
-  echo backing up $bup_name > /dev/stderr
+  echo backing up $bup_name >> /dev/stderr
   local similar=$(ls $BUP_DIR | grep -F "$DBNAME." | grep -F ".$TAG.gz")
   if [ -n "$similar" ] ; then
-    echo " skipping because of the $similar backup..." > /dev/stderr
+    echo " skipping because of the $similar backup..." >> /dev/stderr
     return
   fi
 
@@ -245,10 +245,10 @@ function dir_backup_relink () {
 
   local DIRNAME=$(basename $DIR_PATH)
   local bup_name=${DIRNAME}.$(date +'%Y%m%d').$TAG.tgz
-  echo backing up $bup_name > /dev/stderr
+  echo backing up $bup_name >> /dev/stderr
   local similar=$(ls $BUP_DIR | grep -F "$DIRNAME." | grep -F ".$TAG.tgz")
   if [ -n "$similar" ] ; then
-    echo " skipping because of the $similar backup..." > /dev/stderr
+    echo " skipping because of the $similar backup..." >> /dev/stderr
     return
   fi
 
@@ -314,7 +314,7 @@ function get_asm_ftp () {
   local RAW_DIR="$2"
 
   if ! check_done _get_asm_ftp; then
-    echo getting "$URL" into "$RAW_DIR" > /dev/stderr
+    echo getting "$URL" into "$RAW_DIR" >> /dev/stderr
     pushd $RAW_DIR
     ftp_prefix=$(dirname "$URL")
     asm_name=$(basename "$URL")
@@ -323,7 +323,7 @@ function get_asm_ftp () {
       ln -s "$asm_name" asm
       chmod u+w "$asm_name"
     else
-      echo no ASM_URL, creating asm dir in "$RAW_DIR" > /dev/stderr
+      echo no ASM_URL, creating asm dir in "$RAW_DIR" >> /dev/stderr
       mkdir -p asm
     fi
     popd
@@ -341,7 +341,7 @@ function get_asm_dir () {
   ftp_prefix=$(dirname "$URL")
   asm_name=$(basename "$URL")
   if ! check_done _get_asm_ftp; then
-    echo getting "$URL" into "$RAW_DIR" > /dev/stderr
+    echo getting "$URL" into "$RAW_DIR" >> /dev/stderr
     pushd $RAW_DIR
     cp -r "$URL" .
     ln -s "$asm_name" asm
@@ -358,7 +358,7 @@ function get_file_to_asm () {
   local ASM_DIR="$2"
 
   name="$(basename $URL)"
-  echo getting "$URL" into "$ASM_DIR" > /dev/stderr
+  echo getting "$URL" into "$ASM_DIR" >> /dev/stderr
   wget -O $ASM_DIR/$(basename $URL) "$URL"
 }
 
@@ -383,7 +383,7 @@ function fill_taxonomy () {
   local ENS_DIR="$4"
 
   if ! check_done _fill_taxonomy; then
-    echo "filling taxonomy for ${TAXON_ID} into $DBNAME" > /dev/stderr
+    echo "filling taxonomy for ${TAXON_ID} into $DBNAME" >> /dev/stderr
     perl "$ENS_DIR"/ensembl-pipeline/scripts/load_taxonomy.pl \
       -taxon_id "${TAXON_ID}" \
       $($PROD_SERVER details prefix_taxondb) \
@@ -401,16 +401,16 @@ function fill_meta () {
   local BUP_DIR="$4"
 
   if ! check_done _fill_meta; then
-    echo "filling meta from $META_FILE into $DBNAME" > /dev/stderr
+    echo "filling meta from $META_FILE into $DBNAME" >> /dev/stderr
 
     mkdir -p "$BUP_DIR"
     # storing previous version of meta
     old_file="$BUP_DIR"/"$DBNAME".meta.$(date +'%Y%m%d%H%M%S').gz
-    echo "backing up meta to " > /dev/stderr
+    echo "backing up meta to " >> /dev/stderr
     $CMD $DBNAME -e 'select * from meta;' > $old_file
 
     # droping previous versions of meta pairs
-    echo "removing clashing keys from $DBNAME.meta " > /dev/stderr
+    echo "removing clashing keys from $DBNAME.meta " >> /dev/stderr
     cat $META_FILE |
       grep -v -P '^\s*#' |
       grep -vP '^\s*$' |
@@ -420,7 +420,7 @@ function fill_meta () {
       $CMD $DBNAME
 
     # fill
-    echo "filling meta into $DBNAME.meta " > /dev/stderr
+    echo "filling meta into $DBNAME.meta " >> /dev/stderr
     cat $META_FILE |
       grep -v -P '^\s*#' |
       grep -vP '^\s*$' |
@@ -446,7 +446,7 @@ function load_dna_sequences () {
   local ASM_DIR="${10}"
 
   if ! check_done _load_dna_sequences; then
-    echo "loading sequences into  into $DBNAME" > /dev/stderr
+    echo "loading sequences into  into $DBNAME" >> /dev/stderr
 
     local RANK=11
     if [ -n "$LOWER_CS_RANK" ]; then
@@ -612,7 +612,7 @@ function load_dna_sequences () {
     # load chromosomes if exists AGP
     if [ -f "${PIPELINE_DIR}/${ASSEMBLY}.chromosome.agp" ] ; then
       if [ "$RANK" -lt 1 ]; then
-        echo "failing. rank for 'crhomosome' CS is $RANK" > /dev/stderr
+        echo "failing. rank for 'crhomosome' CS is $RANK" >> /dev/stderr
       fi
 
       RANK=1
@@ -632,7 +632,7 @@ function load_dna_sequences () {
     # update ENA seq_region_attrib
     local not_set_ena=$(get_meta_conf $META_FILE NOT_SET_ENA)
     if [ -n "$not_set_ena" -a "$not_set_ena" -ne 0 ]; then
-      echo NOT SETTING ENA SYNONIMS FLAGS because of the META:CONF:NOT_SET_ENA > /dev/stderr
+      echo NOT SETTING ENA SYNONIMS FLAGS because of the META:CONF:NOT_SET_ENA >> /dev/stderr
     else
       [ -n "$set_ena_contigs" ] && update_ena_attrib_for_cs $CMD $DBNAME 'contig' || true
       [ -n "$set_ena_scaffolds" ] && update_ena_attrib_for_cs $CMD $DBNAME 'scaffold' || true
@@ -710,10 +710,10 @@ function load_dna_sequences () {
     if [ -f "${PIPELINE_DIR}/${ASSEMBLY}.chromosome.agp" ] ; then
       local keep_ctg_scf_chr_mapping=$(get_meta_conf $META_FILE KEEP_CTG_SCF_CHR_MAPPING)
       if [ -s $PIPELINE_DIR/update_chromosome_syns.sql -a -n "$keep_ctg_scf_chr_mapping" -a "$keep_ctg_scf_chr_mapping" -ne 0 ]; then
-          echo 'keeping "chromosome:'${ASSEMBLY}'|scaffold:'${ASSEMBLY}'|contig" assembly mapping path ("assembly.mapping")' > /dev/stderr
+          echo 'keeping "chromosome:'${ASSEMBLY}'|scaffold:'${ASSEMBLY}'|contig" assembly mapping path ("assembly.mapping")' >> /dev/stderr
           $CMD $DBNAME -e "insert ignore into meta (species_id, meta_key, meta_value) values (1, \"assembly.mapping\", \"chromosome:$ASSEMBLY|scaffold:$ASSEMBLY|contig\");"
         else
-          echo 'removing "chromosome:'${ASSEMBLY}'|scaffold:'${ASSEMBLY}'|contig" assembly mapping path ("assembly.mapping")' > /dev/stderr
+          echo 'removing "chromosome:'${ASSEMBLY}'|scaffold:'${ASSEMBLY}'|contig" assembly mapping path ("assembly.mapping")' >> /dev/stderr
           $CMD $DBNAME -e 'delete from meta where meta_key="assembly.mapping" and meta_value="chromosome:'${ASSEMBLY}'|scaffold:'${ASSEMBLY}'|contig";'
         fi
     fi
@@ -748,7 +748,7 @@ function get_old_syns_from_db () {
   local OUTFILE="$3"
 
   if ! check_done _get_old_syns_from_db; then
-    echo "saving old syns from $CMD:$DBNAME to $OUTFILE" > /dev/stderr
+    echo "saving old syns from $CMD:$DBNAME to $OUTFILE" >> /dev/stderr
       local outdir=$(dirname $OUTFILE)
       mkdir -p $outdir
       $CMD $DBNAME -e "select sr.name, srs.synonym, srs.external_db_id from seq_region sr, seq_region_synonym srs where sr.seq_region_id = srs.seq_region_id" > $OUTFILE
@@ -765,7 +765,7 @@ function load_region_syns () {
 
   local DONE_TAG='_load_region_syns'${TAG}
   if ! check_done "$DONE_TAG"; then
-    echo "loading region syns from $SYNS_FILE" > /dev/stderr
+    echo "loading region syns from $SYNS_FILE" >> /dev/stderr
     mkdir -p $OUT_DIR
     $CMD $DBNAME -e "select sr.name, srs.synonym from seq_region sr, seq_region_synonym srs where sr.seq_region_id = srs.seq_region_id" -N  > $OUT_DIR/new_syns.tsv
     cat "$SYNS_FILE" | grep -vwFf $OUT_DIR/new_syns.tsv > $OUT_DIR/syns_filtered.tsv
@@ -784,7 +784,7 @@ function update_ena_attrib_for_cs () {
   local DBNAME="$2"
   local CSNAME="$3"
 
-  echo "updating seq_region ENA attributes in $DBNAME for $CSNAME" > /dev/stderr
+  echo "updating seq_region ENA attributes in $DBNAME for $CSNAME" >> /dev/stderr
   $CMD -D $DBNAME -e 'insert into seq_region_attrib (seq_region_id, attrib_type_id, value) select sr.seq_region_id, "317", "ENA" from seq_region sr, coord_system cs where sr.coord_system_id = cs.coord_system_id and cs.name = "'"$CSNAME"'";'
 }
 
@@ -792,7 +792,7 @@ function update_ena_seq_attrib () {
   local CMD="$1"
   local DBNAME="$2"
   if ! check_done _update_ena_seq_attrib; then
-    echo "updating seq_region ENA attributes in $DBNAME" > /dev/stderr
+    echo "updating seq_region ENA attributes in $DBNAME" >> /dev/stderr
     # Set ENA attrib for non chromosomal ids (i.e. contigs +supercontigs)
     $CMD -D $DBNAME -e 'insert into seq_region_attrib (seq_region_id, attrib_type_id, value) select sr.seq_region_id, "317", "ENA" from seq_region sr  where sr.name not in ("X", "2R", "2L", "3R", "3L", "2RL", "3RL", "MT", "Mt");'
     touch_done _update_ena_seq_attrib
@@ -825,8 +825,8 @@ function filter_gff () {
 
   local DONE_TAG='_filter_gff'${TAG}
   if ! check_done "$DONE_TAG"; then
-    echo "filtering GFF3 file $GFF_FILE into " > /dev/stderr
-    echo "leaving only $KEEP_TAGS tags " > /dev/stderr
+    echo "filtering GFF3 file $GFF_FILE into " >> /dev/stderr
+    echo "leaving only $KEEP_TAGS tags " >> /dev/stderr
     mkdir -p "$OUT_DIR"
     cat $IGNORE_FILE |
       perl -pe 's/#.*$/\n/; s/^\s+//; s/ +$//; s/ +/ /g;' |
@@ -866,7 +866,7 @@ function fix_gff_ids () {
   # local MAX_HISTORICAL_GENE_ID="$6"
 
   if ! check_done _fix_gff_ids; then
-    echo "filtering GFF3 file $GFF_FILE into " > /dev/stderr
+    echo "filtering GFF3 file $GFF_FILE into " >> /dev/stderr
 
     local max_seen_gene_id=$(less $GFF_FILE | perl -e '
         use strict;
@@ -1175,9 +1175,9 @@ function gen_mappings_from_gff () {
   local DONE_TAG='_gen_mappings_from_gff'
   if ! check_done "$DONE_TAG"; then
     mkdir -p "$OUT_DIR"
-    echo "generating gene mappings from $GFF" > /dev/stderr
+    echo "generating gene mappings from $GFF" >> /dev/stderr
     cat $GFF | gen_gene_mapping > $OUT_DIR/gene_orig_mapping.tsv
-    echo "generating peptides mappings from $GFF" > /dev/stderr
+    echo "generating peptides mappings from $GFF" >> /dev/stderr
     cat $GFF | gen_pep_mapping > $OUT_DIR/pep_orig_mapping.tsv
     touch_done "$DONE_TAG"
   fi
@@ -1193,7 +1193,7 @@ function fix_pep_names () {
     if [ ! -s "$PEP_FILE"  ]; then
       PEP_FILE=/dev/null
     fi
-    echo "fixing pep names in $PEP_FILE using $MAP to $OUTFILE" > /dev/stderr
+    echo "fixing pep names in $PEP_FILE using $MAP to $OUTFILE" >> /dev/stderr
       local outdir=$(dirname $OUTFILE)
       mkdir -p $outdir
       ( cut -f 1,2 $MAP; less $PEP_FILE ) |
@@ -1226,7 +1226,7 @@ function load_gff () {
   fi
 
   if ! check_done _load_gff; then
-    echo "loading GFF3 file $GFF_FILE into $DBNAME " > /dev/stderr
+    echo "loading GFF3 file $GFF_FILE into $DBNAME " >> /dev/stderr
 
     mkdir -p $OUT_DIR/prereqs
 
@@ -1278,9 +1278,9 @@ function load_gff () {
     echo "$LOOP_CMD" >> $OUT_DIR/_continue_pipeline
     echo "touch $DONE_TAGS_DIR/_load_gff" >> $OUT_DIR/_continue_pipeline
 
-    echo Running pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD \
       2> $OUT_DIR/sync.stderr \
@@ -1306,7 +1306,7 @@ function apply_protein_seq_fixes () {
 
   local DONE_TAG='_apply_protein_seq_fixes'
   if ! check_done "$DONE_TAG"; then
-    echo "applying protein seq edits $FIX_FILE to $DBNAME" > /dev/stderr
+    echo "applying protein seq edits $FIX_FILE to $DBNAME" >> /dev/stderr
       cat $FIXFILE |
         $CMD $DBNAME
     touch_done "$DONE_TAG"
@@ -1321,7 +1321,7 @@ function find_missing_canonical_tr () {
 
   local DONE_TAG='_find_missing_canonical_tr'
   if ! check_done "$DONE_TAG"; then
-    echo "finding missing canonical transcripts in $DBNAME" > /dev/stderr
+    echo "finding missing canonical transcripts in $DBNAME" >> /dev/stderr
       mkdir -p "$OUT_DIR"
       $CMD -D $DBNAME -e '
           select
@@ -1357,7 +1357,7 @@ function fix_missing_canonical_tr () {
 
   local DONE_TAG='_fix_missing_canonical_tr'
   if ! check_done "$DONE_TAG"; then
-    echo "finding missing canonical transcripts in $DBNAME" > /dev/stderr
+    echo "finding missing canonical transcripts in $DBNAME" >> /dev/stderr
       # seq_region_id transcript_id gene_id stable_id len biotype canonical_transcript_id
       cat $FIXFILE | awk -F "\t" \
          '{printf("UPDATE gene SET canonical_transcript_id = %s WHERE gene_id = %s;\n", $2, $3)}' |
@@ -1376,14 +1376,17 @@ function run_xref () {
   local PARAMS="$6"
 
   if ! check_done _run_xref; then
-    echo "storing old xref primary_ids for $DBNAME " > /dev/stderr
+    [ -d ${OUT_DIR}.old ] && rm -rf ${OUT_DIR}.old
+    [ -d ${OUT_DIR} ] && mv ${OUT_DIR} ${OUT_DIR}.old
+
+    echo "storing old xref primary_ids for $DBNAME " >> /dev/stderr
     mkdir -p $OUT_DIR/prev_xrefs
     perl ${EG_DIR}/ensembl-production-metazoa/scripts/get_gene_tr_pri_xref.pl \
       $($CMD details script) \
       -dbname "$DBNAME" > $OUT_DIR/prev_xrefs/"${DBNAME}.ids_xref.txt" \
       2> $OUT_DIR/prev_xrefs/prev_xrefs.stderr
 
-    echo "running xref pipelines on $DBNAME " > /dev/stderr
+    echo "running xref pipelines on $DBNAME " >> /dev/stderr
     mkdir -p $OUT_DIR/prereqs
     local REG_FILE=$OUT_DIR/prereqs/reg.conf
     gen_one_db_reg_conf $CMD $DBNAME $SPECIES $REG_FILE
@@ -1406,13 +1409,16 @@ function run_xref () {
     local SYNC_CMD=$(cat $OUT_DIR/init.stdout | grep -- -sync'$' | perl -pe 's/^\s*//; s/"//g')
     local LOOP_CMD=$(cat $OUT_DIR/init.stdout | grep -- -loop | perl -pe 's/^\s*//; s/\s*#.*$//; s/"//g')
 
-    echo "$SYNC_CMD" > $OUT_DIR/_continue_pipeline
+    echo -n > $OUT_DIR/_continue_pipeline
+    echo "$SYNC_CMD" >> $OUT_DIR/_continue_pipeline
     echo "$LOOP_CMD" >> $OUT_DIR/_continue_pipeline
     echo "touch $DONE_TAGS_DIR/_run_xref" >> $OUT_DIR/_continue_pipeline
+    echo "rm -f ${OUT_DIR}/uniprot/uniprot_trembl.fasta*" >> $OUT_DIR/_continue_pipeline
+    echo "rm -f ${OUT_DIR}/all/uniprot/uniprot_sprot.fasta*" >> $OUT_DIR/_continue_pipeline
 
-    echo Running pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD \
       2> $OUT_DIR/sync.stderr \
@@ -1424,10 +1430,10 @@ function run_xref () {
       1> $OUT_DIR/loop.stdout
     tail $OUT_DIR/loop.stderr $OUT_DIR/loop.stdout
 
+    touch_done _run_xref
+
     rm -f ${OUT_DIR}/uniprot/uniprot_trembl.fasta* || true
     rm -f ${OUT_DIR}/all/uniprot/uniprot_sprot.fasta* || true
-
-    touch_done _run_xref
   fi
 }
 
@@ -1440,7 +1446,7 @@ function run_xref_vb () {
   local OUT_DIR="$5"
 
   if ! check_done _run_xref_vb; then
-    echo "running xref VB pipelines on $DBNAME " > /dev/stderr
+    echo "running xref VB pipelines on $DBNAME " >> /dev/stderr
 
     mkdir -p $OUT_DIR/prereqs
     local REG_FILE=$OUT_DIR/prereqs/reg.conf
@@ -1467,9 +1473,9 @@ function run_xref_vb () {
     echo "$LOOP_CMD" >> $OUT_DIR/_continue_pipeline
     echo "touch $DONE_TAGS_DIR/_run_xref_vb" >> $OUT_DIR/_continue_pipeline
 
-    echo Running pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD \
       2> $OUT_DIR/sync.stderr \
@@ -1493,7 +1499,7 @@ function load_xrefs () {
 
   local DONE_TAG='_load_xref'
   if ! check_done "$DONE_TAG"; then
-    echo "loading xref for genes into $DBNAME" > /dev/stderr
+    echo "loading xref for genes into $DBNAME" >> /dev/stderr
     # for the list of xref names see:
     #   d3 -D dinothrombium_tinctorium_core_1904_95_1 -e 'select * from external_db'
     if [ -s "$GENE_MAP" ]; then
@@ -1502,7 +1508,7 @@ function load_xrefs () {
         perl $SCRIPTS/load_xref.pl $($CMD details script) -dbname $DBNAME -object 'Gene' -xref_name 'RefSeq_gene_name'
     fi
 
-    echo "loading xref for proteins into $DBNAME" > /dev/stderr
+    echo "loading xref for proteins into $DBNAME" >> /dev/stderr
     if [ -s "$PEP_MAP" ]; then
       less "$PEP_MAP" |
         cut -f 1,2 |
@@ -1521,7 +1527,7 @@ function load_descriptions () {
 
   local DONE_TAG='_load_descr'
   if ! check_done "$DONE_TAG"; then
-    echo "loading gene descriptions into $DBNAME" > /dev/stderr
+    echo "loading gene descriptions into $DBNAME" >> /dev/stderr
     ( $CMD -D $DBNAME -e '
       select
         g.stable_id as gene_stable_id,
@@ -1551,7 +1557,7 @@ function load_descriptions_from_gene_map () {
 
   local DONE_TAG='_load_descr'
   if ! check_done "$DONE_TAG"; then
-    echo "loading gene descriptions into $DBNAME" > /dev/stderr
+    echo "loading gene descriptions into $DBNAME" >> /dev/stderr
     cut -f 1,4 $GENE_MAP |
       awk -F "\t"  '($2 != "" && $1 != "") {
                       printf("update gene set description = \"%s\" where (description is null or description = \"\") and stable_id = \"%s\";\n", $2, $1);
@@ -1565,7 +1571,7 @@ function load_descriptions_from_gene_map () {
 function nonref_set_toplevel () {
   local CMD="$1"
   local DBNAME="$2"
-  echo "setting toplevel for non_ref_scaffolds of $DBNAME" > /dev/stderr
+  echo "setting toplevel for non_ref_scaffolds of $DBNAME" >> /dev/stderr
   # 6 toplevel, 16 non_ref
   $CMD -D $DBNAME -e 'insert ignore
                         into seq_region_attrib (seq_region_id, attrib_type_id, value)
@@ -1584,7 +1590,7 @@ function nonref_set_toplevel () {
 function nonref_unset_toplevel () {
   local CMD="$1"
   local DBNAME="$2"
-  echo "unsetting toplevel for non_ref_scaffolds of $DBNAME" > /dev/stderr
+  echo "unsetting toplevel for non_ref_scaffolds of $DBNAME" >> /dev/stderr
   # 6 toplevel, 16 non_ref
   $CMD -D $DBNAME -e 'insert ignore
                         into seq_region_attrib (seq_region_id, attrib_type_id, value)
@@ -1603,7 +1609,7 @@ function nonref_unset_toplevel () {
 function clean_neg_start_repeats () {
   local CMD="$1"
   local DBNAME="$2"
-  echo "removing repeats with negative starts for $DBNAME" > /dev/stderr
+  echo "removing repeats with negative starts for $DBNAME" >> /dev/stderr
   $CMD -D $DBNAME -e 'delete from repeat_feature where repeat_start < 1'
 }
 
@@ -1616,7 +1622,7 @@ function construct_repeat_libraries () {
 
   local DONE_TAG='_construct_repeat_libraries'
   if ! check_done "$DONE_TAG"; then
-    echo "loading gene descriptions into $DBNAME" > /dev/stderr
+    echo "loading gene descriptions into $DBNAME" >> /dev/stderr
 
     mkdir -p $OUT_DIR
 
@@ -1658,9 +1664,9 @@ function construct_repeat_libraries () {
     echo "find $OUT_DIR/work -maxdepth 2 -type d -name 'RM_*' |
       xargs -r -n 1 -I XXX rm -rf XXX" >> $OUT_DIR/_continue_pipeline
 
-    echo Running pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD \
       2> $OUT_DIR/sync.stderr \
@@ -1702,7 +1708,7 @@ function filter_repeat_library () {
 
   local DONE_TAG='_filter_repeat_library'
   if ! check_done "$DONE_TAG"; then
-    echo "cleaning repeat library $LIB_IN using peptides $PEP_FILE and transcripts $RNA_FILE" > /dev/stderr
+    echo "cleaning repeat library $LIB_IN using peptides $PEP_FILE and transcripts $RNA_FILE" >> /dev/stderr
 
     # convert simple
     # perl -pe 's/-P(\w)$/-R$1/'
@@ -1763,8 +1769,8 @@ function filter_repeat_library () {
       grep -vwFf $WD/lib.exclude.pat |
       perl -pe 's/\t/\n/g' > $OUT_DIR/$OUT_NAME
 
-    echo filtering done > /dev/stderr
-    grep -c '>' $LIB_IN $OUT_DIR/$OUT_NAME > /dev/stderr
+    echo filtering done >> /dev/stderr
+    grep -c '>' $LIB_IN $OUT_DIR/$OUT_NAME >> /dev/stderr
 
     touch_done "$DONE_TAG"
   fi
@@ -1780,8 +1786,8 @@ function run_repeat_masking () {
 
   local DONE_TAG='_run_repeat_masking'
   if ! check_done "$DONE_TAG"; then
-    echo "running repeat masking on $DBNAME" > /dev/stderr
-    echo "using repeatmasker_repbase_species '$REPBASE_SPECIES_NAME'" > /dev/stderr
+    echo "running repeat masking on $DBNAME" >> /dev/stderr
+    echo "using repeatmasker_repbase_species '$REPBASE_SPECIES_NAME'" >> /dev/stderr
 
     [ -d ${OUT_DIR}.old ] && rm -rf ${OUT_DIR}.old
     [ -d ${OUT_DIR} ] && mv ${OUT_DIR} ${OUT_DIR}.old
@@ -1834,9 +1840,9 @@ function run_repeat_masking () {
     echo "popd" >> $OUT_DIR/_continue_pipeline
     echo "touch $DONE_TAGS_DIR/${DONE_TAG}" >> $OUT_DIR/_continue_pipeline
 
-    echo Running pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD \
       2> $OUT_DIR/sync.stderr \
@@ -1867,7 +1873,7 @@ function run_core_stats () {
 
   local DONE_TAG='_run_core_stats'
   if ! check_done "$DONE_TAG"; then
-    echo "running core stats pipeline on $DBNAME" > /dev/stderr
+    echo "running core stats pipeline on $DBNAME" >> /dev/stderr
 
     mkdir -p $OUT_DIR
 
@@ -1896,9 +1902,9 @@ function run_core_stats () {
     echo "$LOOP_CMD" >> $OUT_DIR/_continue_pipeline
     echo "touch $DONE_TAGS_DIR/${DONE_TAG}" >> $OUT_DIR/_continue_pipeline
 
-    echo Running pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD \
       2> $OUT_DIR/sync.stderr \
@@ -1924,7 +1930,7 @@ function set_core_random_samples () {
 
   local DONE_TAG='_set_core_random_samples'
   if ! check_done "$DONE_TAG"; then
-    echo "running rundom core sample for $DBNAME" > /dev/stderr
+    echo "running rundom core sample for $DBNAME" >> /dev/stderr
 
     if [ -n "$SAMPLE_GENE" ]; then
       SAMPLE_GENE=$($CMD -D "$DBNAME" -N -e "select stable_id from gene where stable_id = '${SAMPLE_GENE}' limit 1;")
@@ -1932,7 +1938,7 @@ function set_core_random_samples () {
 
     if [ -z "$SAMPLE_GENE" ]; then
       local RAND_GENE=$($CMD -D "$DBNAME" -N -e 'select stable_id from gene order by rand() limit 1;')
-      echo "using $RAND_GENE as sample" > /dev/stderr
+      echo "using $RAND_GENE as sample" >> /dev/stderr
       SAMPLE_GENE="$RAND_GENE"
     fi
 
@@ -1958,7 +1964,7 @@ function project_toplevel_by_atac () {
 
   local DONE_TAG='_project_toplevel_by_atac'${TAG}
   if ! check_done "$DONE_TAG"; then
-    echo "projecting toplevel cs by atac from ${FROM_CMD}:${FROM_DBNAME} to ${CMD}:${DBNAME}" > /dev/stderr
+    echo "projecting toplevel cs by atac from ${FROM_CMD}:${FROM_DBNAME} to ${CMD}:${DBNAME}" >> /dev/stderr
 
     mkdir -p "$OUT_DIR"
 
@@ -1988,7 +1994,7 @@ function make_tmpdb_4_projections () {
 
   local DONE_TAG='_make_tmpdb_4_projections'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "copying ${FROM_CMD}:${FROM_DBNAME} to ${CMD}:${DBNAME}" > /dev/stderr
+    echo "copying ${FROM_CMD}:${FROM_DBNAME} to ${CMD}:${DBNAME}" >> /dev/stderr
     $CMD -e "drop database if exists $DBNAME;"
     $CMD -e "create database $DBNAME;"
     $FROM_CMD mysqldump --single-transaction --max_allowed_packet=2024M  $FROM_DBNAME |
@@ -2006,7 +2012,7 @@ function patch_species_name_tmpdb_4_projections () {
 
   local DONE_TAG='_patch_trgdb_4_compara_projections'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "updating species.production_name for  ${CMD}:${DBNAME} to ${SPECIES}" > /dev/stderr
+    echo "updating species.production_name for  ${CMD}:${DBNAME} to ${SPECIES}" >> /dev/stderr
     $CMD -D $DBNAME -e "update meta set meta_value = '${SPECIES}' where meta_key = 'species.production_name'"
     $CMD -D $DBNAME -e "update meta set meta_value = '${SPECIES}' where meta_key = 'species.display_name'"
     touch_done "$DONE_TAG"
@@ -2020,7 +2026,7 @@ function filter_src_tmpdb_4_projections () {
 
   local DONE_TAG='_filter_srcdb_4_compara_projections'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "removing regions with no genes from ${CMD}:${DBNAME}" > /dev/stderr
+    echo "removing regions with no genes from ${CMD}:${DBNAME}" >> /dev/stderr
     $CMD -D $DBNAME -e 'insert into seq_region_attrib (seq_region_id, attrib_type_id, value) select distinct sr.seq_region_id, "6", "2" from seq_region sr, gene g where sr.seq_region_id = g.seq_region_id;'
     $CMD -D $DBNAME -e 'delete from seq_region_attrib where attrib_type_id = 6 and value = 1;'
     $CMD -D $DBNAME -e 'update seq_region_attrib set value = 1 where attrib_type_id = 6 and value = 2;'
@@ -2036,7 +2042,7 @@ function clean_tmpdb_4_projections () {
 
   local DONE_TAG='_clean_tmpdb_4_projections'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "dropping tmp (?!) ${CMD}:${DBNAME}" > /dev/stderr
+    echo "dropping tmp (?!) ${CMD}:${DBNAME}" >> /dev/stderr
     $CMD -e "drop database $DBNAME;" # no if exists
 
     touch_done "$DONE_TAG"
@@ -2055,10 +2061,10 @@ function project_genes () {
   if ! check_done "$DONE_TAG"; then
     mkdir -p $OUT_DIR
 
-    echo "getting assembly.name for ${CMD}:${DBNAME}" > /dev/stderr
+    echo "getting assembly.name for ${CMD}:${DBNAME}" >> /dev/stderr
     local NEW_ASM_NAME=$($CMD -D $DBNAME -e 'select meta_value from meta where meta_key = "assembly.name";' -N)
 
-    echo "getting toplevel coord_systems for ${CMD}:${DBNAME}" > /dev/stderr
+    echo "getting toplevel coord_systems for ${CMD}:${DBNAME}" >> /dev/stderr
     local TOPLEVEL_CS_SQL='select distinct cs.name
       from seq_region sr, seq_region_attrib sra, coord_system cs
       where sr.seq_region_id = sra.seq_region_id
@@ -2070,8 +2076,8 @@ function project_genes () {
     local rank=01
     local cs
     for cs in $TOPLEVEL_CS; do
-      echo "projecting from ${FROM_CMD}:${FROM_DBNAME} to ${CMD}:${DBNAME} $cs $NEW_ASM_NAME" > /dev/stderr
-      echo "see tail -f $OUT_DIR/log_${rank}_${cs}.out $OUT_DIR/log_${rank}_${cs}.err" > /dev/stderr
+      echo "projecting from ${FROM_CMD}:${FROM_DBNAME} to ${CMD}:${DBNAME} $cs $NEW_ASM_NAME" >> /dev/stderr
+      echo "see tail -f $OUT_DIR/log_${rank}_${cs}.out $OUT_DIR/log_${rank}_${cs}.err" >> /dev/stderr
       perl $SCRIPTS/core/project_genes.pl \
         $($CMD details script) \
         -old_dbname $FROM_DBNAME -new_dbname $DBNAME \
@@ -2101,7 +2107,7 @@ function analyze_projections () {
     mkdir -p $OUT_DIR
 
     $CMD -D $DBNAME -e 'select stable_id from gene' -N > $OUT_DIR/known_genes
-    echo "$DBNAME has  $(cat $OUT_DIR/known_genes | wc -l) genes" > /dev/stderr
+    echo "$DBNAME has  $(cat $OUT_DIR/known_genes | wc -l) genes" >> /dev/stderr
 
     echo -n > $OUT_DIR/projected.gff3
     echo -n > $OUT_DIR/unprojected.gff3
@@ -2119,7 +2125,7 @@ function analyze_projections () {
         cat $OUT_DIR/look_for.pat | grep -vwFf  $OUT_DIR/ignore.pat > $OUT_DIR/look_for.pat.tmp
         mv $OUT_DIR/look_for.pat.tmp $OUT_DIR/look_for.pat
       done
-      echo "  projected  $(grep -Pc '\tgene\t' $OUT_DIR/projected.gff3) genes" > /dev/stderr
+      echo "  projected  $(grep -Pc '\tgene\t' $OUT_DIR/projected.gff3) genes" >> /dev/stderr
 
       # gather unprojected from all cs (the initial list is in  look_for.pat)
       for res_dir in $(ls --color=none -1 -d 0*_mapping | sort -n); do
@@ -2130,10 +2136,10 @@ function analyze_projections () {
         cat $OUT_DIR/look_for.pat | grep -vwFf  $OUT_DIR/ignore.pat > $OUT_DIR/look_for.pat.tmp
         mv $OUT_DIR/look_for.pat.tmp $OUT_DIR/look_for.pat
       done
-      echo "  unprojected  $(grep -Pc '\tgene\t' $OUT_DIR/unprojected.gff3) genes" > /dev/stderr
+      echo "  unprojected  $(grep -Pc '\tgene\t' $OUT_DIR/unprojected.gff3) genes" >> /dev/stderr
 
       cat $OUT_DIR/look_for.pat > $OUT_DIR/missing_genes
-      echo "  missing $( cat $OUT_DIR/missing_genes | wc -l ) genes" > /dev/stderr
+      echo "  missing $( cat $OUT_DIR/missing_genes | wc -l ) genes" >> /dev/stderr
     popd
 
     # compare whole gene sequences for new coord and the old one. ok if the same
@@ -2193,7 +2199,7 @@ function make_compara_lastz () {
   if ! check_done "$DONE_TAG"; then
     mkdir -p $OUT_DIR
 
-    echo "running compara based lastz alignmebts on $COMPARA_DBNAME" > /dev/stderr
+    echo "running compara based lastz alignmebts on $COMPARA_DBNAME" >> /dev/stderr
 
     local source_species=$(get_db_prod_name $CMD $FROM_DBNAME)
     local target_species=$(get_db_prod_name $CMD $TO_DBNAME)
@@ -2201,8 +2207,8 @@ function make_compara_lastz () {
     local source_asm=$(get_db_asm $CMD $FROM_DBNAME)
     local target_asm=$(get_db_asm $CMD $TO_DBNAME)
 
-    echo "using source $source_species:$source_asm from $FROM_DBNAME" > /dev/stderr
-    echo "using target $target_species:$target_asm from $TO_DBNAME" > /dev/stderr
+    echo "using source $source_species:$source_asm from $FROM_DBNAME" >> /dev/stderr
+    echo "using target $target_species:$target_asm from $TO_DBNAME" >> /dev/stderr
 
     mkdir -p $OUT_DIR/prereqs
     local REG_FILE=$OUT_DIR/prereqs/reg.conf
@@ -2219,7 +2225,7 @@ function make_compara_lastz () {
     local compara_url="$($CMD details url)${COMPARA_DBNAME}"
 
     pushd $OUT_DIR
-      echo "adding $target_species to $compara_url" > /dev/stderr
+      echo "adding $target_species to $compara_url" >> /dev/stderr
 
       perl $ENS_DIR/ensembl-compara/scripts/pipeline/update_genome.pl \
         --reg_conf $REG_FILE \
@@ -2229,7 +2235,7 @@ function make_compara_lastz () {
       local source_db_id=$($CMD -D $COMPARA_DBNAME -e "select genome_db_id from genome_db where name = '$source_species' and assembly = '$source_asm'" -N)
       local target_db_id=$($CMD -D $COMPARA_DBNAME -e "select genome_db_id from genome_db where name = '$target_species' and assembly = '$target_asm'" -N)
 
-      echo "adding LASTZ_NET link (target:source) $target_db_id:$source_db_id from $FROM_DBNAME" > /dev/stderr
+      echo "adding LASTZ_NET link (target:source) $target_db_id:$source_db_id from $FROM_DBNAME" >> /dev/stderr
       perl $ENS_DIR/ensembl-compara/scripts/pipeline/create_mlss.pl \
         --method_link_type LASTZ_NET \
         --genome_db_id "$target_db_id,$source_db_id" \
@@ -2243,7 +2249,7 @@ function make_compara_lastz () {
         --force
 
 
-      echo "adding new collection '$COLLECTION_NAME' to $compara_url" > /dev/stderr
+      echo "adding new collection '$COLLECTION_NAME' to $compara_url" >> /dev/stderr
       perl $ENS_DIR/ensembl-compara/scripts/pipeline/edit_collection.pl \
         --new \
         --compara $compara_url \
@@ -2254,7 +2260,7 @@ function make_compara_lastz () {
 # $ENSCODE/ensembl-compara/modules/Bio/EnsEMBL/Compara/PipeConfig/EBI/Ensembl/Lastz_conf.pm - you shouldn't need to change anything
 # $ENSCODE/ensembl-analysis/modules/Bio/EnsEMBL/Analysis/Config/General.pm exists in your enscode (you're likely to have a copy called General.pm.example, just copy this to General.pm)
 
-      echo "creating lastz pipeline" > /dev/stderr
+      echo "creating lastz pipeline" >> /dev/stderr
 # Bio::EnsEMBL::Compara::PipeConfig::EBI::EG::Lastz_conf
       init_pipeline.pl Bio::EnsEMBL::Compara::PipeConfig::EBI::Ensembl::Lastz_conf \
         $($CMD details script | perl -pe 's/--pass /--password /') \
@@ -2279,9 +2285,9 @@ function make_compara_lastz () {
       echo "popd" >> $OUT_DIR/_continue_pipeline
       echo "touch $DONE_TAGS_DIR/${DONE_TAG}" >> $OUT_DIR/_continue_pipeline
 
-      echo Running pipeline...  > /dev/stderr
-      echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-      cat $OUT_DIR/_continue_pipeline > /dev/stderr
+      echo Running pipeline...  >> /dev/stderr
+      echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+      cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
       $SYNC_CMD \
         2> $OUT_DIR/sync.stderr \
@@ -2319,7 +2325,7 @@ function make_compara_projections () {
 
     local asm_from=$(get_db_asm $CMD $FROM_DBNAME)
     local asm_to=$(get_db_asm $CMD $TO_DBNAME)
-    echo "running $asm_from to $asm_to projections using compara based lastz alignments from $LASTZ_DBNAME" > /dev/stderr
+    echo "running $asm_from to $asm_to projections using compara based lastz alignments from $LASTZ_DBNAME" >> /dev/stderr
 
     init_pipeline.pl Bio::EnsEMBL::EGPipeline::PipeConfig::WGA2GenesDirect_conf \
       --hive_force_init 1 \
@@ -2347,9 +2353,9 @@ function make_compara_projections () {
     echo "$LOOP_CMD" >> $OUT_DIR/_continue_pipeline
     echo "touch $DONE_TAGS_DIR/${DONE_TAG}" >> $OUT_DIR/_continue_pipeline
 
-    echo Running pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD \
       2> $OUT_DIR/sync.stderr \
@@ -2364,7 +2370,7 @@ function make_compara_projections () {
     src_transcripts=$($CMD -D $FROM_DBNAME -e 'select count(*) from transcript' -N)
     src_pc_transcripts=$($CMD -D $FROM_DBNAME -e 'select count(*) from transcript where biotype = "protein_coding"' -N)
     trg_transcripts=$($CMD -D $RES_DBNAME -e 'select count(*) from transcript' -N)
-    echo "projected $trg_transcripts out of $src_pc_transcripts protein coding ($src_transcripts total) " > /dev/stderr
+    echo "projected $trg_transcripts out of $src_pc_transcripts protein coding ($src_transcripts total) " >> /dev/stderr
 
     touch_done "$DONE_TAG"
   fi
@@ -2384,7 +2390,7 @@ function dump_translations () {
 
     local trg_transcripts=$($CMD -D $DBNAME -e 'select count(*) from transcript' -N)
 
-    echo "dumping translations for $trg_transcripts transcripts from $DBNAME" > /dev/stderr
+    echo "dumping translations for $trg_transcripts transcripts from $DBNAME" >> /dev/stderr
     local asm_to=$(get_db_asm $CMD $DBNAME)
 
     local TR_PARTS="transcript"
@@ -2419,7 +2425,7 @@ function dump_translations_and_gff3 () {
 
     local trg_transcripts=$($CMD -D $DBNAME -e 'select count(*) from transcript' -N)
 
-    echo "dumping translations for $trg_transcripts transcripts from $DBNAME" > /dev/stderr
+    echo "dumping translations for $trg_transcripts transcripts from $DBNAME" >> /dev/stderr
     local asm_to=$(get_db_asm $CMD $DBNAME)
 
     perl $ENS_DIR/ensembl-production-imported/scripts/misc_scripts/get_trans.pl -type translation \
@@ -2430,7 +2436,7 @@ function dump_translations_and_gff3 () {
       $($CMD details script) \
       -dbname $DBNAME > $OUT_DIR/${asm_to}_projected.tr.fasta
 
-    echo "dumping gff3 for $DBNAME" > /dev/stderr
+    echo "dumping gff3 for $DBNAME" >> /dev/stderr
     local res_species=$(get_db_prod_name $CMD $DBNAME)
     local res_eg_version=$(get_db_eg_version $CMD $DBNAME)
 
@@ -2465,9 +2471,9 @@ function dump_translations_and_gff3 () {
     echo "$LOOP_CMD" >> $OUT_DIR/_continue_pipeline
     echo "touch $DONE_TAGS_DIR/${DONE_TAG}" >> $OUT_DIR/_continue_pipeline
 
-    echo Running pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD \
       2> $OUT_DIR/sync.stderr \
@@ -2500,7 +2506,7 @@ function run_data_init() {
       if [ -z "$init_cmd" ]; then
         init_cmd='true'
       fi
-      echo "running data init commands: '$init_cmd'" > /dev/stderr
+      echo "running data init commands: '$init_cmd'" >> /dev/stderr
 
       bash -c "set -xeo pipefail; $init_cmd" || false
     popd
@@ -2522,7 +2528,7 @@ function compara_proj_to_gff3 () {
 
   local DONE_TAG='_compara_proj_to_gff3'${TAG}
   if ! check_done "$DONE_TAG"; then
-    echo "compraing source ${CMD_FROM}:${DBNAME_FROM} and target ${CMD_TO}:${DBNAME_TO}" > /dev/stderr
+    echo "compraing source ${CMD_FROM}:${DBNAME_FROM} and target ${CMD_TO}:${DBNAME_TO}" >> /dev/stderr
     mkdir -p "$OUT_DIR"
     local CMP_SCRIPT=$ENS_DIR/ensembl-production-metazoa/scripts/compara_projection2gff3_pre.pl
 
@@ -2544,7 +2550,7 @@ function compara_proj_to_gff3 () {
 
     local asm_to=$(get_db_asm $CMD_TO $DBNAME_TO)
 
-    echo "splitting results ${OUT_DIR}/cmp.{stdout,stderr} for ${asm_to}" > /dev/stderr
+    echo "splitting results ${OUT_DIR}/cmp.{stdout,stderr} for ${asm_to}" >> /dev/stderr
     bash $ENS_DIR/ensembl-production-metazoa/scripts/projections_gff3_pre2gff3.sh \
       "${asm_to}.pre" ${OUT_DIR}/cmp.stdout ${OUT_DIR}/cmp.stderr ${OUT_DIR}/res \
       > ${OUT_DIR}/split.stdout 2> ${OUT_DIR}/split.stderr
@@ -2568,7 +2574,7 @@ function run_rna_features_and_genes () {
 
   local DONE_TAG='_rna_features'${TAG}
   if ! check_done "$DONE_TAG"; then
-    echo "running RNAFeatures for ${CMD}:${DBNAME}" > /dev/stderr
+    echo "running RNAFeatures for ${CMD}:${DBNAME}" >> /dev/stderr
     mkdir -p "$OUT_DIR"
 
     pushd $OUT_DIR
@@ -2604,7 +2610,7 @@ function run_rna_features_and_genes () {
     echo "$LOOP_CMD" >> $OUT_DIR/_continue_pipeline
 
     # LCA run init
-    echo RNAFeatures with LCA...  > /dev/stderr
+    echo RNAFeatures with LCA...  >> /dev/stderr
     mkdir -p $OUT_DIR/rna_features_lca
     init_pipeline.pl Bio::EnsEMBL::EGPipeline::PipeConfig::RNAFeatures_conf \
       $($CMD details script) \
@@ -2631,7 +2637,7 @@ function run_rna_features_and_genes () {
 
     # Create genes from the RNA features
     local RNA_GENES_CONTEXT='vb'
-    echo RNAFeatures to genes with $RNA_GENES_CONTEXT context...  > /dev/stderr
+    echo RNAFeatures to genes with $RNA_GENES_CONTEXT context...  >> /dev/stderr
     mkdir -p $OUT_DIR/rna_genes
     init_pipeline.pl Bio::EnsEMBL::EGPipeline::PipeConfig::RNAGenes_conf \
       $($CMD details script) \
@@ -2662,9 +2668,9 @@ function run_rna_features_and_genes () {
     echo "touch $DONE_TAGS_DIR/${DONE_TAG}" >> $OUT_DIR/_continue_pipeline
 
     # generic run
-    echo Running pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD \
       2> $OUT_DIR/sync.stderr \
@@ -2677,9 +2683,9 @@ function run_rna_features_and_genes () {
     tail $OUT_DIR/loop.stderr $OUT_DIR/loop.stdout
 
     # LCA Run
-    echo Running pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD_LCA \
       2> $OUT_DIR/sync_lca.stderr \
@@ -2692,9 +2698,9 @@ function run_rna_features_and_genes () {
     tail $OUT_DIR/loop_lca.stderr $OUT_DIR/loop_lca.stdout
 
     # Create genes from the RNA features
-    echo Running genes from RNA features pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running genes from RNA features pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD_F2G \
       2> $OUT_DIR/sync_f2g.stderr \
@@ -2727,7 +2733,7 @@ function run_rna_genes () {
 
   local DONE_TAG='_rna_genes'${TAG}
   if ! check_done "$DONE_TAG"; then
-    echo "running RNAGenes for ${CMD}:${DBNAME}" > /dev/stderr
+    echo "running RNAGenes for ${CMD}:${DBNAME}" >> /dev/stderr
     mkdir -p "$OUT_DIR"
 
     pushd $OUT_DIR
@@ -2741,7 +2747,7 @@ function run_rna_genes () {
     local SPECIES_TAG=$(echo $SPECIES | perl -pe 's/^([^_]{3})[^_]+(?:_([^_]{3}))?.*(_[^_]+)$/$1_$2$3/')
 
     # Create genes from the RNA features
-    echo RNAFeatures to genes...  > /dev/stderr
+    echo RNAFeatures to genes...  >> /dev/stderr
     mkdir -p $OUT_DIR/rna_genes
     init_pipeline.pl Bio::EnsEMBL::EGPipeline::PipeConfig::RNAGenes_conf \
       $($CMD details script) \
@@ -2774,9 +2780,9 @@ function run_rna_genes () {
 
 
     # Create genes from the RNA features
-    echo Running genes from RNA features pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running genes from RNA features pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD_F2G \
       2> $OUT_DIR/sync_f2g.stderr \
@@ -2808,7 +2814,7 @@ function run_rna_features () {
 
   local DONE_TAG='_rna_features'${TAG}
   if ! check_done "$DONE_TAG"; then
-    echo "running RNAFeatures for ${CMD}:${DBNAME} with options: ${OPTIONS}" > /dev/stderr
+    echo "running RNAFeatures for ${CMD}:${DBNAME} with options: ${OPTIONS}" >> /dev/stderr
     mkdir -p "$OUT_DIR"
 
     pushd $OUT_DIR
@@ -2845,9 +2851,9 @@ function run_rna_features () {
     echo "touch $DONE_TAGS_DIR/${DONE_TAG}" >> $OUT_DIR/_continue_pipeline
 
     # generic run
-    echo Running pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD \
       2> $OUT_DIR/sync.stderr \
@@ -2880,7 +2886,7 @@ function fix_gene_ids_after_rna_pipeline () {
   local MAX_GENE_NUM=$(python -c "print max($MAX_GENE_NUM_PRE, $GENE_COUNT) + 100")
   # TODO: get max ids from old_core_db:
 
-  echo "Updating gene ids produced by rna pipelines $MAX_GENE $MAX_GENE_PFX $MAX_GENE_NUM" > /dev/stderr
+  echo "Updating gene ids produced by rna pipelines $MAX_GENE $MAX_GENE_PFX $MAX_GENE_NUM" >> /dev/stderr
 
   $CMD -D $DBNAME -e 'select gene_id, stable_id from gene' -N |
     awk -F "\t" -v max_id=$MAX_GENE_NUM -v pfx=$MAX_GENE_PFX 'BEGIN {}
@@ -2916,7 +2922,7 @@ function preprocess_gff () {
 
   local DONE_TAG='_preprocess_gff'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "patching raw gff $GFF_FILE using $PATCHER..." > /dev/stderr
+    echo "patching raw gff $GFF_FILE using $PATCHER..." >> /dev/stderr
     local OUT_DIR="$(dirname $OUT_FILE)"
     mkdir -p $OUT_DIR
 
@@ -2934,7 +2940,7 @@ function gen_map_file () {
 
   local DONE_TAG='_gen_map_file'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "generating map file $OUT_FILE from $IN_FILE using $PATCHER..." > /dev/stderr
+    echo "generating map file $OUT_FILE from $IN_FILE using $PATCHER..." >> /dev/stderr
     local OUT_DIR="$(dirname $OUT_FILE)"
     mkdir -p $OUT_DIR
 
@@ -2953,7 +2959,7 @@ function mark_tr_trans_spliced () {
   local DONE_TAG='_mark_tr_trans_spliced'"$TAG"
   local COUNT=$(echo $ID_LIST | perl -pe 's/,/\n/g' | wc -l)
   if ! check_done "$DONE_TAG"; then
-    echo "setting trans_spliced attrib (503) for $COUNT transcripts in $CMD:$DBNAME..." > /dev/stderr
+    echo "setting trans_spliced attrib (503) for $COUNT transcripts in $CMD:$DBNAME..." >> /dev/stderr
     echo $ID_LIST |
       perl -pe 's/[,\s+]/\n/g' |
       xargs -n 1 -I XXX echo 'insert into transcript_attrib select transcript_id, 503, 1 from transcript where stable_id in ("XXX");' |
@@ -2974,7 +2980,7 @@ function load_chromosome_bands_from_gff () {
 
   local DONE_TAG='_load_chr_bands'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "loading chromosome bands for  $CMD:$DBNAME from $GFF_FILE..." > /dev/stderr
+    echo "loading chromosome bands for  $CMD:$DBNAME from $GFF_FILE..." >> /dev/stderr
     mkdir -p $OUT_DIR
     less $GFF_FILE | grep -P '\tchromosome_band\t' > $OUT_DIR/bands.gff
 
@@ -2998,7 +3004,7 @@ function flybase_gff2xref () {
 
   local DONE_TAG='_gff2xref_flybase'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "loading Xrefs from $GFF_FILE to $CMD:$DBNAME..." > /dev/stderr
+    echo "loading Xrefs from $GFF_FILE to $CMD:$DBNAME..." >> /dev/stderr
     mkdir -p $OUT_DIR
 
     local pat=;
@@ -3007,7 +3013,7 @@ function flybase_gff2xref () {
       local pat_to=$(echo $pat | cut -f 2 -d ':')
       local pat_to_lc=$(echo $pat_to | perl -ne 'print lc($_)')
 
-      echo "Getting $pat_from xrefs from gff..."  > /dev/stderr
+      echo "Getting $pat_from xrefs from gff..."  >> /dev/stderr
       less  $GFF_FILE |
         grep -P '\t'"$pat_from"'\t' |
         perl -pe 's/.*ID=([^;]+);.*Name=([^;]+);.*/$1\t$2/' |
@@ -3016,8 +3022,8 @@ function flybase_gff2xref () {
         sort | uniq > ${OUT_DIR}/"$pat_from.from_gff.txt"
 
       ( echo "Inserting something like this as $pat_to:FlyBaseName_${pat_to_lc}: ";
-        head -n 2 ${OUT_DIR}/"$pat_from.from_gff.txt" > /dev/stderr;
-        echo ) > /dev/stderr
+        head -n 2 ${OUT_DIR}/"$pat_from.from_gff.txt" >> /dev/stderr;
+        echo ) >> /dev/stderr
 
       cat ${OUT_DIR}/"$pat_from.from_gff.txt" |
         perl $ENS_DIR/ensembl-production-imported/scripts/misc_scripts/load_xref.pl \
@@ -3027,14 +3033,14 @@ function flybase_gff2xref () {
         -object "$pat_to" -xref_name "FlyBaseName_${pat_to_lc}" \
         -info_type 'DIRECT' -info_text ''
 
-      echo "Getting $pat_to_lc stable ids as xrefs..."  > /dev/stderr
+      echo "Getting $pat_to_lc stable ids as xrefs..."  >> /dev/stderr
       $CMD -D $DBNAME \
         -e 'select stable_id, stable_id from '"$pat_to_lc"' where stable_id is not NULL;' -N |
         sort | uniq > ${OUT_DIR}/"$pat_to_lc.from_stable.txt"
 
       ( echo "Inserting something like this as $pat_to:flybase_${pat_to_lc}_id ";
-        head -n 2 ${OUT_DIR}/"$pat_to_lc.from_stable.txt" > /dev/stderr;
-        echo ) > /dev/stderr
+        head -n 2 ${OUT_DIR}/"$pat_to_lc.from_stable.txt" >> /dev/stderr;
+        echo ) >> /dev/stderr
 
       cat ${OUT_DIR}/"$pat_to_lc.from_stable.txt" |
         perl $ENS_DIR/ensembl-production-imported/scripts/misc_scripts/load_xref.pl \
@@ -3047,7 +3053,7 @@ function flybase_gff2xref () {
       local pat_from=$(echo $pat | cut -f 1 -d ':')
       local pat_to=$(echo $pat | cut -f 2 -d ':')
 
-      echo "Getting $pat_from xrefs from gff..."  > /dev/stderr
+      echo "Getting $pat_from xrefs from gff..."  >> /dev/stderr
       less  $GFF_FILE |
         grep -P '\tgene\t.*Dbxref=[^;]*'"$pat_from" |
         perl -pe 's/.*ID=([^;]+);.*Dbxref=[^;]*'"${pat_from}"'\:([^;,]+).*/$1\t$2/' |
@@ -3055,8 +3061,8 @@ function flybase_gff2xref () {
         sort | uniq > ${OUT_DIR}/"$pat_from.from_gff.txt"
 
       ( echo "Inserting something like this as Gene:$pat_to:";
-        head -n 2 ${OUT_DIR}/"$pat_from.from_gff.txt" > /dev/stderr;
-        echo ) > /dev/stderr
+        head -n 2 ${OUT_DIR}/"$pat_from.from_gff.txt" >> /dev/stderr;
+        echo ) >> /dev/stderr
 
       cat ${OUT_DIR}/"$pat_from.from_gff.txt" |
         perl $ENS_DIR/ensembl-production-imported/scripts/misc_scripts/load_xref.pl \
@@ -3079,7 +3085,7 @@ function update_prod_tables () {
 
   local DONE_TAG='_update_prod_tables'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "updatin prod tables for $CMD:$DBNAME from $PROD_SERVER:$PROD_DBNAME..." > /dev/stderr
+    echo "updatin prod tables for $CMD:$DBNAME from $PROD_SERVER:$PROD_DBNAME..." >> /dev/stderr
     mkdir -p $OUT_DIR
 
     perl $SCRIPTS/ensembl-production/scripts/production_database/populate_production_db_tables.pl\
@@ -3103,7 +3109,7 @@ function fopt_from_meta () {
   if [ -n "$FNAME" -a -f "$DIR/$FNAME" ]; then
     echo $OPT_NAME "$DIR/$FNAME"
   else
-    echo "No $TAG specified or '$DIR/$FNAME' doesn't exist" > /dev/stderr
+    echo "No $TAG specified or '$DIR/$FNAME' doesn't exist" >> /dev/stderr
     [ -n "$FNAME" ] && [ -n "$ERR_ACTION" ]  && $ERR_ACTION
   fi
 }
@@ -3164,14 +3170,14 @@ function prepare_metada () {
 
   local DONE_TAG='_prepare_metadata'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "generating metadata from raw $META_RAW..." > /dev/stderr
+    echo "generating metadata from raw $META_RAW..." >> /dev/stderr
     mkdir -p $OUT_DIR
 
     local META_RAW_ORIG="${META_RAW}"
     cat "$META_RAW" > "${OUT_DIR}"/meta.raw
     conf_from_refseq_url "${OUT_DIR}"/meta.raw
     local META_RAW="${OUT_DIR}"/meta.raw
-    echo "switching to metadata from raw copy $META_RAW..." > /dev/stderr
+    echo "switching to metadata from raw copy $META_RAW..." >> /dev/stderr
 
     local BRC4_LOAD=$BRC4_LOAD
     if [ -z "$BRC4_LOAD" ]; then
@@ -3249,7 +3255,7 @@ function prepare_metada () {
           2> $OUT_DIR/no_fasta_gff3validator.stderr \
       || [ -n "$IGNORE_UNVALID_SOURCE_GFF" -a "x$IGNORE_UNVALID_SOURCE_GFF" != "xNO" ]  && true \
       || echo "unvalid source gff: $GFF_PATH. no IGNORE_UNVALID_SOURCE_GFF ($IGNORE_UNVALID_SOURCE_GFF) set. failing..." \
-          > /dev/stderr || return false || exit 0
+          >> /dev/stderr || return false || exit 0
 
       # gen stats
       cat $OUT_DIR/no_fasta.gff3 |
@@ -3284,7 +3290,7 @@ function prepare_metada () {
         STOP_AFTER_GFF_STATS=$(get_meta_conf $META_RAW 'STOP_AFTER_GFF_STATS')
       fi
       if [ -n "${STOP_AFTER_GFF_STATS}" -a "x${STOP_AFTER_GFF_STATS}" != "xNO" ]; then
-        echo stoppping beacuse of the STOP_AFTER_GFF_STATS: "$STOP_AFTER_GFF_STATS" > /dev/stderr
+        echo stoppping beacuse of the STOP_AFTER_GFF_STATS: "$STOP_AFTER_GFF_STATS" >> /dev/stderr
         exit 0
         return false
       fi
@@ -3343,7 +3349,7 @@ function prepare_metada () {
     # ad hoc seq regions gff
     local SR_GFF_FILE=$(fopt_from_meta $META_RAW SR_GFF_FILE $ASM_DIR '' true)
     if [ -n "$SR_GFF_FILE" -a -f "$SR_GFF_FILE" ]; then
-      echo getting annditional region data from gff $SR_GFF_FILE > /dev/stderr
+      echo getting annditional region data from gff $SR_GFF_FILE >> /dev/stderr
       less $SR_GFF_FILE |
         awk -F "\t" \
           '($3 == "region") {print}
@@ -3378,7 +3384,7 @@ function prepare_metada () {
     local MCFG_SR_SYNS_OPT=""
     local SR_SYNS_FILE=$(fopt_from_meta $META_RAW SR_SYNS_FILE $ASM_DIR '' true)
     if [ -n "$SR_SYNS_FILE" -a -f "$SR_SYNS_FILE" ]; then
-      echo using additional region synonyms data from $SR_SYNS_FILE > /dev/stderr
+      echo using additional region synonyms data from $SR_SYNS_FILE >> /dev/stderr
       MCFG_SR_SYNS_OPT="--seq_region_syns $SR_SYNS_FILE"
     fi # ad hoc seq regions synonyms file
 
@@ -3419,7 +3425,7 @@ function run_new_loader () {
 
   local DONE_TAG='_load_new'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "loading new species based on metadata fromr$META_DIR..." > /dev/stderr
+    echo "loading new species based on metadata fromr$META_DIR..." >> /dev/stderr
     [ -d "$OUT_DIR" ] && mkdir -p "$OUT_DIR"/old && mv -f "$OUT_DIR"/* "$OUT_DIR"/old || true
     mkdir -p $OUT_DIR
 
@@ -3497,7 +3503,7 @@ function run_new_loader () {
     # try to set max_allowed_packet size
     $CMD_W -e 'SET GLOBAL max_allowed_packet=2147483648;' || true
 
-    echo GFF_LOADER_OPTIONS ${GFF_LOADER_OPTIONS} > /dev/stderr
+    echo GFF_LOADER_OPTIONS ${GFF_LOADER_OPTIONS} >> /dev/stderr
 
     init_pipeline.pl Bio::EnsEMBL::Pipeline::PipeConfig::BRC4_genome_loader_conf \
       $($CMD_W details hive) \
@@ -3530,9 +3536,9 @@ function run_new_loader () {
 
     echo "touch $DONE_TAGS_DIR/$DONE_TAG" >> $OUT_DIR/_continue_pipeline
 
-    echo Running pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD \
       2> $OUT_DIR/sync.stderr \
@@ -3565,7 +3571,7 @@ function get_repbase_lib () {
 
   local DONE_TAG='_get_repbase'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "getting data from repeatmasker libs for species ${SPECIES}..." > /dev/stderr
+    echo "getting data from repeatmasker libs for species ${SPECIES}..." >> /dev/stderr
     mkdir -p $OUT_DIR
 
     echo $SPECIES |  perl -pe 's/[ _]+/_/g' > $OUT_DIR/name_set.pre
@@ -3576,13 +3582,13 @@ function get_repbase_lib () {
     local name=
     for name in $(cat $OUT_DIR/name_set.pre); do
       local repname="$(echo $name | perl -pe 's/_/ /g' )"
-      echo getting RepBase data for "'$repname'" > /dev/stderr
+      echo getting RepBase data for "'$repname'" >> /dev/stderr
       $REPUTIL -species "$repname" > $OUT_DIR/repbase.lib 2> $OUT_DIR/err.log
       local repcnt=$(grep -c '>' $OUT_DIR/repbase.lib)
       if [ "$repcnt" -gt 0 ]; then
         break
       fi
-      echo failed to get RepBase data for "'$repname'" > /dev/stderr
+      echo failed to get RepBase data for "'$repname'" >> /dev/stderr
       name=
       rm -f $OUT_DIR/repbase.lib
     done
@@ -3605,7 +3611,7 @@ function update_prod_tables_new () {
 
   local DONE_TAG='_update_prod_tables_new'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "running production dbsync pipeline for ${CMD}:${DBNAME}" > /dev/stderr
+    echo "running production dbsync pipeline for ${CMD}:${DBNAME}" >> /dev/stderr
     mkdir -p "$OUT_DIR"
 
     pushd $OUT_DIR
@@ -3641,9 +3647,9 @@ function update_prod_tables_new () {
     echo "touch $DONE_TAGS_DIR/${DONE_TAG}" >> $OUT_DIR/_continue_pipeline
 
     # generic run
-    echo Running pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD \
       2> $OUT_DIR/sync.stderr \
@@ -3673,7 +3679,7 @@ function patch_db_schema () {
     local CVER=$($CMD -D $DBNAME -Ne 'select  meta_value from meta where meta_key = "schema_version"')
     local NVER=$(($CVER + 1))
 
-    echo "patching schema from $CVER to $NVER for for ${CMD}:${DBNAME}" > /dev/stderr
+    echo "patching schema from $CVER to $NVER for for ${CMD}:${DBNAME}" >> /dev/stderr
     mkdir -p "$OUT_DIR"
     ls -1 $SCRIPTS/ensembl.${NVER}/sql/patch_${CVER}_${NVER}*.sql > $OUT_DIR/patches.lst
 
@@ -3697,7 +3703,7 @@ function run_dc () {
 
   local DONE_TAG='_run_dc'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "running datachecks for ${CMD}:${DBNAME}" > /dev/stderr
+    echo "running datachecks for ${CMD}:${DBNAME}" >> /dev/stderr
     mkdir -p "$OUT_DIR"
 
     pushd $OUT_DIR
@@ -3709,7 +3715,7 @@ function run_dc () {
 
     CVER=".${CVER}"
     if [ -d $SCRIPTS/ensembl${CVER} -a -d $SCRIPTS/ensembl-datacheck${CVER} ]; then
-      echo using $CVER versiond of ensembl and ensembl-datacheck > /dev/stderr
+      echo using $CVER versiond of ensembl and ensembl-datacheck >> /dev/stderr
       PERL5LIB=$SCRIPTS/ensembl${CVER}/modules:$(echo $PERL5LIB | perl -pe 'chomp; $_=join(":", grep {$_ !~ m,/ensembl/modules/,} split(":", $_))')
       PERL5LIB=$SCRIPTS/ensembl-datacheck${CVER}/lib:$(echo $PERL5LIB | perl -pe 'chomp; $_=join(":", grep {$_ !~ m,/ensembl-datacheck/lib/,} split(":", $_))')
       export PERL5LIB
@@ -3762,9 +3768,9 @@ function run_dc () {
     echo "touch $DONE_TAGS_DIR/${DONE_TAG}" >> $OUT_DIR/_continue_pipeline
 
     # generic run
-    echo Running pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD \
       2> $OUT_DIR/sync.stderr \
@@ -3785,7 +3791,7 @@ function run_dc () {
       sort -nr > $OUT_DIR/failed.lst
 
     if [ "$(cat $OUT_DIR/failed.lst | wc -l)" -gt 0 ]; then
-      echo "non empty failed list: $OUT_DIR/failed.lst" > /dev/stderr
+      echo "non empty failed list: $OUT_DIR/failed.lst" >> /dev/stderr
       false
     fi
 
@@ -3805,7 +3811,7 @@ function run_core_stats_new () {
 
   local DONE_TAG='_run_core_stats_new'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "running production core stats pipeline for ${CMD}:${DBNAME}" > /dev/stderr
+    echo "running production core stats pipeline for ${CMD}:${DBNAME}" >> /dev/stderr
     mkdir -p "$OUT_DIR"
 
     pushd $OUT_DIR
@@ -3841,9 +3847,9 @@ function run_core_stats_new () {
     echo "touch $DONE_TAGS_DIR/${DONE_TAG}" >> $OUT_DIR/_continue_pipeline
 
     # generic run
-    echo Running pipeline...  > /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
-    cat $OUT_DIR/_continue_pipeline > /dev/stderr
+    echo Running pipeline...  >> /dev/stderr
+    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
     $SYNC_CMD \
       2> $OUT_DIR/sync.stderr \
@@ -3878,7 +3884,7 @@ function update_stable_ids () {
 
   local DONE_TAG='_update_stable_ids'"$TAG"
   if ! check_done "$DONE_TAG"; then
-    echo "update stable_ids for for ${CMD}:${DBNAME}" > /dev/stderr
+    echo "update stable_ids for for ${CMD}:${DBNAME}" >> /dev/stderr
     mkdir -p "$OUT_DIR"
 
     pushd $OUT_DIR
@@ -3892,11 +3898,11 @@ function update_stable_ids () {
           $OPTIONS \
           > $OUT_DIR/updated_list.txt \
           2> $OUT_DIR/updated.stderr
-      echo "updated:" > /dev/stderr
-      cat $OUT_DIR/updated_list.txt | cut -f 1 | sort | uniq -c > /dev/stderr
+      echo "updated:" >> /dev/stderr
+      cat $OUT_DIR/updated_list.txt | cut -f 1 | sort | uniq -c >> /dev/stderr
       tail $OUT_DIR/updated.stderr
     else
-      echo "not prev xrefs file ($PREV_XREF_FILE) found" > /dev/stderr
+      echo "not prev xrefs file ($PREV_XREF_FILE) found" >> /dev/stderr
       false
     fi
 
