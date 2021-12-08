@@ -1593,6 +1593,8 @@ function construct_repeat_libraries () {
     mkdir -p $OUT_DIR
 
     pushd $OUT_DIR
+    [ -d $OUT_DIR/work.old ] && rm -rf $OUT_DIR/work.old
+    [ -d $OUT_DIR/work ] && mv $OUT_DIR/work $OUT_DIR/work.old
 
     nonref_set_toplevel $CMD $DBNAME
 
@@ -1618,11 +1620,15 @@ function construct_repeat_libraries () {
     local SYNC_CMD=$(cat $OUT_DIR/init.stdout | grep -- -sync'$' | perl -pe 's/^\s*//; s/"//g')
     local LOOP_CMD=$(cat $OUT_DIR/init.stdout | grep -- -loop | perl -pe 's/^\s*//; s/\s*#.*$//; s/"//g')
 
-    echo "$SYNC_CMD" > $OUT_DIR/_continue_pipeline
+    echo -n > $OUT_DIR/_continue_pipeline
+    echo "pushd $OUT_DIR" >> $OUT_DIR/_continue_pipeline
+    echo "$SYNC_CMD" >> $OUT_DIR/_continue_pipeline
     echo "$LOOP_CMD" >> $OUT_DIR/_continue_pipeline
     echo "nonref_unset_toplevel $CMD $DBNAME" >> $OUT_DIR/_continue_pipeline
     echo "popd" >> $OUT_DIR/_continue_pipeline
     echo "touch $DONE_TAGS_DIR/${DONE_TAG}" >> $OUT_DIR/_continue_pipeline
+    echo "find $OUT_DIR/work -maxdepth 2 -type d -name 'RM_*' |
+      xargs -r -n 1 -I XXX rm -rf XXX" >> $OUT_DIR/_continue_pipeline
 
     echo Running pipeline...  > /dev/stderr
     echo See $OUT_DIR/_continue_pipeline if failed...  > /dev/stderr
@@ -1642,6 +1648,12 @@ function construct_repeat_libraries () {
 
     popd
     touch_done "$DONE_TAG"
+
+    # clean up
+    (
+      find $OUT_DIR/work -maxdepth 2 -type d -name 'RM_*' |
+        xargs -r -n 1 -I XXX rm -rf XXX
+    ) || true
   fi
 
 }
