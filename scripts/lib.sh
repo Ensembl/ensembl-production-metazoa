@@ -1414,7 +1414,7 @@ function run_xref () {
     echo "$LOOP_CMD" >> $OUT_DIR/_continue_pipeline
     echo "touch $DONE_TAGS_DIR/_run_xref" >> $OUT_DIR/_continue_pipeline
     echo "rm -f ${OUT_DIR}/uniprot/uniprot_trembl.fasta*" >> $OUT_DIR/_continue_pipeline
-    echo "rm -f ${OUT_DIR}/all/uniprot/uniprot_sprot.fasta*" >> $OUT_DIR/_continue_pipeline
+    echo "rm -f ${OUT_DIR}/uniprot/uniprot_sprot.fasta*" >> $OUT_DIR/_continue_pipeline
 
     echo Running pipeline...  >> /dev/stderr
     echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
@@ -1433,7 +1433,7 @@ function run_xref () {
     touch_done _run_xref
 
     rm -f ${OUT_DIR}/uniprot/uniprot_trembl.fasta* || true
-    rm -f ${OUT_DIR}/all/uniprot/uniprot_sprot.fasta* || true
+    rm -f ${OUT_DIR}/uniprot/uniprot_sprot.fasta* || true
   fi
 }
 
