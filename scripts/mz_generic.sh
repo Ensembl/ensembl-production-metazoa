@@ -162,7 +162,7 @@ backup_relink $DBNAME $CMD new_loader $DATA_DIR/bup
 
 if [ z"${SPECIAL_ACTION}" = z"restore" ]; then
   # RESTORE / UNCOMMENT TO USE
-  echo "!!! RESTORING DB (tag: '${SPECIAL_ACTION_ARG}')!!!" >> /dev/stderr; restore $DBNAME $CMD_W $DATA_DIR/bup "$SPECIAL_ACTION_ARG"; echo ok > /dev/stderr; exit 0; false; fail
+  echo "!!! RESTORING DB (tag: '${SPECIAL_ACTION_ARG}')!!!" >> /dev/stderr; restore $DBNAME $CMD_W $DATA_DIR/bup "$SPECIAL_ACTION_ARG"; echo ok >> /dev/stderr; exit 0; false; fail
 fi
 
 # fill meta
@@ -273,7 +273,7 @@ if [ -n "$REP_LIB" -a "x$REP_LIB" != "xNO" ]; then
   if [ "$rep_lib_size" -lt "1" ]; then
     echo "empty repeat library ${REP_LIB}" >> /dev/stderr
     IGNORE_EMPTY_REP_LIB=$(get_meta_conf $META_FILE_RAW IGNORE_EMPTY_REP_LIB)
-    if [ -n "$IGNORE_EMPTY_REP_LIB" ]; then
+    if [ -n "$IGNORE_EMPTY_REP_LIB" -a "x$IGNORE_EMPTY_REP_LIB" != "xNO" -a "x$IGNORE_EMPTY_REP_LIB" != "x0" ]; then
       REP_LIB="NO"
       echo "  ignoring. (IGNORE_EMPTY_REP_LIB=${IGNORE_EMPTY_REP_LIB})" >> /dev/stderr
     else
@@ -304,6 +304,11 @@ if [ -n "$GFF_FILE" ]; then
     backup_relink $DBNAME $CMD rna_genes $DATA_DIR/bup
   fi
 
+
+  if [ z"${SPECIAL_ACTION}" = z"stop_before_xref" ]; then
+    echo "stopping before run_xref..." >> /dev/stderr
+    exit 0
+  fi
 
   # run xref pipelines
   run_xref $CMD_W $DBNAME $SPECIES $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/xrefs/all "$(get_meta_conf $META_FILE_RAW XREF_PARAMS)"
