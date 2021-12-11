@@ -2815,6 +2815,10 @@ function run_rna_features () {
   local DONE_TAG='_rna_features'${TAG}
   if ! check_done "$DONE_TAG"; then
     echo "running RNAFeatures for ${CMD}:${DBNAME} with options: ${OPTIONS}" >> /dev/stderr
+
+    [ -d ${OUT_DIR}.old ] && rm -rf ${OUT_DIR}.old
+    [ -d ${OUT_DIR} ] && mv ${OUT_DIR} ${OUT_DIR}.old
+
     mkdir -p "$OUT_DIR"
 
     pushd $OUT_DIR
@@ -2836,6 +2840,7 @@ function run_rna_features () {
       -species $SPECIES \
       -eg_pipelines_dir $ENS_DIR/ensembl-production-imported \
       -no_summary_plots 1 \
+      -cmsscan_resource_class cmscan_16Gb_mem \
       ${OPTIONS} \
       2> $OUT_DIR/init.stderr \
       1> $OUT_DIR/init.stdout
