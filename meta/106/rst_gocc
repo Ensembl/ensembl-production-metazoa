@@ -8,6 +8,24 @@
 # species.production_name	_PROD_NAME_
 species.common_name	Western predatory mite
 
+
+# NB for the same taxon:34638 two synomyms are valid
+#  * Galendromus occidentalis
+#  * Metaseiulus occidentalis
+# prod name is used: metaseiulus_occidentalis_gca000255335v1
+
+
+# adding aliases manually
+species.alias	mocc
+species.alias	M.occ
+species.alias	M. occidentalis
+
+species.alias	Galendromus occidentalis
+species.alias	gocc
+species.alias	G.occ
+species.alias	G. occidentalis
+
+
 # GCA_000255335.1
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_000255335.1
 # https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/255/335/GCF_000255335.1_Mocc_1.0
@@ -72,3 +90,13 @@ annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Galen
 #
 # FINALIZE
 #
+
+# # fix missing speceies.alias(es)
+# ${CMD_W} -D premz_metaseiulus_occidentalis_gca000255335v1_core_54_106_1  -e '
+# insert into meta (species_id, meta_key, meta_value) values
+# (1, "species.alias", "Galendromus occidentalis"),
+# (1, "species.alias", "gocc"),
+# (1, "species.alias", "G.occ"),
+# (1, "species.alias", "G. occidentalis");
+# '
+
