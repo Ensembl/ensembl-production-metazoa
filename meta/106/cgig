@@ -30,6 +30,7 @@ species.common_name	Pacific oyster
 #CONF	DATA_INIT	cp ../../../../../cgigas_uk_roslin_v1/cgigas_uk_roslin_annotation_v1.1.gff3.gz .
 #CONF	DATA_INIT	cp ../../../../../cgigas_uk_roslin_v1/cgigas_uk_roslin_annotation_v1.1_protein.fa.gz .
 #CONF	DATA_INIT	cp ../../../../../cgigas_uk_roslin_v1/cgigas_uk_roslin_v1.repmod.db-families.fa.gz .
+#CONF	DATA_INIT	zcat cgigas_uk_roslin_v1.repmod.db-families.fa.gz > cgigas_uk_roslin_v1.repmod.db-families.fa
 
 #CONF	DATA_INIT	zcat GCA_902806645.1_cgigas_uk_roslin_v1_genomic.fna.gz | cat - MZ497416.1.fna  > fna.fna
 #CONF	DATA_INIT	(zcat cgigas_uk_roslin_annotation_v1.1.gff3.gz | perl -pe 's/ID=([\w\.]+).cds.\d+;/ID=$1:cds;/ if m/\tCDS\t/'; grep -v '#' MZ497416.1.gff3) > gff3.gff3
@@ -92,7 +93,8 @@ assembly.provider_url	https://www.ed.ac.uk/roslin
 annotation.provider_name	The Roslin Institute, The University of Edinburgh
 annotation.provider_url	https://www.ed.ac.uk/roslin
 
-# use custom rep lib !!!
+# NB!!! Using custom repeat library provided by the collaborators from The Roslin Institute, The University of Edinburgh
+#CONF	REP_LIB	../../raw/asm/cgigas_uk_roslin_v1.repmod.db-families.fa
 
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
 
