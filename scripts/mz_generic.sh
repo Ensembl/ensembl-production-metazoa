@@ -245,7 +245,8 @@ if [ -z "$REP_LIB" ]; then
       # dump transctipts and translations
       DUMP_TR_DIR=$DATA_DIR/data/pipeline_out/repeat_lib/tr_tr
       dump_translations $CMD $DBNAME $DUMP_TR_DIR \
-        ${SCRIPTS}/ensembl.prod.${ENS_VERSION}
+        ${SCRIPTS}/ensembl.prod.${ENS_VERSION} \
+        "cds" # dump CDS. I.e. UTRs having repeats are valid models
 
       RM_CLEAN_RNA_FILE=${DUMP_TR_DIR}/tr.fna
       RM_CLEAN_PEP_FILE=${DUMP_TR_DIR}/pep.faa
