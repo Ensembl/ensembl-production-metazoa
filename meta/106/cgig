@@ -118,4 +118,17 @@ species.stable_id_prefix	ENSLOC
 #
 # FINALIZE
 #
+# Adding proper attributions for MZ497416.1 (MT) seq_region
+##   adding "added_seq_accession", "added_seq_asm_pr_nam", "added_seq_asm_pr_url", "added_seq_ann_pr_nam", "added_seq_ann_pr_url" seq_region_attrib 
+# ${CMD_W} -D premz_crassostrea_gigas_core_54_106_2 -e 'INSERT IGNORE INTO seq_region_attrib (seq_region_id, attrib_type_id, value) SELECT sr.seq_region_id, at.attrib_type_id, "MZ497416.1" FROM seq_region sr, attrib_type at WHERE sr.name = "MZ497416.1" AND at.code = "added_seq_accession";'
+# ${CMD_W} -D premz_crassostrea_gigas_core_54_106_2 -e 'INSERT IGNORE INTO seq_region_attrib (seq_region_id, attrib_type_id, value) SELECT sr.seq_region_id, at.attrib_type_id, "The Roslin Institute, The University of Edinburgh" FROM seq_region sr, attrib_type at WHERE sr.name = "MZ497416.1" AND at.code = "added_seq_asm_pr_nam";'
+# ${CMD_W} -D premz_crassostrea_gigas_core_54_106_2 -e 'INSERT IGNORE INTO seq_region_attrib (seq_region_id, attrib_type_id, value) SELECT sr.seq_region_id, at.attrib_type_id, "https://www.ed.ac.uk/roslin" FROM seq_region sr, attrib_type at WHERE sr.name = "MZ497416.1" AND at.code = "added_seq_asm_pr_url";'
+# ${CMD_W} -D premz_crassostrea_gigas_core_54_106_2 -e 'INSERT IGNORE INTO seq_region_attrib (seq_region_id, attrib_type_id, value) SELECT sr.seq_region_id, at.attrib_type_id, "The Roslin Institute, The University of Edinburgh" FROM seq_region sr, attrib_type at WHERE sr.name = "MZ497416.1" AND at.code = "added_seq_ann_pr_nam";'
+# ${CMD_W} -D premz_crassostrea_gigas_core_54_106_2 -e 'INSERT IGNORE INTO seq_region_attrib (seq_region_id, attrib_type_id, value) SELECT sr.seq_region_id, at.attrib_type_id, "https://www.ed.ac.uk/roslin" FROM seq_region sr, attrib_type at WHERE sr.name = "MZ497416.1" AND at.code = "added_seq_ann_pr_url";'
+##    adding "added_seq.region_name" meta_key
+# ${CMD_W} -D premz_crassostrea_gigas_core_54_106_2 -e 'INSERT INTO meta (species_id, meta_key, meta_value) VALUES (1, "added_seq.region_name", "MZ497416.1");' 
+#
+# ${CMD} mysqldump --max_allowed_packet=1024M premz_crassostrea_gigas_core_54_106_2 | gzip - > data/cgig/bup/premz_crassostrea_gigas_core_54_106_2.after_ad_hoc_attribs.g
+# 
 
+  
