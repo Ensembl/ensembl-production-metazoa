@@ -94,7 +94,8 @@ annotation.provider_name	The Roslin Institute, The University of Edinburgh
 annotation.provider_url	https://www.ed.ac.uk/roslin
 
 # NB!!! Using custom repeat library provided by the collaborators from The Roslin Institute, The University of Edinburgh
-#CONF	REP_LIB	../../raw/asm/cgigas_uk_roslin_v1.repmod.db-families.fa
+#  USE ABS PATH !!!
+#CONF	REP_LIB	/.../data/cgig/data/raw/asm/cgigas_uk_roslin_v1.repmod.db-families.fa
 
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
 
