@@ -133,5 +133,3 @@ species.stable_id_prefix	ENSLOC
 #
 # ${CMD} mysqldump --max_allowed_packet=1024M premz_crassostrea_gigas_core_54_106_2 | gzip - > data/cgig/bup/premz_crassostrea_gigas_core_54_106_2.after_ad_hoc_attribs.g
 # 
-
-  
