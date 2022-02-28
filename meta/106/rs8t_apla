@@ -10,11 +10,11 @@ species.common_name	Crown-of-thorns starfish
 
 # GCA_001949145.1
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_001949145.1
-# https://_REFSEQ_FTP_URL_
+# https://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/949/145/GCF_001949145.1_OKI-Apl_1.0
 # RefSeq Annotation Name: NCBI Acanthaster planci Annotation Release 100
 # RefSeq Annotation Url: https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Acanthaster_planci/100
 
-#CONF	ASM_URL	ftp://_REFSEQ_FTP_URL_
+#CONF	ASM_URL	ftp://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/949/145/GCF_001949145.1_OKI-Apl_1.0
 
 
 # stats and metadata generation options

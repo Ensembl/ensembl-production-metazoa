@@ -10,11 +10,11 @@ species.common_name	Acorn barnacle
 
 # GCA_019059575.1
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_019059575.1
-# https://_REFSEQ_FTP_URL_
+# https://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/019/059/575/GCF_019059575.1_NRLGWU_Aamphi_draft
 # RefSeq Annotation Name: NCBI Amphibalanus amphitrite Annotation Release 100
 # RefSeq Annotation Url: https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Amphibalanus_amphitrite/100
 
-#CONF	ASM_URL	ftp://_REFSEQ_FTP_URL_
+#CONF	ASM_URL	ftp://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/019/059/575/GCF_019059575.1_NRLGWU_Aamphi_draft
 
 
 # stats and metadata generation options

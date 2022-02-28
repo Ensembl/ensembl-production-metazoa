@@ -10,11 +10,11 @@ species.common_name	Australian red waratah sea anemone
 
 # GCA_009602425.1
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_009602425.1
-# https://_REFSEQ_FTP_URL_
+# https://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/602/425/GCF_009602425.1_ASM960242v1
 # RefSeq Annotation Name: NCBI Actinia tenebrosa Annotation Release 100
 # RefSeq Annotation Url: https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Actinia_tenebrosa/100
 
-#CONF	ASM_URL	ftp://_REFSEQ_FTP_URL_
+#CONF	ASM_URL	ftp://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/602/425/GCF_009602425.1_ASM960242v1
 
 
 # stats and metadata generation options
