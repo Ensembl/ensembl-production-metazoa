@@ -14,7 +14,7 @@ species.common_name	European starfish
 # RefSeq Annotation Name: NCBI Asterias rubens Annotation Release 100
 # RefSeq Annotation Url: https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Asterias_rubens/100
 
-#CONF	ASM_URL	ftp://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/902/459/465/GCF_902459465.1_eAstRub1.3
+#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/902/459/465/GCF_902459465.1_eAstRub1.3
 
 
 # stats and metadata generation options

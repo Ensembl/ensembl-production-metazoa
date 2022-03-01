@@ -14,7 +14,7 @@ species.common_name	Stony coral
 # RefSeq Annotation Name: NCBI Acropora millepora Annotation Release 101
 # RefSeq Annotation Url: https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Acropora_millepora/101
 
-#CONF	ASM_URL	ftp://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/753/865/GCF_013753865.1_Amil_v2.1
+#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/753/865/GCF_013753865.1_Amil_v2.1
 
 
 # stats and metadata generation options
