@@ -65,6 +65,8 @@ cd $dir
 ## First checkout the Ensembl modules that follow the standard
 ## branching pattern...
 for module in \
+    ensembl \
+    ensembl-io \
     ensembl-datacheck \
     ensembl-metadata \
     ensembl-production
@@ -82,10 +84,8 @@ done
 ## Now checkout legacy stuff using "master" branch
 branch=master
 for module in \
-    ensembl \
     ensembl-compara \
     ensembl-funcgen \
-    ensembl-io \
     ensembl-rest \
     ensembl-tools \
     ensembl-variation \
