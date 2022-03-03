@@ -24,14 +24,14 @@ URL_PFX="git@github.com:"
 ## The first option to the script is the location for "create_setup_script"
 create_setup_script=$1
 if [ -z "$create_setup_script" ]; then
-    echo "Usage: $0 <create_setup_script> <dir> [branch]" > /dev/stderr
+    echo "Usage: $0 <create_setup_script> <dir> [branch]" >> /dev/stderr
     exit 1
 fi
 
 ## The second option to the script is the location for the checkout
 dir=$2
 if [ -z "$dir" ]; then
-    echo "Usage: $0 <create_setup_script> <dir> [branch]" > /dev/stderr
+    echo "Usage: $0 <create_setup_script> <dir> [branch]" >> /dev/stderr
     exit 1
 fi
 
@@ -47,57 +47,62 @@ fi
 remote=origin
 
 
-
 ## BEGIN
 
 dir=$(readlink -f $dir)
 if [ ! -e "$dir" ]; then
-    echo "Directory $dir does not exist - creating..." > /dev/stderr
+    echo "Directory $dir does not exist - creating..." >> /dev/stderr
     mkdir -p $dir
 fi
 
-echo "Creating Ensembl work directory in $dir" > /dev/stderr
-echo > /dev/stderr
+echo "Creating Ensembl work directory in $dir" >> /dev/stderr
+echo >> /dev/stderr
 
 cd $dir
 
+[ -f _FAILED ] && rm _FAILED
 
 ## First checkout the Ensembl modules that follow the standard
 ## branching pattern...
 for module in \
     ensembl \
     ensembl-io \
+    ensembl-compara \
     ensembl-datacheck \
+    ensembl-funcgen \
     ensembl-metadata \
-    ensembl-production
+    ensembl-production \
+    ensembl-rest
 do
-    echo "Checking out $module ($branch)" > /dev/stderr
+    echo "Checking out $module ($branch)" >> /dev/stderr
     git clone -b $branch --depth 1 --no-single-branch ${URL_PFX}Ensembl/${module} || {
-        echo "Could not check out $module ($branch)" > /dev/stderr
+        echo "Could not check out $module ($branch)" >> /dev/stderr
+        touch _FAILED
         exit 2
     }
-    echo done > /dev/stderr
-    echo > /dev/stderr
+    [ -f _FAILED ] && exit 2
+    echo done >> /dev/stderr
+    echo >> /dev/stderr
 done
+
 
 
 ## Now checkout legacy stuff using "master" branch
 branch=master
 for module in \
-    ensembl-compara \
-    ensembl-funcgen \
-    ensembl-rest \
     ensembl-tools \
     ensembl-variation \
     ensembl-vep
 do
-    echo "Checking out $module ($branch)" > /dev/stderr
+    echo "Checking out $module ($branch)" >> /dev/stderr
     git clone -b $branch --depth 1 --no-single-branch ${URL_PFX}Ensembl/${module} || {
-        echo "Could not check out $module ($branch)" > /dev/stderr
+        echo "Could not check out $module ($branch)" >> /dev/stderr
+        touch _FAILED
         exit 2
     }
-    echo done > /dev/stderr
-    echo > /dev/stderr
+    [ -f _FAILED ] && exit 2
+    echo done >> /dev/stderr
+    echo >> /dev/stderr
 done
 
 
@@ -107,41 +112,48 @@ branch="version/2.6"
 for module in \
     ensembl-hive
 do
-    echo "Checking out $module ($branch)" > /dev/stderr
+    echo "Checking out $module ($branch)" >> /dev/stderr
     git clone -b $branch --depth 1 --no-single-branch ${URL_PFX}Ensembl/${module} || {
-        echo "Could not check out $module ($branch)" > /dev/stderr
+        echo "Could not check out $module ($branch)" >> /dev/stderr
+        touch _FAILED
         exit 2
     }
-    echo done > /dev/stderr
+    [ -f _FAILED ] && exit 2
+    echo done >> /dev/stderr
     echo
 done
 
 
 
 ## Now checkout taxonomy (no release branch!)
-branch="master"
+branch="main"
 for module in \
     ensembl-taxonomy
 do
-    echo "Checking out $module ($branch)" > /dev/stderr
+    echo "Checking out $module ($branch)" >> /dev/stderr
     git clone -b $branch ${URL_PFX}Ensembl/${module} || {
-        echo "Could not check out $module ($branch)" > /dev/stderr
+        echo "Could not check out $module ($branch)" >> /dev/stderr
+        touch _FAILED
         exit 2
     }
-    echo done > /dev/stderr
+    [ -f _FAILED ] && exit 2
+    echo done >> /dev/stderr
     echo
 done
 
 ## Now checkout ensemblgenomes-api (different URL)
+branch="master"
 for module in \
     ensemblgenomes-api
 do
-    echo "Checking out $module ($branch)" > /dev/stderr
+    echo "Checking out $module ($branch)" >> /dev/stderr
     git clone -b $branch ${URL_PFX}EnsemblGenomes/${module} || {
-        echo "Could not check out $module ($branch)" > /dev/stderr
+        echo "Could not check out $module ($branch)" >> /dev/stderr
+        touch _FAILED
         exit 2
     }
-    echo done > /dev/stderr
+    [ -f _FAILED ] && exit 2
+    echo done >> /dev/stderr
     echo
 done
 
@@ -152,12 +164,14 @@ branch="dev/hive_master"
 for module in \
     ensembl-analysis
 do
-    echo "Checking out $module ($branch)" > /dev/stderr
+    echo "Checking out $module ($branch)" >> /dev/stderr
     git clone -b $branch --depth 1 --no-single-branch ${URL_PFX}Ensembl/${module} || {
-        echo "Could not check out $module ($branch)" > /dev/stderr
+        echo "Could not check out $module ($branch)" >> /dev/stderr
+        touch _FAILED
         exit 2
     }
-    echo done > /dev/stderr
+    [ -f _FAILED ] && exit 2
+    echo done >> /dev/stderr
     echo
 done
 )
@@ -175,7 +189,7 @@ git clone git@github.com:Ensembl/ensembl-production-imported-private.git || true
 # grab new_genome_loader
 git clone git@github.com:MatBarba/new_genome_loader.git new_genome_loader
 
-echo "Building python3 venv" > /dev/stderr
+echo "Building python3 venv" >> /dev/stderr
 
 pyenv local 3.7.6
 python3.7 -m venv venv
@@ -184,15 +198,15 @@ pip3 install Cython
 pip3 install -r new_genome_loader/requirements.txt
 
 
-echo "Adding perl deps" > /dev/stderr
+echo "Adding perl deps" >> /dev/stderr
 mkdir -p ${dir}/perl5
 cpanm install --local-lib=${dir}/perl5 Text::Levenshtein::Damerau::XS
 
 
 ## Gasp!
 
-echo "Checkout complete" > /dev/stderr
-echo "Creating a setup script" > /dev/stderr
+echo "Checkout complete" >> /dev/stderr
+echo "Creating a setup script" >> /dev/stderr
 
 ${create_setup_script} $dir
 
@@ -224,4 +238,4 @@ echo 'export PERL5LIB ENSEMBL_ROOT_DIR ENSEMBL_CVS_ROOT_DIR PYTHONPATH PATH' >> 
 
 
 echo
-echo "DONE!" > /dev/stderr
+echo "DONE!" >> /dev/stderr

@@ -93,6 +93,9 @@ flock ${SCRIPTS}/ensembl.prod.${ENS_VERSION}.lock -c "
   get_ensembl_prod ${SCRIPTS}/ensembl.prod.${ENS_VERSION} $ENS_VERSION \
     $MZ_SCRIPTS/checkout_ensembl.20210208.sh $MZ_SCRIPTS/legacy/create_setup_script.sh
   "
+
+[ -f "${SCRIPTS}/ensembl.prod.${ENS_VERSION}/_FAILED" ] && echo "setting up env failed... exiting" >> /dev/stderr && exit 2
+
 # or copy
 
 

@@ -70,6 +70,8 @@ function get_ensembl_prod () {
     pushd $BASE
     "$CHECKOUT_SCRIPT" "$CREATE_SETUP_SCRIPT" .
 
+    [ -f '_FAILED' ] && echo "setting up '$BASE' env failed..." > /dev/stderr  && return 1 
+
     for d in  $(find * -maxdepth 0 -type d); do
       echo $d
       pushd $d
