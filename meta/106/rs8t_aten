@@ -23,7 +23,8 @@ species.common_name	Australian red waratah sea anemone
 #CONF	GFF_PARSER_CONF_PATCH	NO
 
 # disabling default [transcript -> mRNA] gff3 feature type convesion
-#CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna
+# ignore "gene/exon" models instead of failing (MT related, 2 genes)
+#CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna,ignore_mt_gene_exon
 
 #no CONF	GFF_PARSER_PFX_TRIM	NO
 #CONF	GFF_LOADER_OPTIONS	--external_db_map_name external_db_map_metazoa.txt
