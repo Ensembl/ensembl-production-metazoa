@@ -192,7 +192,7 @@ git clone git@github.com:MatBarba/new_genome_loader.git new_genome_loader
 echo "Building python3 venv" >> /dev/stderr
 
 # pyenv local 3.7.6
-python3.7 -m venv venv
+python3 -m venv venv
 source venv/bin/activate
 pip3 install Cython
 pip3 install -r new_genome_loader/requirements.txt
