@@ -70,7 +70,7 @@ function get_ensembl_prod () {
     pushd $BASE
     "$CHECKOUT_SCRIPT" "$CREATE_SETUP_SCRIPT" .
 
-    [ -f '_FAILED' ] && echo "setting up '$BASE' env failed..." > /dev/stderr  && return 1 
+    [ -f '_FAILED' ] && echo "setting up '$BASE' env failed..." >> /dev/stderr  && return 1 
 
     for d in  $(find * -maxdepth 0 -type d); do
       echo $d
@@ -3559,7 +3559,7 @@ function run_new_loader () {
 
     local failed_jobs=$($SYNC_CMD --failed_jobs 2>/dev/null | grep -cF 'status=FAILED')
     if [ "$failed_jobs" -gt "0" ]; then
-      echo $failed_jobs failed jobs in loader...> /dev/stderr
+      echo $failed_jobs failed jobs in loader... >> /dev/stderr
       false
     fi
 
@@ -3870,7 +3870,7 @@ function run_core_stats_new () {
 
     local failed_jobs=$($SYNC_CMD --failed_jobs 2>/dev/null | grep -cF 'status=FAILED')
     if [ "$failed_jobs" -gt "0" ]; then
-      echo $failed_jobs failed jobs in loader...> /dev/stderr
+      echo $failed_jobs failed jobs in loader... >> /dev/stderr
       false
     fi
 
