@@ -191,7 +191,7 @@ git clone git@github.com:MatBarba/new_genome_loader.git new_genome_loader
 
 echo "Building python3 venv" >> /dev/stderr
 
-pyenv local 3.7.6
+# pyenv local 3.7.6
 python3.7 -m venv venv
 source venv/bin/activate
 pip3 install Cython
@@ -218,7 +218,7 @@ echo 'export PERL5LIB=$PERL5LIB:'${dir_full_path}'/ensembl-variation/scripts/imp
 echo 'PERL5LIB='${dir_full_path}'/ensembl-datacheck/lib:$PERL5LIB' >> $dir/setup.sh
 echo 'PATH='${dir_full_path}'/ensembl-datacheck/scripts:$PATH' >> $dir/setup.sh
 
-#echo 'pyenv local 3.7.6' >> $dir/setup.sh
+# echo 'pyenv local 3.7.6' >> $dir/setup.sh
 #echo 'pyenv deactivate' >> $dir/setup.sh
 echo 'source '${dir_full_path}'/venv/bin/activate' >> $dir/setup.sh
 
