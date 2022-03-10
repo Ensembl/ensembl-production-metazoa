@@ -3418,6 +3418,8 @@ function prepare_metada () {
       --manifest_out $OUT_DIR/manifest.json \
       --meta_out $OUT_DIR/meta
 
+    echo -e "#CONF\tMETA_FILE_RAW_ORIG\t${META_RAW_ORIG}" >> $OUT_DIR/meta
+
     touch_done "$DONE_TAG"
   fi
 }
@@ -3437,7 +3439,7 @@ function run_new_loader () {
     mkdir -p $OUT_DIR
 
     local META_FILE=$META_DIR/meta
-    local META_FILE_RAW=$(get_meta_conf $META_FILE 'META_FILE_RAW')
+    local META_FILE_RAW=$(get_meta_conf $META_FILE 'META_FILE_RAW_ORIG')
     if [ -z "$META_FILE_RAW" ]; then
       META_FILE_RAW=$META_FILE
     fi
