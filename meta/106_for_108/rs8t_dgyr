@@ -51,8 +51,8 @@ assembly.accession	GCA_904063045.1
 assembly.provider_name	Department of Biological Sciences, University of Bergen
 assembly.provider_url	https://www.uib.no/en/bio
 
-annotation.provider_name	NCBI
-annotation.provider_url	NOT REFSEQ
+annotation.provider_name	Department of Biological Sciences, University of Bergen
+annotation.provider_url	https://www.uib.no/en/bio
 
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
 #  to change the lower allowed length [default 5000]: -min_slice_length 1000
@@ -80,4 +80,8 @@ annotation.provider_url	NOT REFSEQ
 
 #
 # FINALIZE
+#
+#  fix:
+#    annotation.provider_name	Department of Biological Sciences, University of Bergen
+#    annotation.provider_url	https://www.uib.no/en/bio
 #

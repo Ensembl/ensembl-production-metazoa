@@ -50,8 +50,8 @@ assembly.accession	GCA_002082055.1
 assembly.provider_name	Institute for Advanced Biosciences, Keio University
 assembly.provider_url	https://www.iab.keio.ac.jp/en/index.html
 
-annotation.provider_name	NCBI
-annotation.provider_url	NOT REFSEQ
+annotation.provider_name	Institute for Advanced Biosciences, Keio University
+annotation.provider_url	https://www.iab.keio.ac.jp/en/index.html
 
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
 #  to change the lower allowed length [default 5000]: -min_slice_length 1000

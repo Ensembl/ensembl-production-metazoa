@@ -6,15 +6,15 @@
 #  * uncomment "species.production_name" below
 # # updated, prev was _PREV_CORE_NAME_ 
 # species.production_name	_PROD_NAME_
-species.common_name	Amphipod
+species.common_name	Kuruma shrimp
 
-# GCA_000764305.3
-# https://www.ncbi.nlm.nih.gov/assembly/GCA_000764305.3
-# https://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/764/305/GCA_000764305.3_Hazt_2.0.1
+# GCA_017312705.2
+# https://www.ncbi.nlm.nih.gov/assembly/GCA_017312705.2
+# https://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/017/312/705/GCA_017312705.2_Mj_TUMSAT_v1.0
 # RefSeq Annotation Name: NOT REFSEQ (assembly version update)
 # RefSeq Annotation Url: NOT REFSEQ
 
-#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/764/305/GCA_000764305.3_Hazt_2.0.1
+#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/017/312/705/GCA_017312705.2_Mj_TUMSAT_v1.0
 
 
 # stats and metadata generation options
@@ -41,17 +41,18 @@ species.common_name	Amphipod
 
 
 # Assembly metadata
-assembly.accession	GCA_000764305.3
+assembly.accession	GCA_017312705.2
 #no CONF	GCF_TO_GCA	1
 
 # Provider metadata
 #CONF	GFF3_LOAD_SOURCE_NAME	RefSeq
 
-assembly.provider_name	BCM-HGSC i5k initiative (arthropods) Hyalella azteca Genome Project
-assembly.provider_url	https://www.hgsc.bcm.edu/arthropods/hyalella-azteca-genome-project
+assembly.provider_name	Laboratory of Genome Science Graduate School of Marine Science and Technology, Tokyo University of Marine Science and Technology
+assembly.provider_url	https://www2.kaiyodai.ac.jp/~h-kondo/genome/index.html
 
-annotation.provider_name	BCM-HGSC i5k initiative (arthropods) Hyalella azteca Genome Project
-annotation.provider_url	https://www.hgsc.bcm.edu/arthropods/hyalella-azteca-genome-project
+annotation.provider_name	Laboratory of Genome Science Graduate School of Marine Science and Technology, Tokyo University of Marine Science and Technology
+annotation.provider_url	https://www2.kaiyodai.ac.jp/~h-kondo/genome/index.html
+
 
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
 #  to change the lower allowed length [default 5000]: -min_slice_length 1000
