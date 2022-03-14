@@ -8,6 +8,13 @@
 # species.production_name	_PROD_NAME_
 species.common_name	Sea anemone
 
+# overriding taxonomy because of the merge (https://www.ncbi.nlm.nih.gov/taxonomy/?term=1720309)
+#CONF	TAXON_ID	2652724
+species.production_name	exaiptasia_diaphana_gca001417965v1
+species.url	Exaiptasia_diaphana_gca001417965v1
+species.scientific_name	Exaiptasia diaphana
+
+#
 # GCA_001417965.1
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_001417965.1
 # https://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/417/965/GCF_001417965.1_Aiptasia_genome_1.1
