@@ -30,4 +30,4 @@ Kuruma shrimp	Penaeus japonicus	pjap2	GCA_017312705.2	https://ftp.ncbi.nlm.nih.g
 
 # cat _refseq_108.lst | grep -vF '#' | grep -vP '^\s*$' | awk -F "\t" '{print NF}' | sort | uniq -c
 # cd ../../
-# python3 ./scripts/tmpl2meta.py --template meta/refseq.tmpl --param_table meta/106/_refseq_108.lst --output_dir meta/106 --out_file_pfx rs8t_
+# python3 ./scripts/tmpl2meta.py --template meta/refseq.tmpl --param_table meta/106_for_108/_refseq_108.lst --output_dir meta/106_for_108 --out_file_pfx rs8t_
