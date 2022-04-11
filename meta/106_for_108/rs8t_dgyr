@@ -85,3 +85,7 @@ annotation.provider_url	https://www.uib.no/en/bio
 #    annotation.provider_name	Department of Biological Sciences, University of Bergen
 #    annotation.provider_url	https://www.uib.no/en/bio
 #
+# $CMD_W -D premz_dimorphilus_gyrociliatus_gca904063045v1_core_55_106_1 -e 'update meta set meta_value = "Department of Biological Sciences, University of Bergen" where meta_key = "annotation.provider_name"' 
+# $CMD_W -D premz_dimorphilus_gyrociliatus_gca904063045v1_core_55_106_1 -e 'update meta set meta_value = "https://www.uib.no/en/bio" where meta_key = "annotation.provider_url"' 
+#
+
