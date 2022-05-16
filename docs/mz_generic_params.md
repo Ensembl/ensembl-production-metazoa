@@ -48,16 +48,15 @@ Though, you can use "help" and "env_setup_only" (see below) options instead of m
 In addition to the meta conf paramete you can provide additional option, that controls the generic loader `scripts/mz_generic.sh` behaviour:
 | Option | Description | Comments |
 | - | - | - | 
-| help | print usage and exit | |
-| env_setup_only | prepare environment and exit | |
-| restore [tag_pattern] | restore from the latest back up, or from the one matching "tag_pattern" | move `bup` symlink, if you need something older than the last saved; when pattern is used, back-ups that followed the macthing are removed (drops everything fresher then the one it's restoring from) |
-| stop_after_conf | get data, validate, prepare cofiguration for the loader and stop | |
-| stop_after_load | stop after the loader pipeline before running anything else | |
-| stop_before_xref | stop before running xref helper | |
-| pre_final_dc | run datachecks before creating final dump | |
-| pre_final_dc | run datachecks before patching to the new schema stage | active, only if the goal is reachable |
-| finalise | create back up with the `final` tag |  active, only if the goal is reachable |
-| patch_schema | patch schema to the latest available | | 
+| `help` | print usage and exit | |
+| `env_setup_only` | prepare environment and exit | |
+| `restore [tag_pattern]` | restore from the latest back up, or from the one matching "tag\_pattern" | move `bup` symlink, if you need something older than the last saved; when pattern is used, back-ups that followed the macthing are removed (drops everything fresher then the one it's restoring from). N.B. as many `${DATA_DIR}/<meta_name>/done` tags as you need (use `ls -lt` to sort tags by time). |
+| `stop_after_conf` | get data, validate, prepare cofiguration for the loader and stop | |
+| `stop_after_load` | stop after the loader pipeline before running anything else | |
+| `stop_before_xref` | stop before running xref helper | |
+| `pre_final_dc` | run datachecks before patching to the new schema stage | active, only if the goal is reachable |
+| `finalise` | create back up with the `final` tag |  active, only if the goal is reachable |
+| `patch_schema` | patch schema to the latest available | | 
 
 
 ## Ad-hoc environment setup
@@ -71,8 +70,10 @@ cd $configs_dir
 
 git clone git@github.com:Ensembl/ensembl-production-metazoa.git
 
-# source _mz.conf file
+# source ensembl-production-metazoa/conf/_mz.conf file
 # or 
+export PROD_SERVER=<prod_server_alias>
+
 export ENS_VERSION=107
 
 # setup environment (you should have proper github keys/permissions in place)
