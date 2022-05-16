@@ -70,9 +70,12 @@ for module in \
     ensembl-compara \
     ensembl-datacheck \
     ensembl-funcgen \
+    ensembl-genomio \
     ensembl-metadata \
     ensembl-production \
-    ensembl-rest
+    ensembl-rest \
+    ensembl-variation \
+  ;
 do
     echo "Checking out $module ($branch)" >> /dev/stderr
     git clone -b $branch --depth 1 --no-single-branch ${URL_PFX}Ensembl/${module} || {
@@ -91,7 +94,6 @@ done
 branch=master
 for module in \
     ensembl-tools \
-    ensembl-variation \
     ensembl-vep
 do
     echo "Checking out $module ($branch)" >> /dev/stderr
@@ -186,16 +188,14 @@ git clone git@github.com:Ensembl/ensembl-production-imported.git
 # private configs
 git clone git@github.com:Ensembl/ensembl-production-imported-private.git || true
 
-# grab new_genome_loader
-git clone git@github.com:MatBarba/new_genome_loader.git new_genome_loader
-
+# prepare ensembl-genomio
 echo "Building python3 venv" >> /dev/stderr
 
 # pyenv local 3.7.6
 python3 -m venv venv
 source venv/bin/activate
 pip3 install Cython
-pip3 install -r new_genome_loader/requirements.txt
+pip3 install -r ensembl-genomio/requirements.txt
 
 
 echo "Adding perl deps" >> /dev/stderr
@@ -225,8 +225,8 @@ echo 'source '${dir_full_path}'/venv/bin/activate' >> $dir/setup.sh
 echo 'export PERL5LIB='${dir_full_path}'/perl5/lib/perl5:$PERL5LIB' >> $dir/setup.sh
 
 echo 'export PYTHONPATH='${dir_full_path}'/ensembl-hive/wrappers/python3:$PYTHONPATH' >> $dir/setup.sh
-echo 'export PERL5LIB='${dir_full_path}'/new_genome_loader/lib/perl:$PERL5LIB' >> $dir/setup.sh
-echo 'export PYTHONPATH='${dir_full_path}'/new_genome_loader/lib/python:$PYTHONPATH' >> $dir/setup.sh
+echo 'export PERL5LIB='${dir_full_path}'/ensembl-genomio/lib/perl:$PERL5LIB' >> $dir/setup.sh
+echo 'export PYTHONPATH='${dir_full_path}'/ensembl-genomio/lib/python:$PYTHONPATH' >> $dir/setup.sh
 
 echo 'export PERL5LIB='${dir_full_path}'/ensembl-production-imported/lib/perl:$PERL5LIB' >> $dir/setup.sh
 echo 'export PYTHONPATH='${dir_full_path}'/ensembl-production-imported/lib/python:$PYTHONPATH' >> $dir/setup.sh
