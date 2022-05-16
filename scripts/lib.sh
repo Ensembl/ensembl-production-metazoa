@@ -3210,7 +3210,7 @@ function prepare_metada () {
     local MCFG_GBFF_OPTS=$(fopt_from_meta $META_RAW GBFF_FILE $ASM_DIR '--gbff_file' false)
     local MCFG_ASM_REP_OPTS=$(fopt_from_meta $META_RAW ASM_REP_FILE $ASM_DIR  '--asm_rep_file' false)
 
-    local GFF_PARSER_CONF_DIR="$SCRIPTS/new_genome_loader/scripts/gff_metaparser/conf"
+    local GFF_PARSER_CONF_DIR="$SCRIPTS/ensembl-genomio/scripts/gff_metaparser/conf"
 
     local MCFG_GFF_CAUSED_OPTS=''
     local GFF_PATH=$(fopt_from_meta $META_RAW GFF_FILE $ASM_DIR '' false)
@@ -3277,7 +3277,7 @@ function prepare_metada () {
 
       # gen stats
       cat $OUT_DIR/no_fasta.gff3 |
-        python $SCRIPTS/new_genome_loader/scripts/gff_metaparser/gff_stats.py \
+        python $SCRIPTS/ensembl-genomio/scripts/gff_metaparser/gff_stats.py \
           --dump_used_options \
           --fail_unknown \
           --conf $GFF_STATS_CONF \
@@ -3315,7 +3315,7 @@ function prepare_metada () {
 
       # prepare gff and json
       gzcat_or_cat $OUT_DIR/validated.gff3 |
-        python $SCRIPTS/new_genome_loader/scripts/gff_metaparser/gff3_meta_parse.py \
+        python $SCRIPTS/ensembl-genomio/scripts/gff_metaparser/gff3_meta_parse.py \
           --dump_used_options \
           --conf $GFF_PARSER_CONF \
           $GFF_PARSER_CONF_PATCH \
@@ -3384,7 +3384,7 @@ function prepare_metada () {
       local SR_GFF_PARSER_CONF_PATCH=$(fopt_from_meta $META_RAW 'SR_GFF_PARSER_CONF_PATCH' $GFF_PARSER_CONF_DIR '--conf_patch' true)
 
       cat $OUT_DIR/sr_gff.gff3 |
-        python $SCRIPTS/new_genome_loader/scripts/gff_metaparser/gff3_meta_parse.py \
+        python $SCRIPTS/ensembl-genomio/scripts/gff_metaparser/gff3_meta_parse.py \
           --dump_used_options \
           --conf $SR_GFF_PARSER_CONF \
           $SR_GFF_PARSER_CONF_PATCH \
@@ -3413,7 +3413,7 @@ function prepare_metada () {
 
     local GEN_META_CONF_OPTIONS="$(get_meta_conf $META_RAW GEN_META_CONF_OPTIONS)"
 
-    python $SCRIPTS/new_genome_loader/scripts/gff_metaparser/gen_meta_conf.py \
+    python $SCRIPTS/ensembl-genomio/scripts/gff_metaparser/gen_meta_conf.py \
       --assembly_version $ASM_VERSION \
       --data_out_dir $OUT_DIR \
       --raw_meta_conf $META_RAW \
