@@ -45,8 +45,19 @@ function grep () {
   sh -c -- "grep $params" || :
 }
 
-# create directory structure
+function gzcat_or_cat() {
+  # use `gzcat` for gzipped files, plain `cat` -- for everything else
+  local params="$@"
+  local has_gz=$(file $params 2>&1 | grep "gzip" | wc -l)
+  if [ "$has_gz" -ge 1 ]; then
+    zcat $params
+  else
+    cat $params
+  fi
+}
 
+
+# create directory structure
 function populate_dirs () {
   local BASE=$1
   mkdir -p $BASE
@@ -505,12 +516,12 @@ function load_dna_sequences () {
       # use existing contigs 2 scaffolds agp
       local CONTIGS_TO_SCAFFOLDS_AGP_FILE=$(get_meta_conf $META_FILE 'CONTIGS_TO_SCAFFOLDS_AGP_FILE')
       if [ -f "$CONTIGS_TO_SCAFFOLDS_AGP_FILE" ]; then
-        less "$CONTIGS_TO_SCAFFOLDS_AGP_FILE" > $PIPELINE_DIR/${ASSEMBLY}.agp
+        gzcat_or_cat "$CONTIGS_TO_SCAFFOLDS_AGP_FILE" > $PIPELINE_DIR/${ASSEMBLY}.agp
       fi
       # same for the non-ref
       local CONTIGS_TO_NON_REF_SCAFFOLDS_AGP_FILE=$(get_meta_conf $META_FILE 'CONTIGS_TO_NON_REF_SCAFFOLDS_AGP_FILE')
       if [ -f "$CONTIGS_TO_NON_REF_SCAFFOLDS_AGP_FILE" ]; then
-        less "$CONTIGS_TO_NON_REF_SCAFFOLDS_AGP_FILE" > $PIPELINE_DIR/${ASSEMBLY}.non_ref_scaffolds.agp
+        gzcat_or_cat "$CONTIGS_TO_NON_REF_SCAFFOLDS_AGP_FILE" > $PIPELINE_DIR/${ASSEMBLY}.non_ref_scaffolds.agp
       fi
       set_ena_contigs=1
     fi
@@ -525,7 +536,7 @@ function load_dna_sequences () {
 
     SCAFFOLDS_TO_CHROMOSOMES_AGP_FILE=$(get_meta_conf $META_FILE 'SCAFFOLDS_TO_CHROMOSOMES_AGP_FILE')
     if [ -f "$SCAFFOLDS_TO_CHROMOSOMES_AGP_FILE" ]; then
-      less "$SCAFFOLDS_TO_CHROMOSOMES_AGP_FILE" > $PIPELINE_DIR/${ASSEMBLY}.chromosome.agp
+      gzcat_or_cat "$SCAFFOLDS_TO_CHROMOSOMES_AGP_FILE" > $PIPELINE_DIR/${ASSEMBLY}.chromosome.agp
       set_ena_chromosomes=1
     else
       # load chromosome names as syns
@@ -843,7 +854,7 @@ function filter_gff () {
     # change "pseudogene" to "pseudogenic_trascript"
     # fix ensembl protein ids for CDS
     # xref display ID /??
-    less $GFF_FILE |
+    gzcat_or_cat $GFF_FILE |
       grep -viF -f "$OUT_DIR/tmp.pat" |
       perl -pe 's/VectorBase/vectorbase_maker/' |
       gff_keep_only_tags "$KEEP_TAGS" |
@@ -870,7 +881,7 @@ function fix_gff_ids () {
   if ! check_done _fix_gff_ids; then
     echo "filtering GFF3 file $GFF_FILE into " >> /dev/stderr
 
-    local max_seen_gene_id=$(less $GFF_FILE | perl -e '
+    local max_seen_gene_id=$(gzcat_or_cat $GFF_FILE | perl -e '
         use strict;
         my $gene_cnt = 0;
         my $max_num_part = 0;
@@ -892,7 +903,7 @@ function fix_gff_ids () {
     # select max(gene_stable_id) from gene_archive;
 
 
-    less $GFF_FILE |
+    gzcat_or_cat $GFF_FILE |
       perl -e '
         my $gene_cnt = 1;
         my $next_max_gene_id = '${max_seen_gene_id}'+100;
@@ -1198,7 +1209,7 @@ function fix_pep_names () {
     echo "fixing pep names in $PEP_FILE using $MAP to $OUTFILE" >> /dev/stderr
       local outdir=$(dirname $OUTFILE)
       mkdir -p $outdir
-      ( cut -f 1,2 $MAP; less $PEP_FILE ) |
+      ( cut -f 1,2 $MAP; gzcat_or_cat $PEP_FILE ) |
           awk 'BEGIN {go = 0 } (!go) {r[">"$2] = ">"$1} (/^>/) {go = 1; $1 = r[$1]; if ($1) {print} else {go = 0}} (!/^>/ && go) {print}' > $OUTFILE
 
     touch_done "$DONE_TAG"
@@ -1505,14 +1516,14 @@ function load_xrefs () {
     # for the list of xref names see:
     #   d3 -D dinothrombium_tinctorium_core_1904_95_1 -e 'select * from external_db'
     if [ -s "$GENE_MAP" ]; then
-      less "$GENE_MAP" |
+      gzcat_or_cat "$GENE_MAP" |
         cut -f 1,2 |
         perl $SCRIPTS/load_xref.pl $($CMD details script) -dbname $DBNAME -object 'Gene' -xref_name 'RefSeq_gene_name'
     fi
 
     echo "loading xref for proteins into $DBNAME" >> /dev/stderr
     if [ -s "$PEP_MAP" ]; then
-      less "$PEP_MAP" |
+      gzcat_or_cat "$PEP_MAP" |
         cut -f 1,2 |
         perl $SCRIPTS/load_xref.pl $($CMD details script) -dbname $DBNAME -object 'Translation' -xref_name 'RefSeq_peptide'
     fi
@@ -1724,7 +1735,7 @@ function filter_repeat_library () {
 
     # blast proteins against giriRepbase
     makeblastdb -in $REPBASE_FILE -dbtype nucl -input_type fasta -out $WD/repbase.db
-    less $PEP_FILE |
+    gzcat_or_cat $PEP_FILE |
       tblastn -query - \
       -db $WD/repbase.db \
       -evalue 1e-5 \
@@ -1742,14 +1753,14 @@ function filter_repeat_library () {
 
 
     # filter out these hits from transcriptome
-    less $RNA_FILE |
+    gzcat_or_cat $RNA_FILE |
       fasta2sl |
       grep -vwFf $WD/rna.exclude.pat |
       perl -pe 's/\t/\n/g' > $WD/rna_clean.fa
 
     # blast new repeats against transcriptome
     makeblastdb -in $WD/rna_clean.fa -dbtype nucl -out $WD/rna_clean.db
-    less $LIB_IN |
+    gzcat_or_cat $LIB_IN |
       blastn -task megablast \
         -query - \
         -db $WD/rna_clean.db \
@@ -1766,7 +1777,7 @@ function filter_repeat_library () {
       sort | uniq > $WD/lib.exclude.pat
 
     # finally clean library
-    less $LIB_IN |
+    gzcat_or_cat $LIB_IN |
       fasta2sl |
       grep -vwFf $WD/lib.exclude.pat |
       perl -pe 's/\t/\n/g' > $OUT_DIR/$OUT_NAME
@@ -2547,7 +2558,7 @@ function compara_proj_to_gff3 () {
 
     bsub $BSUB_OPTS \
       -o $OUT_DIR/bsub.out -e $OUT_DIR/bsub.err \
-      -Is "less $SRC_GFF | $CMP_CMD; exit"
+      -Is "gzcat_or_cat $SRC_GFF | $CMP_CMD; exit"
     tail $OUT_DIR/bsub.out $OUT_DIR/bsub.err
 
     local asm_to=$(get_db_asm $CMD_TO $DBNAME_TO)
@@ -2933,7 +2944,7 @@ function preprocess_gff () {
     local OUT_DIR="$(dirname $OUT_FILE)"
     mkdir -p $OUT_DIR
 
-    less $GFF_FILE | $PATCHER > $OUT_FILE
+    gzcat_or_cat $GFF_FILE | $PATCHER > $OUT_FILE
 
     touch_done "$DONE_TAG"
   fi
@@ -2951,7 +2962,7 @@ function gen_map_file () {
     local OUT_DIR="$(dirname $OUT_FILE)"
     mkdir -p $OUT_DIR
 
-    less $IN_FILE | $PATCHER > $OUT_FILE
+    gzcat_or_cat $IN_FILE | $PATCHER > $OUT_FILE
 
     touch_done "$DONE_TAG"
   fi
@@ -2989,7 +3000,7 @@ function load_chromosome_bands_from_gff () {
   if ! check_done "$DONE_TAG"; then
     echo "loading chromosome bands for  $CMD:$DBNAME from $GFF_FILE..." >> /dev/stderr
     mkdir -p $OUT_DIR
-    less $GFF_FILE | grep -P '\tchromosome_band\t' > $OUT_DIR/bands.gff
+    gzcat_or_cat $GFF_FILE | grep -P '\tchromosome_band\t' > $OUT_DIR/bands.gff
 
     perl $SCRIPTS/archive/flybase/load_karyotype.pl \
       $($CMD details script) -dbname $DBNAME \
@@ -3021,7 +3032,7 @@ function flybase_gff2xref () {
       local pat_to_lc=$(echo $pat_to | perl -ne 'print lc($_)')
 
       echo "Getting $pat_from xrefs from gff..."  >> /dev/stderr
-      less  $GFF_FILE |
+      gzcat_or_cat  $GFF_FILE |
         grep -P '\t'"$pat_from"'\t' |
         perl -pe 's/.*ID=([^;]+);.*Name=([^;]+);.*/$1\t$2/' |
         perl -pe 's/\\/\\\\/' |
@@ -3061,7 +3072,7 @@ function flybase_gff2xref () {
       local pat_to=$(echo $pat | cut -f 2 -d ':')
 
       echo "Getting $pat_from xrefs from gff..."  >> /dev/stderr
-      less  $GFF_FILE |
+      gzcat_or_cat  $GFF_FILE |
         grep -P '\tgene\t.*Dbxref=[^;]*'"$pat_from" |
         perl -pe 's/.*ID=([^;]+);.*Dbxref=[^;]*'"${pat_from}"'\:([^;,]+).*/$1\t$2/' |
         awk -F "\t" '{OFS="\t"; print $1, $2, $2}' |
@@ -3199,7 +3210,7 @@ function prepare_metada () {
     local MCFG_GBFF_OPTS=$(fopt_from_meta $META_RAW GBFF_FILE $ASM_DIR '--gbff_file' false)
     local MCFG_ASM_REP_OPTS=$(fopt_from_meta $META_RAW ASM_REP_FILE $ASM_DIR  '--asm_rep_file' false)
 
-    local GFF_PARSER_CONF_DIR="$SCRIPTS/new_genome_loader/scripts/gff_metaparser/conf"
+    local GFF_PARSER_CONF_DIR="$SCRIPTS/ensembl-genomio/scripts/gff_metaparser/conf"
 
     local MCFG_GFF_CAUSED_OPTS=''
     local GFF_PATH=$(fopt_from_meta $META_RAW GFF_FILE $ASM_DIR '' false)
@@ -3252,7 +3263,7 @@ function prepare_metada () {
       fi
 
       # remove #FASTA part
-      less $GFF_PATH |
+      gzcat_or_cat $GFF_PATH |
         sed -n '/^##FASTA/q; /^>/q; p' > $OUT_DIR/no_fasta.gff3 || true
 
       # initial validation
@@ -3266,7 +3277,7 @@ function prepare_metada () {
 
       # gen stats
       cat $OUT_DIR/no_fasta.gff3 |
-        python $SCRIPTS/new_genome_loader/scripts/gff_metaparser/gff_stats.py \
+        python $SCRIPTS/ensembl-genomio/scripts/gff_metaparser/gff_stats.py \
           --dump_used_options \
           --fail_unknown \
           --conf $GFF_STATS_CONF \
@@ -3303,8 +3314,8 @@ function prepare_metada () {
       fi
 
       # prepare gff and json
-      less $OUT_DIR/validated.gff3 |
-        python $SCRIPTS/new_genome_loader/scripts/gff_metaparser/gff3_meta_parse.py \
+      gzcat_or_cat $OUT_DIR/validated.gff3 |
+        python $SCRIPTS/ensembl-genomio/scripts/gff_metaparser/gff3_meta_parse.py \
           --dump_used_options \
           --conf $GFF_PARSER_CONF \
           $GFF_PARSER_CONF_PATCH \
@@ -3333,7 +3344,7 @@ function prepare_metada () {
       local PEP_FILE=$(fopt_from_meta $META_RAW PEP_FILE $ASM_DIR '' false)
       ###
       if [ -n "$PEP_FILE" ]; then
-        less $PEP_FILE |
+        gzcat_or_cat $PEP_FILE |
           perl -pe 's/\./\*/g if !m/^>/' \
             > $OUT_DIR/pep_fasta.corrected_stops.faa
         local MCFG_PEP_OPTS="--fasta_pep  $OUT_DIR/pep_fasta.corrected_stops.faa"
@@ -3341,7 +3352,7 @@ function prepare_metada () {
         local PEP_MODIFY_ID=$(get_meta_conf $META_RAW PEP_MODIFY_ID)
         if [ -n "$PEP_MODIFY_ID" -a "x$PEP_MODIFY_ID" != "xNO" ]; then
           local PEP_FILE=$(fopt_from_meta $META_RAW PEP_FILE $ASM_DIR '' false)
-          less $PEP_FILE |
+          gzcat_or_cat $PEP_FILE |
             perl -pe 's/\./\*/g if !m/^>/' |
             perl -pe "${PEP_MODIFY_ID} if m/^>/" \
               > $OUT_DIR/pep_fasta.changed_ids.faa
@@ -3357,7 +3368,7 @@ function prepare_metada () {
     local SR_GFF_FILE=$(fopt_from_meta $META_RAW SR_GFF_FILE $ASM_DIR '' true)
     if [ -n "$SR_GFF_FILE" -a -f "$SR_GFF_FILE" ]; then
       echo getting annditional region data from gff $SR_GFF_FILE >> /dev/stderr
-      less $SR_GFF_FILE |
+      gzcat_or_cat $SR_GFF_FILE |
         awk -F "\t" \
           '($3 == "region") {print}
            ($3 == "CDS" && $9 ~ /transl_table=/ && !seen[$1]) {print; seen[$1] = 1}' \
@@ -3373,7 +3384,7 @@ function prepare_metada () {
       local SR_GFF_PARSER_CONF_PATCH=$(fopt_from_meta $META_RAW 'SR_GFF_PARSER_CONF_PATCH' $GFF_PARSER_CONF_DIR '--conf_patch' true)
 
       cat $OUT_DIR/sr_gff.gff3 |
-        python $SCRIPTS/new_genome_loader/scripts/gff_metaparser/gff3_meta_parse.py \
+        python $SCRIPTS/ensembl-genomio/scripts/gff_metaparser/gff3_meta_parse.py \
           --dump_used_options \
           --conf $SR_GFF_PARSER_CONF \
           $SR_GFF_PARSER_CONF_PATCH \
@@ -3402,7 +3413,7 @@ function prepare_metada () {
 
     local GEN_META_CONF_OPTIONS="$(get_meta_conf $META_RAW GEN_META_CONF_OPTIONS)"
 
-    python $SCRIPTS/new_genome_loader/scripts/gff_metaparser/gen_meta_conf.py \
+    python $SCRIPTS/ensembl-genomio/scripts/gff_metaparser/gen_meta_conf.py \
       --assembly_version $ASM_VERSION \
       --data_out_dir $OUT_DIR \
       --raw_meta_conf $META_RAW \
@@ -3900,7 +3911,7 @@ function update_stable_ids () {
 
     if [ -f "$PREV_XREF_FILE"  ] ; then
       local OPTIONS=" -type GeneID -dry_run 0 ${ADDITIONAL_OPTIONS}"
-      less "$PREV_XREF_FILE" |
+      gzcat_or_cat "$PREV_XREF_FILE" |
         perl $SCRIPTS/ensembl-production-metazoa/scripts/update_stable_ids_from_xref.pl \
           $($CMD details script) \
           -dbname $DBNAME \

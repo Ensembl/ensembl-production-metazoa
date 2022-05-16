@@ -19,9 +19,10 @@ There are few ways to specify these parameters.
 `CMD` | cmd_server_alias | SQL DB server alias, to create *core DB* at and put *e-hive* DBs for running pipelines
 `PROD_SERVER` | prod_server_alias | Production SQL DB server alias to get `ensembl_production` and `ncbi_taxonomy` databases from | Should be exported within config file (`export PROD_SERVER`)
 
-## Commnad line arguments
+## Usage and commnad line arguments
+
 ### First parameter -- [meta configuration file](../(docs/metaconf.md)
-Always provide meta configuration file as the first option:
+For most of the use cases the meta configuration file (meta-file) should be provide as the first option:
 ```
 ./ensembl-production-metazoa/scripts/mz_generic.sh ${METACONF_DIR}/<meta_conf_file>
 ```
@@ -31,18 +32,36 @@ You can use either:
  * or just name of the meta configuration file to be searched for in
   `./ensembl-production-metazoa/meta/${ENS_VERSION}` dir
 
+I.e.
+```
+./ensembl-production-metazoa/scripts/mz_generic.sh ./ensembl-production-metazoa/meta/104/dmel
+```
+
+Though, you can use "help" and "env_setup_only" (see below) options instead of meta-file path on their own
+```
+./ensembl-production-metazoa/scripts/mz_generic.sh help
+```
+
+
+
 ### Second (optional) parameter
 In addition to the meta conf paramete you can provide additional option, that controls the generic loader `scripts/mz_generic.sh` behaviour:
 | Option | Description | Comments |
 | - | - | - | 
-| restore | restore from the latest back up | move `bup` symlink, if you need something older than the last saved
-| pre_final_dc | run datachecks before patching to the new schema stage | active, only if the goal is reachable |
-| finalise | create back up with the `final` tag |  active, only if the goal is reachable
+| `help` | print usage and exit | |
+| `env_setup_only` | prepare environment and exit | |
+| `restore [tag_pattern]` | restore from the latest back up, or from the one matching "tag\_pattern" | move `bup` symlink, if you need something older than the last saved; when pattern is used, back-ups that followed the macthing are removed (drops everything fresher then the one it's restoring from). N.B. as many `${DATA_DIR}/<meta_name>/done` tags as you need (use `ls -lt` to sort tags by time). |
+| `stop_after_conf` | get data, validate, prepare cofiguration for the loader and stop | |
+| `stop_after_load` | stop after the loader pipeline before running anything else | |
+| `stop_before_xref` | stop before running xref helper | |
+| `pre_final_dc` | run datachecks before patching to the new schema stage | active, only if the goal is reachable |
+| `finalise` | create back up with the `final` tag |  active, only if the goal is reachable |
+| `patch_schema` | patch schema to the latest available | | 
 
 
 ## Ad-hoc environment setup
 Sometimes there's a need to have Ensembl environment, that can be used by unrelated pipelines / workflows.
-A [`lib.sh`](scripts/lib.sh) wrapper called `get_ensembl_prod` can be used for this task.
+
 
 To setup environment
 ```
@@ -51,23 +70,14 @@ cd $configs_dir
 
 git clone git@github.com:Ensembl/ensembl-production-metazoa.git
 
-# source _mz.conf file
-# and/or 
+# source ensembl-production-metazoa/conf/_mz.conf file
+# or 
+export PROD_SERVER=<prod_server_alias>
 
-ENS_VERSION=105
+export ENS_VERSION=107
 
-cat > get_env.sh << EOF
-set -o errexit
-set -o xtrace
-
-source ${configs_dir}/ensembl-production-metazoa/scripts/lib.sh
-
-get_ensembl_prod ${configs_dir}/ensembl.prod.${ENS_VERSION} $ENS_VERSION \
-  ${configs_dir}/ensembl-production-metazoa/scripts/checkout_ensembl.20210208.sh \
-  ${configs_dir}/ensembl-production-metazoa/scripts/legacy/create_setup_script.sh
-EOF
-
-bash get_env.sh
+# setup environment (you should have proper github keys/permissions in place)
+./ensembl-production-metazoa/scripts/mz_generic.sh env_setup_only
 
 cd ${configs_dir}
 ln -s ensembl.prod.${ENS_VERSION} ensembl.prod

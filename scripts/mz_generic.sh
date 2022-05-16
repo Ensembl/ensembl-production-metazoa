@@ -15,12 +15,39 @@
 # limitations under the License.
 
 
-set -o errexit
-set -o xtrace
-
 SPEC_PATH="$1"
 SPECIAL_ACTION="$2"
 SPECIAL_ACTION_ARG="$3"
+
+if [ -z "$SPEC_PATH" ]; then
+  SPEC_PATH="help"
+fi
+
+if [ z"${SPECIAL_ACTION}" = z"help" -o z"$SPEC_PATH" = z"help" ]; then
+  SPECIAL_ACTION="help"
+  echo 'usage: $0 meta/config/path|help|env_setup_only [optional args] ' >> /dev/stderr
+  echo '  N.B. "help" and "|env_setup_only" can be used as optional argumets. see below' >> /dev/stderr
+  echo '   optional arguments:' >> /dev/stderr
+  echo '     help -- print help and exit' >> /dev/stderr
+  echo '     env_setup_only -- prepare environment and exit' >> /dev/stderr
+  echo '     restore [pattern] -- restore from the back up matching "pattern", removing later backups; or restore from the most recent one, if no "pattern" is given ' >> /dev/stderr
+  echo '     stop_after_conf -- get data, validate, prepare cofiguration for the loader and stop' >> /dev/stderr
+  echo '     stop_after_load -- stop after the loader pipeline before running anything else' >> /dev/stderr
+  echo '     stop_before_xref -- stop before running xref helper' >> /dev/stderr
+  echo '     pre_final_dc -- run datachecks before creating final dump' >> /dev/stderr
+  echo '     finalise -- create "final" backup' >> /dev/stderr
+  echo '     patch_schema -- patch schema to the latest available' >> /dev/stderr
+  exit 0
+fi
+
+# enabling tracing and failing on error
+set -o errexit
+set -o xtrace
+
+
+if [ z"${SPECIAL_ACTION}" = z"env_setup_only" -o z"$SPEC_PATH" = z"env_setup_only" ]; then
+  SPECIAL_ACTION="env_setup_only"
+fi
 
 
 # load _mz.conf
@@ -37,7 +64,7 @@ fi
 # ENS_VERSION and MZ_RELEASE number
 if [ -z "$MZ_RELEASE" ]; then
   MZ_RELEASE=51
-fi 
+fi
 if [ -z "$ENS_VERSION" ]; then
   ENS_VERSION=104
 fi
@@ -52,11 +79,11 @@ fi
 mkdir -p "$WD"
 
 # db server alias
-if [ -z "$CMD" ]; then 
+if [ -z "$CMD" ]; then
   echo 'no db server alias "$CMD" is provided' >> /dev/stderr
   exit 1
 fi
-if [ -z "$CMD_W" ]; then 
+if [ -z "$CMD_W" ]; then
   CMD_W="${CMD}-w"
 fi
 
@@ -68,27 +95,33 @@ MZ_SCRIPTS=${SCRIPTS}/ensembl-production-metazoa/scripts
 
 source ${MZ_SCRIPTS}/lib.sh
 
-# picking META_FILE_RAW
-SPEC_SHORT="$(basename ${SPEC_PATH})"
 
-spec_dir="$(dirname ${SPEC_PATH})"
-abs_dir="$(dirname $(realpath ${SPEC_PATH}))"
+if [ z"${SPECIAL_ACTION}" = z"env_setup_only" ]; then
+  # env_setup_only -- no meta needed
+  echo 'not using meta information. "env_setup_only" passed...' >> /dev/stderr
+else
+  # picking META_FILE_RAW
+  SPEC_SHORT="$(basename ${SPEC_PATH})"
 
-if [ "$spec_dir" = "$abs_dir" ]; then
-  META_FILE_RAW=${SPEC_PATH}  
-else # relative paths
-  if [ "$spec_dir" = "." ]; then
-    META_FILE_RAW=$MZ_SCRIPTS/../meta/$ENS_VERSION/$SPEC_SHORT
-  else # use current dir as base
-    META_FILE_RAW=$(pwd)/$SPEC_PATH
+  spec_dir="$(dirname ${SPEC_PATH})"
+  abs_dir="$(dirname $(realpath ${SPEC_PATH}))"
+
+  if [ "$spec_dir" = "$abs_dir" ]; then
+    META_FILE_RAW=${SPEC_PATH}
+  else # relative paths
+    if [ "$spec_dir" = "." ]; then
+      META_FILE_RAW=$MZ_SCRIPTS/../meta/$ENS_VERSION/$SPEC_SHORT
+    else # use current dir as base
+      META_FILE_RAW=$(pwd)/$SPEC_PATH
+    fi
   fi
-fi
+fi # ! env_setup_only
 
 
 # prepare / source ensembl.prod.${ENS_VERSION}
 #   ${SCRIPTS}/ensembl.prod.${ENS_VERSION}
 
-flock ${SCRIPTS}/ensembl.prod.${ENS_VERSION}.lock -c " 
+flock ${SCRIPTS}/ensembl.prod.${ENS_VERSION}.lock -c "
   source ${MZ_SCRIPTS}/lib.sh;
   get_ensembl_prod ${SCRIPTS}/ensembl.prod.${ENS_VERSION} $ENS_VERSION \
     $MZ_SCRIPTS/checkout_ensembl.20210208.sh $MZ_SCRIPTS/legacy/create_setup_script.sh
