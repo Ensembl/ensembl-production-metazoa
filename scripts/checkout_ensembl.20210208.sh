@@ -35,8 +35,8 @@ if [ -z "$dir" ]; then
     exit 1
 fi
 
-## The third option is the branch to use (master by default)
-## Note, if branch doesn't exist, it falls back to master (typically)
+## The third option is the branch to use (main by default)
+## Note, if branch doesn't exist, it falls back to main (typically)
 branch="main"
 if [ ! -z "$3" ]; then
     branch="$3"
@@ -75,6 +75,7 @@ for module in \
     ensembl-production \
     ensembl-rest \
     ensembl-variation \
+    ensembl-vep \
   ;
 do
     echo "Checking out $module ($branch)" >> /dev/stderr
@@ -94,7 +95,7 @@ done
 branch=master
 for module in \
     ensembl-tools \
-    ensembl-vep
+  ;
 do
     echo "Checking out $module ($branch)" >> /dev/stderr
     git clone -b $branch --depth 1 --no-single-branch ${URL_PFX}Ensembl/${module} || {
@@ -195,7 +196,8 @@ echo "Building python3 venv" >> /dev/stderr
 python3 -m venv venv
 source venv/bin/activate
 pip3 install Cython
-pip3 install -r ensembl-genomio/requirements.txt
+
+pip3 install -e './ensembl-genomio[dev]'
 
 
 echo "Adding perl deps" >> /dev/stderr
@@ -226,7 +228,8 @@ echo 'export PERL5LIB='${dir_full_path}'/perl5/lib/perl5:$PERL5LIB' >> $dir/setu
 
 echo 'export PYTHONPATH='${dir_full_path}'/ensembl-hive/wrappers/python3:$PYTHONPATH' >> $dir/setup.sh
 echo 'export PERL5LIB='${dir_full_path}'/ensembl-genomio/lib/perl:$PERL5LIB' >> $dir/setup.sh
-echo 'export PYTHONPATH='${dir_full_path}'/ensembl-genomio/lib/python:$PYTHONPATH' >> $dir/setup.sh
+# we use `pip install -e ` instead
+# echo 'export PYTHONPATH='${dir_full_path}'/ensembl-genomio/lib/python:$PYTHONPATH' >> $dir/setup.sh
 
 echo 'export PERL5LIB='${dir_full_path}'/ensembl-production-imported/lib/perl:$PERL5LIB' >> $dir/setup.sh
 echo 'export PYTHONPATH='${dir_full_path}'/ensembl-production-imported/lib/python:$PYTHONPATH' >> $dir/setup.sh
