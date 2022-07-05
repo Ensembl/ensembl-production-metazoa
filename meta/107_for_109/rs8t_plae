@@ -42,7 +42,7 @@ species.common_name	Thorny-headed worm
 
 # Assembly metadata
 assembly.accession	GCA_012934845.2
-#CONF	GCF_TO_GCA	1
+#no CONF	GCF_TO_GCA	0
 
 # Provider metadata
 #CONF	GFF3_LOAD_SOURCE_NAME	RefSeq
@@ -81,3 +81,5 @@ annotation.provider_url	https://iome.biologie.uni-mainz.de
 # FINALIZE
 #
 # N.B. update display name!
+# Pomphorhynchus laevis (P. laevis sensulato, Thorny-headed worm, GPI110) - GCA_012934845.2
+#
