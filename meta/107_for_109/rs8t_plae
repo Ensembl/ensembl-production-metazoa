@@ -82,4 +82,11 @@ annotation.provider_url	https://iome.biologie.uni-mainz.de
 #
 # N.B. update display name!
 # Pomphorhynchus laevis (P. laevis sensulato, Thorny-headed worm, GPI110) - GCA_012934845.2
+# $CMD -D premz_pomphorhynchus_laevis_gca012934845v2_core_56_107_1 -e '
+#   update meta
+#     set
+#       meta_value = "Pomphorhynchus laevis (P. laevis sensulato, Thorny-headed worm, GPI110) - GCA_012934845.2"
+#     where
+#        meta_key = "species.display_name"
+# '
 #
