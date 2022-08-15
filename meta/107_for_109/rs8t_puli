@@ -80,3 +80,8 @@ annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Daphn
 #
 # FINALIZE
 #
+# $CMD  -D  premz_daphnia_pulicaria_gca021234035v2_core_56_107_1 -e '
+#   delete from meta
+#     where meta_key = "species.alias"
+#       and meta_value in ("D.pul", "dpul")'
+#
