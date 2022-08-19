@@ -80,3 +80,14 @@ annotation.provider_url	https://www.ncbi.nlm.nih.gov/data-hub/genome/GCF_0002553
 #
 # FINALIZE
 #
+#
+
+# # fix missing speceies.alias(es)
+# ${CMD_W} -D premz_galendromus_occidentalis_gca000255335v2_core_56_107_1 -e '
+#  insert into meta (species_id, meta_key, meta_value) values
+#  (1, "species.alias", "Metaseiulus occidentalis"),
+#  (1, "species.alias", "mocc"),
+#  (1, "species.alias", "M.occ"),
+#  (1, "species.alias", "M. occidentalis");
+#  '
+
