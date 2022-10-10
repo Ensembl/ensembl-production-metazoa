@@ -74,6 +74,7 @@ for module in \
     ensembl-metadata \
     ensembl-production \
     ensembl-rest \
+    ensembl-tools \
     ensembl-variation \
     ensembl-vep \
   ;
@@ -91,26 +92,8 @@ done
 
 
 
-## Now checkout legacy stuff using "master" branch
-branch=master
-for module in \
-    ensembl-tools \
-  ;
-do
-    echo "Checking out $module ($branch)" >> /dev/stderr
-    git clone -b $branch --depth 1 --no-single-branch ${URL_PFX}Ensembl/${module} || {
-        echo "Could not check out $module ($branch)" >> /dev/stderr
-        touch _FAILED
-        exit 2
-    }
-    [ -f _FAILED ] && exit 2
-    echo done >> /dev/stderr
-    echo >> /dev/stderr
-done
-
-
 ## Now checkout Hive
-#branch="master"
+#branch="main"
 branch="version/2.6"
 for module in \
     ensembl-hive
