@@ -3411,6 +3411,7 @@ function prepare_metada () {
       SEQ_REGION_SOURCE_DEFAULT="GenBank"
     fi
 
+    # a generic mechanism for passing options
     local GEN_META_CONF_OPTIONS="$(get_meta_conf $META_RAW GEN_META_CONF_OPTIONS)"
 
     python $SCRIPTS/ensembl-genomio/scripts/gff_metaparser/gen_meta_conf.py \

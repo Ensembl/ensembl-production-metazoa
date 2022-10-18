@@ -113,6 +113,7 @@ Same parser, different configs to generate seq_region.json from `SR_GFF_FILE` (s
 `CONTIG_CHR_MT` | `CONTIG_CHR_MT mitochondrion_genome` (tab separated) | `str:` `sequence name` | Same as above and sets seq_region [`location`](https://github.com/Ensembl/ensembl-genomio/blob/master/schema/seq_region_schema.json) to  `mitochondrial_chromosome` | Activates  `MT_CODON_TABLE` and `MT_CODON_TABLE` parsing.
 `MT_CODON_TABLE`| 5 | `int` | [Sets](https://github.com/Ensembl/ensembl-genomio/blob/master/scripts/gff_metaparser/genmetaconf/seqregionconf.py) seq_region's [`codon_table`](https://github.com/Ensembl/ensembl-genomio/blob/master/schema/seq_region_schema.json) | Parsed only if `CONTIG_CHR_MT` present.
 `MT_CIRCULAR`| YES | `str:` `1`, `YES`, `TRUE` -- enabled, empty and everything else -- disabled| [Enables](https://github.com/Ensembl/ensembl-genomio/blob/master/scripts/gff_metaparser/genmetaconf/seqregionconf.py) seq_region `circular` [flag](https://github.com/Ensembl/ensembl-genomio/blob/master/schema/seq_region_schema.json). | Parsed only if `CONTIG_CHR_MT` present
+`ANNOTATION_SOURCE_SFX`|  | `str:` `rs`|  `species.annotation_source` derived suffix to be appended to the `species.production_name` (and core db name) | Should match mapping `RefSeq`->`rs`, `GenBank`->`gb`, `FlyBase`->`fb`, `WormBase`->`wb`, `VEuPathDB`->`vb`, `Community`->`cm`, `NonINSDC`->`ni`
 
 #### BRC4 related options
 | Option | Example | Type: possible values | Action | Comment|
