@@ -10,11 +10,11 @@ species.common_name	Grasshoppers
 
 # GCA_023897955.2
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_023897955.2
-# https://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/023/897/955/GCF_023897955.1_iqSchGreg1.22
+# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/023/897/955/GCF_023897955.1_iqSchGreg1.2
 # RefSeq Annotation Name: NCBI Schistocerca gregaria Annotation Release 100
 # RefSeq Annotation Url: https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Schistocerca_gregaria/100
 
-#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/023/897/955/GCF_023897955.1_iqSchGreg1.22
+#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/023/897/955/GCF_023897955.1_iqSchGreg1.2
 
 # RefSeq related defaults
 #CONF	GCF_TO_GCA	1

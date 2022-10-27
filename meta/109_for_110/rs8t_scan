@@ -10,11 +10,11 @@ species.common_name	South American locust
 
 # GCA_023864275.2
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_023864275.2
-# https://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/023/864/275/GCF_023864275.1_iqSchCanc2.11
+# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/023/864/275/GCF_023864275.1_iqSchCanc2.1
 # RefSeq Annotation Name: NCBI Schistocerca cancellata Annotation Release 100
 # RefSeq Annotation Url: https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Schistocerca_cancellata/100
 
-#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/023/864/275/GCF_023864275.1_iqSchCanc2.11
+#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/023/864/275/GCF_023864275.1_iqSchCanc2.1
 
 # RefSeq related defaults
 #CONF	GCF_TO_GCA	1

@@ -10,11 +10,11 @@ species.common_name	Parasitoid wasp
 
 # GCA_013357705.1
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_013357705.1
-# https://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/357/705/GCF_013357705.1_ASM1335770v11
+# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/357/705/GCF_013357705.1_ASM1335770v1
 # RefSeq Annotation Name: NCBI Chelonus insularis Annotation Release 100
 # RefSeq Annotation Url: https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Chelonus_insularis/100
 
-#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/357/705/GCF_013357705.1_ASM1335770v11
+#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/357/705/GCF_013357705.1_ASM1335770v1
 
 # RefSeq related defaults
 #CONF	GCF_TO_GCA	1
