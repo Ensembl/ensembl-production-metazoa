@@ -184,8 +184,10 @@ pip3 install -e './ensembl-genomio[dev]'
 
 
 echo "Adding perl deps" >> /dev/stderr
+PL_ENV_VERSION=5.26.2
+plenv local ${PL_ENV_VERSION}
 mkdir -p ${dir}/perl5
-cpanm install --local-lib=${dir}/perl5 Text::Levenshtein::Damerau::XS
+cpanm --local-lib=${dir}/perl5 Text::Levenshtein::Damerau::XS
 
 
 ## Gasp!
@@ -196,6 +198,15 @@ echo "Creating a setup script" >> /dev/stderr
 ${create_setup_script} $dir
 
 dir_full_path=$(readlink -f $dir)
+
+# adding plenv initialization
+echo "plenv local ${PL_ENV_VERSION}" >> $dir/setup.sh.plenv
+echo 'export PERL5LIB='${dir_full_path}'/perl5/lib/perl5:$PERL5LIB' >> $dir/setup.sh.plenv
+
+# joining
+cat $dir/setup.sh > $dir/setup.sh.orig
+cat $dir/setup.sh.plenv $dir/setup.sh.orig > $dir/setup.sh
+
 echo 'PERL5LIB='${dir_full_path}'/ensembl-variation/modules:$PERL5LIB' >> $dir/setup.sh
 echo 'PATH='${dir_full_path}'/ensembl-variation/scripts:$PATH' >> $dir/setup.sh
 echo 'export PERL5LIB=$PERL5LIB:'${dir_full_path}'/ensembl-variation/scripts/import' >> $dir/setup.sh
@@ -206,8 +217,6 @@ echo 'PATH='${dir_full_path}'/ensembl-datacheck/scripts:$PATH' >> $dir/setup.sh
 # echo 'pyenv local 3.7.6' >> $dir/setup.sh
 #echo 'pyenv deactivate' >> $dir/setup.sh
 echo 'source '${dir_full_path}'/venv/bin/activate' >> $dir/setup.sh
-
-echo 'export PERL5LIB='${dir_full_path}'/perl5/lib/perl5:$PERL5LIB' >> $dir/setup.sh
 
 echo 'export PYTHONPATH='${dir_full_path}'/ensembl-hive/wrappers/python3:$PYTHONPATH' >> $dir/setup.sh
 echo 'export PERL5LIB='${dir_full_path}'/ensembl-genomio/lib/perl:$PERL5LIB' >> $dir/setup.sh
