@@ -10,11 +10,11 @@ species.common_name	Cotton bollworm
 
 # GCA_023701775.1
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_023701775.1
-# https://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/023/701/775/GCA_023701775.1_HaSCD2
+# https://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/023/701/775/GCF_023701775.1_HaSCD2
 # RefSeq Annotation Name: NCBI Helicoverpa armigera Annotation Release 101
 # RefSeq Annotation Url: https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Helicoverpa_armigera/100/
 
-#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/023/701/775/GCA_023701775.1_HaSCD2
+#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/023/701/775/GCF_023701775.1_HaSCD2
 
 # RefSeq related defaults
 #CONF	GCF_TO_GCA	1
