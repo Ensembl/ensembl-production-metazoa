@@ -37,6 +37,9 @@ Australian sheep blowfly	Lucilia cuprina	Diptera	lcup	GCA_022045245.1	https://ft
 # have community/OF									
 Tick	Dermacentor silvarum	Ixodidea	dsil	GCA_013339745.2	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/339/745/GCF_013339745.2_BIME_Dsil_1.4/	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Dermacentor_silvarum/101/	NCBI Dermacentor silvarum Annotation Release 101	TIGMIC Group, Beijing Institute of Microbiology and Epidemiology	https://ngdc.cncb.ac.cn/gwh/Assembly/8869/show
 Brown dog tick	Rhipicephalus sanguineus	Ixodidea	rsan	GCA_013339695.2	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/339/695/GCF_013339695.2_BIME_Rsan_1.4	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Rhipicephalus_sanguineus/101/	NCBI Rhipicephalus sanguineus Annotation Release 101	TIGMIC Group, Beijing Institute of Microbiology and Epidemiology	https://bigd.big.ac.cn/gwh/Assembly/8868/show
+# User request
+Greater wax moth	Galleria mellonella	Lepidoptera	gmel	GCA_003640425.2	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/640/425/GCF_003640425.2_ASM364042v2	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Galleria_mellonella/101	NCBI Galleria mellonella Annotation Release 101	Department of Entomology, University of Illinois at Urbana-Champaign	https://sib.illinois.edu/entomology/
+
 
 # cat _refseq_110.lst | grep -vF '#' | grep -vP '^\s*$' | awk -F "\t" '{print NF}' | sort | uniq -c
 # cd ../../
