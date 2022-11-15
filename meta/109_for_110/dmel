@@ -25,17 +25,19 @@ species.annotation_source	FlyBase
 #CONF	ASM_URL	ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r6.46_FB2022_03
 #CONF	FNA_FILE	fasta/dmel-all-chromosome-r6.46.fasta.gz
 
-#CONF	GFF_FILE	gff/dmel-all-no-analysis-r6.46.gff.gz
+# assigning "no strand" TE (`ID=FBti0215368;Name=Tc1{}6596`) to "+" strand to fix loading
+#CONF	DATA_INIT	zcat gff/dmel-all-no-analysis-r6.46.gff.gz | awk -F "\t" '{OFS="\t"; if ($3 == "transposable_element" && $7 == ".") {$7 = "+"}; print}' | gzip - > fixed_te_strands.gff3.gz
+#CONF	GFF_FILE	fixed_te_strands.gff3.gz
 #CONF	PEP_FILE	fasta/dmel-all-translation-r6.46.fasta.gz
 
 #   add-ons from NCBI
-#CONF	ASM_SINGLE	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/215/GCA_000001215.4_Release_6_plus_ISO1_MT/GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gbff.gz
+#CONF	ASM_SINGLE	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/215/GCA_000001215.4_Release_6_plus_ISO1_MT/GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gbff.gz
 #CONF	GBFF_FILE	GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gbff.gz
 
-#CONF	ASM_SINGLE	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/215/GCA_000001215.4_Release_6_plus_ISO1_MT/GCA_000001215.4_Release_6_plus_ISO1_MT_assembly_report.txt
+#CONF	ASM_SINGLE	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/215/GCA_000001215.4_Release_6_plus_ISO1_MT/GCA_000001215.4_Release_6_plus_ISO1_MT_assembly_report.txt
 #CONF	ASM_REP_FILE	GCA_000001215.4_Release_6_plus_ISO1_MT_assembly_report.txt
 
-#CONF	ASM_SINGLE	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/215/GCA_000001215.4_Release_6_plus_ISO1_MT/GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gff.gz
+#CONF	ASM_SINGLE	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/215/GCA_000001215.4_Release_6_plus_ISO1_MT/GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gff.gz
 #CONF	SR_GFF_FILE	GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gff.gz
 
 # stats and metadata generatio options
