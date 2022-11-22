@@ -77,7 +77,7 @@ species.annotation_source	FlyBase
 #    AND f.is_analysis = False
 #    AND f.uniquename ~ '^FBtr\d+$';
 #" | psql -h chado.flybase.org -U flybase flybase -F $'\t' --no-align
- 
+
 #CONF	TR_TRANS_SPLICED	FBtr0084079,FBtr0084080,FBtr0084081,FBtr0084082,FBtr0084083,FBtr0084084,FBtr0084085,FBtr0307759,FBtr0307760,FBtr0089347
 
 
@@ -123,3 +123,8 @@ sample.variation_text	rs202391697
 
 
 # FINALIZE
+#
+#  fixing broken objects xrefs
+# ${CMD} -D premz_drosophila_melanogaster_core_57_109_10 -e 'delete from object_xref where object_xref_id = 1087920'
+# ${CMD} -D premz_drosophila_melanogaster_core_57_109_10 -e 'delete from identity_xref where object_xref_id = 1087920'
+#
