@@ -1,0 +1,62 @@
+#CONF	DB_PFX	preprok
+#CONF	ASM_VERSION	1
+
+species.common_name	Human gut metagenome
+species.production_name	bacteria_col_9
+#CONF	TAXON_ID	2582415
+
+# NB using "blank sample"(2582415) taxon instead of "uncultured Oscillospiraceae bacterium"(707003)
+# instead of ""
+#no CONF	TAXON_ID	707003
+
+
+#CONF	DATA_INIT	cp ../../../../../pooled.faa in.faa
+#CONF	DATA_INIT	cp ../../../../../pooled.fna in.fna
+#CONF	DATA_INIT	cp ../../../../../pooled.gff3 in.gff3
+
+#CONF	FNA_FILE	in.fna
+#CONF	GFF_FILE	in.gff3
+#no CONF	PEP_FILE	in.faa
+
+
+#CONF	GEN_META_CONF_OPTIONS	--species_division EnsemblBacteria --default_genetic_code 11 --default_circular
+
+# stats and metadata generation options
+#CONF	IGNORE_UNVALID_SOURCE_GFF	YES
+#or IGNORE_UNVALID_SOURCE_GFF       NO
+#CONF	STOP_AFTER_CONF	NO
+
+
+# disabling default [transcript -> mRNA] gff3 feature type convesion
+#CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna,mgnify_prodig
+
+#CONF	GFF_PARSER_CONF	gff_metaparser/mgnify_prodig.conf
+
+#CONF	GFF3_LOAD_LOGIC_NAME	gff3_import_raw
+
+#CONF	GFF_LOADER_OPTIONS	--external_db_map_name external_db_map_default.txt --check_manifest 0 --load_func_ann_rc_name 64GB
+#  FlyBase: --external_db_map_name external_db_map_default.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
+#  minimal: --external_db_map_name external_db_map_minimal.txt --skip_unknown_xref_source 1
+#  add to ignore manifest integrity check: --check_manifest 0
+
+
+# Assembly metadata
+#   not using a GenBank one
+assembly.accession	FAKEONE01.1
+
+# Provider metadata
+#CONF	GFF3_LOAD_SOURCE_NAME	MGnify
+
+assembly.provider_name	EMBL-EBI Metagenomics Team
+assembly.provider_url	https://www.ebi.ac.uk/metagenomics/
+
+annotation.provider_name	EMBL-EBI Metagenomics Team
+annotation.provider_url	https://www.ebi.ac.uk/metagenomics/
+
+# NO FUTHER ANALYSIS TO BE RUN
+#   use "stop_after_load" option
+
+#
+# FINALIZE
+#
+
