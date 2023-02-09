@@ -111,7 +111,7 @@ my $core_db = new Bio::EnsEMBL::DBSQL::DBAdaptor(
   -dbname => $dbname,
   -multispecies_db => 1,
 );
-die "cannot connect to the core db. exiting...\n" if !$core_db;
+die "# FAILED cannot connect to the core db. exiting...\n" if !$core_db;
 $core_db->dbc->disconnect_if_idle;
 
 my $taxonomy_db = new Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyDBAdaptor(
@@ -121,7 +121,7 @@ my $taxonomy_db = new Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyDBAdaptor(
   -dbname => $taxonomy_dbname,
   -multispecies_db => 1,
 ) ;
-die "cannot connect to the taxonomy db. exiting...\n" if !$taxonomy_db;
+die "# FAILED cannot connect to the taxonomy db. exiting...\n" if !$taxonomy_db;
 $taxonomy_db->dbc->disconnect_if_idle;
 
 # get species id and name
@@ -129,7 +129,7 @@ my $sql = "SELECT DISTINCT species_id, meta_value FROM meta WHERE meta_key IN ('
 my $species_id_name_raw = $core_db->dbc->sql_helper()->execute(-SQL => $sql);
 $core_db->dbc->disconnect_if_idle;
 
-die "not able to get any species id. exiting..." if !$species_id_name_raw;
+die "# FAILED not able to get any species id. exiting..." if !$species_id_name_raw;
 
 # forming a list of dicts { "id": id, "name" : name }
 my @species_id_name =
@@ -148,7 +148,7 @@ my $unique_names = scalar(keys %{{ map {$_->{name} => 1} @species_id_name }});
 
 warn "# found $total_count species to process ($unique_names unique names, $unique_ids unique ids)\n";
 if ($unique_ids != $total_count || $unique_names != $total_count) {
-  die "# $unique_names unique names, $unique_ids unique ids not equal to total count $total_count\n";
+  die "# FAILED $unique_names unique names, $unique_ids unique ids not equal to total count $total_count\n";
 }
 
 
