@@ -270,11 +270,15 @@ sub get_taxonomy_info {
     }
   }
 
+  my $seen = {};
   my $all_ancestors = $node_adaptor->fetch_ancestors($node);
   foreach my $ancestor ( @$all_ancestors ) {
     next if ($ancestor->rank eq "genus");
     #push @$output, ["species.classification", $ancestor->name, $ancestor->rank];
-    push @$output, ["species.classification", $ancestor->name];
+    my $aname = $ancestor->name;
+    next if exists $seen->{$aname};
+    $seen->{$aname} = 1;
+    push @$output, ["species.classification", $aname];
     last if ($ancestor->rank eq "superkingdom");
   }
 
