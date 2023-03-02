@@ -224,3 +224,12 @@ All the back up files that are fresher then the specified one will be droped.
 Use `ls -lt ${DATA_DIR}/<meta_name>/bup` to list the available backup files.
 
 N.B. Don't forget to drop as many `${DATA_DIR}/<meta_name>/done` tags as you need (use `ls -lt` to sort tags by time).
+
+
+### Static Content generation
+
+See related ["Static content"](docs/static_generation.md) documentation.
+```
+WikipediaREST_RefSeq_2_static_wrapper.sh ...
+```
+
