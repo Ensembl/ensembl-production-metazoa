@@ -1,6 +1,6 @@
 # Procedure for generation of static content [Ensembl Metazoa](https://metazoa.ensembl.org/index.html)
 
-Generation of static content is handled via a single BASH wrapper script:
+Generation of static content is handled via a single BASH wrapper script.
 
 ```
 sh WikipediaREST_RefSeq_2_static_wrapper.sh \
@@ -13,22 +13,23 @@ sh WikipediaREST_RefSeq_2_static_wrapper.sh \
 
 ## Summary of processing performed:
 
-In order to run the main static wrapper and generate species markdown contents, image resources etc. 
-users must provide the following input parameters:
-
 Static wrapper script manages running a number of procesing stages including:
-- Downloading Wikipedia summary information, for each species input.
-- Downloading NCBI assembly and annotation summary files. 
-- Download species image(s) and associated wikimedia common license information
-- Generate formated list of species processed for **'whatsnew.md'**. See [ensembl-static](https://github.com/EnsemblGenomes/ensembl-static)
+- Downloading Wikipedia summary information, for each species input. [BASH]
+- Downloading NCBI assembly and annotation summary files. [BASH]
+- Generation of static content .md files. Generate *_about.md, *_assembly.md, *_annotation.md. [Perl] 
+- Download species image(s) and associated wikimedia common license information. [BASH, Perl]
+- Generate formated list of species processed for **'whatsnew.md'**. See [ensembl-static](https://github.com/EnsemblGenomes/ensembl-static). [Bash]
 
 ## Format of input parameters:
+In order to run the main static content wrapper to generate species markdown contents, image resources etc.
+users must provide the following input parameters:
 
-1. RunStage options: 'All', 'Wiki', 'NCBI', 'Static', 'Image', 'WhatsNew', 'Tidy'.
-2. List of Input Core DBs: Flat textfile listing one one core_db per line
-3. List of species associated RefSeq/Genbank FTP url: Flat textfile listing RefSeq/Genbank ftp URL(s) per line
-4. Source MYSQL server where cores are hosted: Typically staging host server
-5. Unique run identifier: (e.g. RunE107)
+1. Run-stage option: 
+      ['All', 'Wiki', 'NCBI', 'Static', 'Image', 'WhatsNew', 'Tidy'].
+2. List of Input Core DBs: Flat textfile listing one one core database name per line.
+3. List of species associated RefSeq/Genbank FTP url: Flat textfile listing RefSeq/Genbank ftp URL(s) one per line.
+4. Source MySQL server where cores are hosted: Typically staging host server.
+5. Unique run identifier: (e.g. RunE107).
 
 ### Input core(s) file contents:
 ```
@@ -44,35 +45,61 @@ https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/571/385/GCF_002571385.1_Styloph
 
 ## Summary of static wrapper output:
 
-- StaticContent_MD_Output-* **(Dir)**
-        Main output directory containing all markdown .md static content. One sub directory per species.
+- StaticContent_MD_Output-* **(Dir)** 
+```
+Main output directory containing all markdown .md static content. One sub directory per species.
+```
 - Output_Image_Licenses.final.tsv
-        Formatted TSV of WikiMedia Licensing meta information related to species images downloaded from Wikipedia.
+```
+Formatted TSV of WikiMedia Licensing meta information related to species images downloaded from Wikipedia.
+```
 - Source_Images_wikipedia **(Dir)**
-        Species image files obtained from Wikipedia. One per species - IF AVAILABLE !
+```
+Species image files obtained from Wikipedia. One per species - !If Available!
+```
 - WIKI_JSON_OUT **(Dir)**
-        Full JSON dumps from Wikipedia (page/summary/{title}). One json file per core_db processed.
+```
+Full JSON dumps from Wikipedia (page/summary/{title}). One JSON file per core_db processed.
+```
 - RefSeq_Assembly_Reports **(Dir)**
-        NCBI-RefSeq genome assembly reports (.txt), one per species
+```
+NCBI-RefSeq genome assembly reports (.txt), one per species
+```
 - RefSeq_Annotation_Reports **(Dir)**
-        NCBI Ref-Seq genome annotation reports (.txt), one per species
+```
+NCBI Ref-Seq genome annotation reports (.txt), one per species
+```
 - Commons_Licenses **(Dir)**
-        Full JSON dumps files of WikiMedia commons licensing meta information ([Commons: API/MediaWiki](https://commons.wikimedia.org/wiki/Commons:API/MediaWiki)).
+```
+Full JSON dumps files of WikiMedia commons licensing meta information ([Commons: API/MediaWiki](https://commons.wikimedia.org/wiki/Commons:API/MediaWiki)).
+```
 
 ### Other log and intermediate files generated:
 
 **Log_Outputs_and_other_intermediates (DIR)**
 
 - generate_Wiki_JSON_Summary.sh
-        Wget commands used to generate Wikipedia JSON files.
+```
+wget commands that generated Wikipedia JSON files.
+```
 - Wikipedia_URL_listed.check.txt
-        Main wikipedia landing page URLs for each species. Useful for checking web content for that species.
+```
+Main wikipedia landing page URLs for each species. Useful for checking web content for that species.
+```
 - wiki_sp2image.tsv
-        Intermediate output of all species image resource URLs.
+```
+Intermediate output of all species image resource URLs.
+```
 - Without_Wikipedia_Summary_Content.txt
-        List of all species found to be lacking Wikipedia summary info at time of processing.
-        NB: In such cases, a template '_about.md' file is generated which needs to be manually processed to include species information.
+```
+List of all species found to be lacking Wikipedia summary info at time of processing.
+NB: In such cases, a template '_about.md' file is generated which needs to be manually processed to include species information.
+```
 - StaticContent_Gen_*.log
-        Summary log of static markdown file generation. Cat file for log information formatted with colourised text.
+```
+Summary log of static markdown file generation. Cat this file for log information formatted with colourised text.
+```
 - *_checkDone **(DIR)**
-        Stage processing lock files, stops processing if earlier stage hasn't completed. Delete lock file to rerun specific stage.
+```
+Stage processing check, stops specific stage processing if preceeding stage wasn't completed.
+```
