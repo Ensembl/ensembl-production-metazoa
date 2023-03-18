@@ -207,7 +207,7 @@ backup_relink $DBNAME $CMD with_meta $DATA_DIR/bup
 
 
 # mark trans_spliced transcripts
-TR_TRANS_SPLICED="$(get_meta_conf $META_FILE 'TR_TRANS_SPLICED')"
+TR_TRANS_SPLICED="$(get_meta_conf $META_FILE_RAW 'TR_TRANS_SPLICED')"
 if [ -n "$TR_TRANS_SPLICED" ]; then
   mark_tr_trans_spliced $CMD_W $DBNAME "$TR_TRANS_SPLICED"
   backup_relink $DBNAME $CMD tr_spliced_marks $DATA_DIR/bup
@@ -321,7 +321,7 @@ if [ -n "$REP_LIB" -a "x$REP_LIB" != "xNO" ]; then
 fi
 
 # repeat masking
-run_repeat_masking $CMD_W $DBNAME $SPECIES "$REP_LIB" $DATA_DIR/data/pipeline_out/dna_features "$REPBASE_SPECIES_NAME"
+run_repeat_masking $CMD_W $DBNAME $SPECIES "$REP_LIB" $DATA_DIR/data/pipeline_out/dna_features "$REPBASE_SPECIES_NAME" "$META_FILE_RAW"
 # nonref_unset_toplevel $CMD_W $DBNAME
 backup_relink $DBNAME $CMD repeat_masking $DATA_DIR/bup
 
