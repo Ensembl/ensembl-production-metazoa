@@ -207,7 +207,9 @@ annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Glyci
 #   update exon set phase = 0, end_phase = 0 where exon_id = 11414;
 #   update exon_transcript set rank = 2 where exon_id = 11415;
 #   update exon set phase = 0, end_phase = 1 where exon_id = 11415;
+#   update translation set  start_exon_id = 11414, end_exon_id = 11413 where translation_id = 2233;
 # '
+#
 # FIX missing MT code table (1 in this case)
 # $CMD_W -D prepl_glycine_soja_gca004193775v2rs_core_57_110_1 -e '
 #   insert into seq_region_attrib (seq_region_id, attrib_type_id, value) values (1119, 11, 1);
