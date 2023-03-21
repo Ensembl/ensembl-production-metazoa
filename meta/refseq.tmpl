@@ -4,7 +4,7 @@
 # if substituting existing core
 #  * update ASM_VERSION above
 #  * uncomment "species.production_name" below
-# # updated, prev was _PREV_CORE_NAME_ 
+# # updated, prev was _PREV_CORE_NAME_
 # species.production_name	_PROD_NAME_
 species.common_name	_COMMON_NAME_
 
@@ -31,9 +31,11 @@ species.annotation_source	RefSeq
 #CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna
 
 #no CONF	GFF_PARSER_PFX_TRIM	NO
-#CONF	GFF_LOADER_OPTIONS	--external_db_map_name external_db_map_default.txt
-#  FlyBase: --external_db_map_name external_db_map_default.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
-#  minimal: --external_db_map_name external_db_map_minimal.txt --skip_unknown_xref_source 1
+#CONF	GFF_LOADER_OPTIONS	--external_db_map_name default.txt
+#  Default: --external_db_map_name default.txt
+#  FlyBase: --external_db_map_name default.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
+#  Plants: --xref_display_db_default Ensembl_Plants -division EnsemblPlants
+#  minimal: --external_db_map_name minimal.txt --skip_unknown_xref_source 1
 #  add to ignore manifest integrity check: --check_manifest 0
 
 #no CONF	ORDERED_CS_TAG	chromosome
@@ -60,6 +62,8 @@ annotation.provider_url	_REFSEQ_ANN_REPORT_URL_
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
 #  to change the lower allowed length [default 5000]: -min_slice_length 1000
 #  to change the splitting length threshold [default 10_000_000]: -max_seq_length 19000000
+
+#plants CONF	DNA_FEATURES_OPTIONS	-redatrepeatmasker 1
 
 #no CONF	IGNORE_EMPTY_REP_LIB	YES
 #   to ignore empty de novo repeat libraries

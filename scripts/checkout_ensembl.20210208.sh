@@ -219,9 +219,9 @@ echo 'PATH='${dir_full_path}'/ensembl-datacheck/scripts:$PATH' >> $dir/setup.sh
 echo 'source '${dir_full_path}'/venv/bin/activate' >> $dir/setup.sh
 
 echo 'export PYTHONPATH='${dir_full_path}'/ensembl-hive/wrappers/python3:$PYTHONPATH' >> $dir/setup.sh
-echo 'export PERL5LIB='${dir_full_path}'/ensembl-genomio/lib/perl:$PERL5LIB' >> $dir/setup.sh
+echo 'export PERL5LIB='${dir_full_path}'/ensembl-genomio/src/perl:$PERL5LIB' >> $dir/setup.sh
 # we use `pip install -e ` instead
-# echo 'export PYTHONPATH='${dir_full_path}'/ensembl-genomio/lib/python:$PYTHONPATH' >> $dir/setup.sh
+# echo 'export PYTHONPATH='${dir_full_path}'/ensembl-genomio/src/python:$PYTHONPATH' >> $dir/setup.sh
 
 echo 'export PERL5LIB='${dir_full_path}'/ensembl-production-imported/lib/perl:$PERL5LIB' >> $dir/setup.sh
 echo 'export PYTHONPATH='${dir_full_path}'/ensembl-production-imported/lib/python:$PYTHONPATH' >> $dir/setup.sh

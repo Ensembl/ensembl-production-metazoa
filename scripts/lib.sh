@@ -1796,6 +1796,7 @@ function run_repeat_masking () {
   local REP_LIB="$4"
   local OUT_DIR="$5"
   local REPBASE_SPECIES_NAME="$6"
+  local META_RAW="$7"
 
   local DONE_TAG='_run_repeat_masking'
   if ! check_done "$DONE_TAG"; then
@@ -1821,6 +1822,8 @@ function run_repeat_masking () {
       REP_LIB_OPT=
     fi
 
+    DNA_FEATURES_OPTIONS="$(get_meta_conf $META_RAW 'DNA_FEATURES_OPTIONS')"
+
     local SPECIES_TAG=$(echo $SPECIES | perl -pe 's/^([^_]{3})[^_]+(?:_([^_]{3}))?.*(_[^_]+)$/$1_$2$3/')
 
     init_pipeline.pl Bio::EnsEMBL::EGPipeline::PipeConfig::DNAFeatures_conf \
@@ -1839,6 +1842,7 @@ function run_repeat_masking () {
       $REP_LIB_OPT \
       -repeatmasker_repbase_species "$REPBASE_SPECIES_NAME" \
       -max_seq_length 300000 \
+      ${DNA_FEATURES_OPTIONS} \
       2> $OUT_DIR/init.stderr \
       1> $OUT_DIR/init.stdout
     tail $OUT_DIR/init.stderr $OUT_DIR/init.stdout
@@ -2980,7 +2984,7 @@ function mark_tr_trans_spliced () {
     echo "setting trans_spliced attrib (503) for $COUNT transcripts in $CMD:$DBNAME..." >> /dev/stderr
     echo $ID_LIST |
       perl -pe 's/[,\s+]/\n/g' |
-      xargs -n 1 -I XXX echo 'insert into transcript_attrib select transcript_id, 503, 1 from transcript where stable_id in ("XXX");' |
+      xargs -n 1 -I XXX echo 'insert ignore into transcript_attrib select transcript_id, 503, 1 from transcript where stable_id in ("XXX");' |
       $CMD -D $DBNAME
 
     touch_done "$DONE_TAG"
