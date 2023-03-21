@@ -1850,6 +1850,16 @@ function run_repeat_masking () {
     local SYNC_CMD=$(cat $OUT_DIR/init.stdout | grep -- -sync'$' | perl -pe 's/^\s*//; s/"//g')
     local LOOP_CMD=$(cat $OUT_DIR/init.stdout | grep -- -loop | perl -pe 's/^\s*//; s/\s*#.*$//; s/"//g')
 
+    # using chunking for trf by default
+    export DNA_FEATURES_TRF_SPLIT_SPLITTER_CHUNK_SIZE=10_000_000
+    export DNA_FEATURES_TRF_SPLIT_TRF_OPTIONS='-l 10'
+    if [ -z "$DNA_FEATURES_TRF_SPLIT_TRF_EXE" ]; then
+      export DNA_FEATURES_TRF_SPLIT_TRF_EXE=trf
+    fi
+    local EHIVE_URL="$(echo $SYNC_CMD | cut -f 3 -d ' ')"
+    tweak_pipeline.pl -url "$EHIVE_URL" \
+      -tweak 'analysis[TRF].param[parameters_hash]={program=>"'${ENSEMBL_ROOT_DIR}'/ensembl-genomio/scripts/trf_split_run.bash"}'
+
     echo "$SYNC_CMD" > $OUT_DIR/_continue_pipeline
     echo "$LOOP_CMD" >> $OUT_DIR/_continue_pipeline
     echo "clean_neg_start_repeats $CMD $DBNAME" >> $OUT_DIR/_continue_pipeline
