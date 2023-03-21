@@ -3214,7 +3214,7 @@ function prepare_metada () {
     local MCFG_GBFF_OPTS=$(fopt_from_meta $META_RAW GBFF_FILE $ASM_DIR '--gbff_file' false)
     local MCFG_ASM_REP_OPTS=$(fopt_from_meta $META_RAW ASM_REP_FILE $ASM_DIR  '--asm_rep_file' false)
 
-    local GFF_PARSER_CONF_DIR="$SCRIPTS/ensembl-genomio/scripts/gff_metaparser/conf"
+    local GFF_PARSER_CONF_DIR="$SCRIPTS/ensembl-genomio/config/gff_metaparser"
 
     local MCFG_GFF_CAUSED_OPTS=''
     local GFF_PATH=$(fopt_from_meta $META_RAW GFF_FILE $ASM_DIR '' false)
@@ -3233,7 +3233,7 @@ function prepare_metada () {
 
         GFF_PARSER_BRC4_OPTIONS="${GFF_PARSER_BRC4_OPTIONS}"
         if [ -z "$GFF_PARSER_CONF_PATCH" ]; then
-          GFF_PARSER_CONF_PATCH="$GFF_PARSER_CONF_DIR/gff_metaparser/brc4.patch"
+          GFF_PARSER_CONF_PATCH="$GFF_PARSER_CONF_DIR/metaparser/brc4.patch"
         fi
       fi
 
@@ -3242,7 +3242,7 @@ function prepare_metada () {
         GFF_STATS_CONF=$GFF_PARSER_CONF_DIR/valid_structures.conf
       fi
       if [ -z "$GFF_PARSER_CONF" ]; then
-        GFF_PARSER_CONF=$GFF_PARSER_CONF_DIR/gff_metaparser.conf
+        GFF_PARSER_CONF=$GFF_PARSER_CONF_DIR/metaparser.conf
       fi
       # pactch conf
       if [ -z "$GFF_PARSER_CONF_PATCH" ]; then
@@ -3382,7 +3382,7 @@ function prepare_metada () {
       local SR_GFF_PARSER_OPTIONS=$(get_meta_conf $META_RAW SR_GFF_PARSER_OPTIONS)
 
       if [ -z "$SR_GFF_PARSER_CONF" ]; then
-        SR_GFF_PARSER_CONF=$GFF_PARSER_CONF_DIR/gff_metaparser.conf
+        SR_GFF_PARSER_CONF=$GFF_PARSER_CONF_DIR/metaparser.conf
       fi
 
       local SR_GFF_PARSER_CONF_PATCH=$(fopt_from_meta $META_RAW 'SR_GFF_PARSER_CONF_PATCH' $GFF_PARSER_CONF_DIR '--conf_patch' true)

@@ -44,7 +44,7 @@ species.common_name	Human gut metagenome
 # disabling default [transcript -> mRNA] gff3 feature type convesion
 #CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna,mgnify_prodig
 
-#CONF	GFF_PARSER_CONF	gff_metaparser/mgnify_prodig.conf
+#CONF	GFF_PARSER_CONF	metaparser/mgnify_prodig.conf
 #CONF	GFF_PARSER_PFX_TRIM	NO
 
 #CONF	GFF3_LOAD_LOGIC_NAME	gff3_import_raw
