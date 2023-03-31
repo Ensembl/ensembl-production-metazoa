@@ -1,0 +1,90 @@
+#CONF	DB_PFX	premz
+#CONF	ASM_VERSION	1
+
+# if substituting existing core
+#  * update ASM_VERSION above
+#  * uncomment "species.production_name" below
+# # updated, prev was _PREV_CORE_NAME_
+# species.production_name	_PROD_NAME_
+species.common_name	Aster leafhopper
+
+# GCA_028750875.1
+# https://www.ncbi.nlm.nih.gov/assembly/GCA_028750875.1
+# https://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/028/750/875/GCF_028750875.1_UCM_ALF_1.0
+# RefSeq Annotation Name: NCBI Macrosteles quadrilineatus Annotation Release GCF_028750875.1-RS_2023_03
+# RefSeq Annotation Url: https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Macrosteles_quadrilineatus/GCF_028750875.1-RS_2023_03/
+
+#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/028/750/875/GCF_028750875.1_UCM_ALF_1.0
+
+# RefSeq related defaults
+#CONF	GCF_TO_GCA	1
+#CONF	ANNOTATION_SOURCE_SFX	rs
+species.annotation_source	RefSeq
+
+
+# stats and metadata generation options
+#CONF	STOP_AFTER_CONF	NO
+
+#CONF	GFF_PARSER_CONF_PATCH	NO
+
+# disabling default [transcript -> mRNA] gff3 feature type convesion
+#CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna
+
+#no CONF	GFF_PARSER_PFX_TRIM	NO
+#CONF	GFF_LOADER_OPTIONS	--external_db_map_name default.txt
+#  Default: --external_db_map_name default.txt
+#  FlyBase: --external_db_map_name default.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
+#  Plants: --xref_display_db_default Ensembl_Plants -division EnsemblPlants
+#  minimal: --external_db_map_name minimal.txt --skip_unknown_xref_source 1
+#  add to ignore manifest integrity check: --check_manifest 0
+
+#no CONF	ORDERED_CS_TAG	chromosome
+
+
+# update stable ids
+#CONF	UPDATE_STABLE_IDS	1
+# it's better not to split version ('-fix_version 0' by default)
+#no CONF	UPDATE_STABLE_IDS_OPTIONS	-fix_version 1
+
+
+# Assembly metadata
+assembly.accession	GCA_028750875.1
+
+# Provider metadata
+#CONF	GFF3_LOAD_SOURCE_NAME	RefSeq
+
+assembly.provider_name	University of California Merced
+assembly.provider_url	https://www.ucmerced.edu/
+
+annotation.provider_name	NCBI
+annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Macrosteles_quadrilineatus/GCF_028750875.1-RS_2023_03/
+
+#no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
+#  to change the lower allowed length [default 5000]: -min_slice_length 1000
+#  to change the splitting length threshold [default 10_000_000]: -max_seq_length 19000000
+
+#plants CONF	DNA_FEATURES_OPTIONS	-redatrepeatmasker 1
+
+#no CONF	IGNORE_EMPTY_REP_LIB	YES
+#   to ignore empty de novo repeat libraries
+
+
+# rna features and genes
+#CONF	RNA_FEAT_PARAMS	-cmscan_threshold 1e-6 -taxonomic_lca 1
+
+#CONF	RUN_RNA_GENES	NO
+
+# or
+# using 'vb' context, otherwise ('eg' context) needs special "ena*" database
+#no CONF	RNA_GENE_PARAMS	-run_context vb -score_threshold 65
+#               m.b. updated maximum_per_hit_name { 'pre_miRNA' => 100, 'ribozyme' => 100 }
+# species.stable_id_prefix	ENSLOC
+
+
+# load UniProt gene names and descriptions
+#CONF	XREF_PARAMS	-description_source reviewed -description_source unreviewed -gene_name_source reviewed
+#no -overwrite_description 1
+
+#
+# FINALIZE
+#
