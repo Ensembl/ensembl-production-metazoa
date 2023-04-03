@@ -1842,6 +1842,7 @@ function run_repeat_masking () {
       $REP_LIB_OPT \
       -repeatmasker_repbase_species "$REPBASE_SPECIES_NAME" \
       -max_seq_length 300000 \
+      -trf_resource_class 32Gb_mem \
       ${DNA_FEATURES_OPTIONS} \
       2> $OUT_DIR/init.stderr \
       1> $OUT_DIR/init.stdout
@@ -1852,7 +1853,6 @@ function run_repeat_masking () {
 
     # using chunking for trf by default
     export DNA_FEATURES_TRF_SPLIT_SPLITTER_CHUNK_SIZE=10_000_000
-    export DNA_FEATURES_TRF_SPLIT_TRF_OPTIONS='-l 10'
     if [ -z "$DNA_FEATURES_TRF_SPLIT_TRF_EXE" ]; then
       export DNA_FEATURES_TRF_SPLIT_TRF_EXE=trf
     fi
@@ -1860,7 +1860,11 @@ function run_repeat_masking () {
     tweak_pipeline.pl -url "$EHIVE_URL" \
       -tweak 'analysis[TRF].param[parameters_hash]={program=>"'${ENSEMBL_ROOT_DIR}'/ensembl-genomio/scripts/trf_split_run.bash"}'
 
-    echo "$SYNC_CMD" > $OUT_DIR/_continue_pipeline
+    echo -n > $OUT_DIR/_continue_pipeline
+
+    echo "pushd $OUT_DIR" >> $OUT_DIR/_continue_pipeline
+    echo "export DNA_FEATURES_TRF_SPLIT_SPLITTER_CHUNK_SIZE=10_000_000" >> $OUT_DIR/_continue_pipeline
+    echo "$SYNC_CMD" >> $OUT_DIR/_continue_pipeline
     echo "$LOOP_CMD" >> $OUT_DIR/_continue_pipeline
     echo "clean_neg_start_repeats $CMD $DBNAME" >> $OUT_DIR/_continue_pipeline
     echo "nonref_unset_toplevel $CMD $DBNAME" >> $OUT_DIR/_continue_pipeline
