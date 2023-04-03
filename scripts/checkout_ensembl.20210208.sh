@@ -114,7 +114,9 @@ done
 ## Now checkout taxonomy (no release branch!)
 branch="main"
 for module in \
-    ensembl-taxonomy
+    ensembl-analysis \
+    ensembl-taxonomy \
+  ;
 do
     echo "Checking out $module ($branch)" >> /dev/stderr
     git clone -b $branch ${URL_PFX}Ensembl/${module} || {
@@ -142,25 +144,6 @@ do
     echo done >> /dev/stderr
     echo
 done
-
-## Now checkout analysis (no release branch!) 
-## getting dev/hive_master,
-(
-branch="dev/hive_master"
-for module in \
-    ensembl-analysis
-do
-    echo "Checking out $module ($branch)" >> /dev/stderr
-    git clone -b $branch --depth 1 --no-single-branch ${URL_PFX}Ensembl/${module} || {
-        echo "Could not check out $module ($branch)" >> /dev/stderr
-        touch _FAILED
-        exit 2
-    }
-    [ -f _FAILED ] && exit 2
-    echo done >> /dev/stderr
-    echo
-done
-)
 
 # ATAC stuff
 git clone ${URL_PFX}EnsemblGenomes/eg-assemblyconverter
