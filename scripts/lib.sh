@@ -1843,6 +1843,7 @@ function run_repeat_masking () {
       -repeatmasker_repbase_species "$REPBASE_SPECIES_NAME" \
       -max_seq_length 300000 \
       -trf_resource_class 32Gb_mem \
+      -splitdump_resource_class 32Gb_mem \
       ${DNA_FEATURES_OPTIONS} \
       2> $OUT_DIR/init.stderr \
       1> $OUT_DIR/init.stdout
