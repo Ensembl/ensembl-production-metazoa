@@ -194,7 +194,7 @@ Options for `run_xref` wrapper from [lib.sh](script/lib.sh).
 | Option | Example | Type: possible values | Action | Comment|
 | - | - | - | -  | - |
 `XREF_PARAMS` |  `-description_source reviewed -description_source unreviewed -gene_name_source reviewed` | `str:` `pipeline options` | Options to be forwarded to [`AllXref`](https://github.com/Ensembl/ensembl-production-imported/blob/trunk/lib/perl/Bio/EnsEMBL/EGPipeline/PipeConfig/AllXref_conf.pm) pipeline (called from `run_xref` wrapper). | Sometimes  `-overwrite_description 1` can be used. For dmel use `-refseq_dna -refseq_peptide 1 -refseq_tax_level invertebrate`. Pipeline is not run if there's no `GFF_FILE` (no annotaion provided).
-`RUN_XREF` |  `` | `str:` `NO` -- to prevent `AllXref` pipeline from running | Set to `NO` to prevent [`AllXref`](https://github.com/Ensembl/ensembl-production-imported/blob/trunk/lib/perl/Bio/EnsEMBL/EGPipeline/PipeConfig/AllXref_conf.pm) pipeline from runing |
+`RUN_XREF` |  `NO` | `str:` `NO` -- to prevent `AllXref` pipeline from running | Set to `NO` to prevent [`AllXref`](https://github.com/Ensembl/ensembl-production-imported/blob/trunk/lib/perl/Bio/EnsEMBL/EGPipeline/PipeConfig/AllXref_conf.pm) pipeline from runing |
 
 #### Filling samle meta data options
 If there's no `sample.location_param` meta data,
