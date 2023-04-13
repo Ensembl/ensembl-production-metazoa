@@ -348,8 +348,11 @@ if [ -n "$GFF_FILE" ]; then
   fi
 
   # run xref pipelines
-  run_xref $CMD_W $DBNAME $SPECIES $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/xrefs/all "$(get_meta_conf $META_FILE_RAW XREF_PARAMS)"
-  backup_relink $DBNAME $CMD run_xref $DATA_DIR/bup
+  RUN_XREF="$(get_meta_conf $META_FILE_RAW RUN_XREF)"
+  if [ -z "$RUN_XREF" -o "x$RUN_XREF" != "xNO" ]; then
+    run_xref $CMD_W $DBNAME $SPECIES $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/xrefs/all "$(get_meta_conf $META_FILE_RAW XREF_PARAMS)"
+    backup_relink $DBNAME $CMD run_xref $DATA_DIR/bup
+  fi
 
 
   # fix gene and transcript stable ids, update xrefs name
