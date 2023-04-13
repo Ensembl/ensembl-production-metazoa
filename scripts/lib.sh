@@ -3661,12 +3661,14 @@ function update_prod_tables_new () {
 
     local SPECIES_TAG=$(echo $SPECIES | perl -pe 's/^([^_]{3})[^_]+(?:_([^_]{3}))?.*(_[^_]+)$/$1_$2$3/')
 
+    local DIVISION=$(${CMD} -D ${DBNAME} -Ne 'select lower(replace(meta_value, "Ensembl", "")) from meta where meta_key = "species.division" limit 1')
+
     init_pipeline.pl Bio::EnsEMBL::Production::Pipeline::PipeConfig::ProductionDBSync_conf \
       $($CMD details hive) \
       -pipeline_name "prod_db_sync_${SPECIES_TAG}" \
       -hive_force_init 1\
       -registry $REG_FILE \
-      -division "metazoa" \
+      -division "$DIVISION" \
       -group core \
       -backup_dir $OUT_DIR \
       -pipeline_dir $OUT_DIR/sync_${SPECIES_TAG} \
@@ -3776,6 +3778,8 @@ function run_dc () {
 
     local PIPELINE_DBNAME=dc_${SPECIES_TAG}
 
+    local DIVISION=$(${CMD} -D ${DBNAME} -Ne 'select lower(replace(meta_value, "Ensembl", "")) from meta where meta_key = "species.division" limit 1')
+
     # can be useful:  -parallelize_datachecks 1 \
 
     perl $SCRIPTS/ensembl-datacheck${CVER}/scripts/run_pipeline.pl \
@@ -3784,7 +3788,7 @@ function run_dc () {
       -pipeline_dbname ${PIPELINE_DBNAME} \
       -registry_file $REG_FILE \
       -dbtype core \
-      -division metazoa \
+      -division "$DIVISION" \
       -group core \
       -datacheck_type critical \
       -history_file $OUT_DIR/dc.json \
@@ -3861,12 +3865,14 @@ function run_core_stats_new () {
 
     local SPECIES_TAG=$(echo $SPECIES | perl -pe 's/^([^_]{3})[^_]+(?:_([^_]{3}))?.*(_[^_]+)$/$1_$2$3/')
 
+    local DIVISION=$(${CMD} -D ${DBNAME} -Ne 'select lower(replace(meta_value, "Ensembl", "")) from meta where meta_key = "species.division" limit 1')
+
     init_pipeline.pl Bio::EnsEMBL::Production::Pipeline::PipeConfig::CoreStatistics_conf \
       $($CMD details hive) \
       -pipeline_name "prod_core_stats_${SPECIES_TAG}" \
       -hive_force_init 1\
       -registry $REG_FILE \
-      -division "metazoa" \
+      -division "$DIVISION" \
       -history_file $OUT_DIR/hist.json \
       -pipeline_dir $OUT_DIR/stats_${SPECIES_TAG} \
       -scratch_large_dir $OUT_DIR/scratch \
