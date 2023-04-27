@@ -4,7 +4,7 @@
 # if substituting existing core
 #  * update ASM_VERSION above
 #  * uncomment "species.production_name" below
-# # updated, prev was _PREV_CORE_NAME_ 
+# # updated, prev was _PREV_CORE_NAME_
 # species.production_name	_PROD_NAME_
 species.common_name	Wild soybean
 
@@ -30,9 +30,9 @@ species.common_name	Wild soybean
 #NC_022868.1  RefSeq  gene  137862  138650  .  +  .  ID=gene-W848_p084;Dbxref=GeneID:17675664
 #
 #NC_022868.1   RefSeq  mRNA  220394  138650  .  ?  .  ID=rna-W848_p084;Parent=gene-W848_p084
-#  NB  220394  %  152217  =  68177, thus suggest transforming into 
-##NC_022868.1  RefSeq  mRNA  68177  138650  .  ?  .  ID=rna-W848_p084;Parent=gene-W848_p084
-# I wonder if we can have exons with strands different from the mRNA one
+#  NB  220394  %  152217  =  68177, thus suggest transforming into (N.B. putting on the + strand)
+#NC_022868.1  RefSeq  mRNA  68177  138650  .  +  .  ID=rna-W848_p084;Parent=gene-W848_p084
+# we can have exons with strands different from the mRNA one
 #
 #NC_022868.1  RefSeq  exon  68177  68302  .  -  .  ID=exon-W848_p084-1;Parent=rna-W848_p084
 #NC_022868.1  RefSeq  exon  137862  138093  .  +  .  ID=exon-W848_p084-2;Parent=rna-W848_p084
@@ -44,9 +44,9 @@ species.common_name	Wild soybean
 #NC_022868.1  RefSeq  CDS  138625  138650  .  +  2  ID=cds-YP_008816270.1;Parent=rna-W848_p084
 #
 # For this one, let's
-# change (mRNA 220394 138650) to the one with % contig_len coordinates and strand "+"
+# change (mRNA 220394 138650) to the one with % contig_len coordinates and on the "+" strand
 #NC_022868.1  RefSeq  mRNA  68177  138650  .  +  .  ID=rna-W848_p084;Parent=gene-W848_p084
-# and drop gene part 1 (gene 68177 68302) and changing part 2 (gene 137862 138650) to 
+# and drop gene part 1 (gene 68177 68302) and changing part 2 (gene 137862 138650) to
 #NC_022868.1  RefSeq  gene  68177 138650  .  +  .  ID=gene-W848_p084;Dbxref=GeneID:17675664
 #
 #
@@ -57,56 +57,29 @@ species.common_name	Wild soybean
 #NC_022868.1  RefSeq  gene  96742  97530  .  -  .  ID=gene-W848_p085;Dbxref=GeneID:17675718
 #
 #NC_022868.1  RefSeq  mRNA  96742  220519  .  -  .  ID=rna-W848_p085;Parent=gene-W848_p085
-##  NC_022868.1  RefSeq  mRNA  96742  68302  .  -  .  ID=rna-W848_p085;Parent=gene-W848_p085
-#
 #NC_022868.1  RefSeq  exon  220394  220519  .  -  .  ID=exon-W848_p085-1;Parent=rna-W848_p085
-# same here: % (contig_len) turns into
-#   NC_022868.1  RefSeq  exon  68177  68302  .  -  .  ID=exon-W848_p085-1;Parent=rna-W848_p085
 #NC_022868.1  RefSeq  exon  97299  97530  .  -  .  ID=exon-W848_p085-2;Parent=rna-W848_p085
 #NC_022868.1  RefSeq  exon  96742  96767  .  -  .  ID=exon-W848_p085-3;Parent=rna-W848_p085
 #
 #     CDS             complement(join(96742..96767,97299..97530,68177..68302))
 #NC_022868.1  RefSeq  CDS  220394  220519  .  -  0  ID=cds-YP_008816226.1;Parent=rna-W848_p085
-# same here: % (contig_len) turns into
-#  NC_022868.1  RefSeq  CDS  68177  68302  .  -  0  ID=cds-YP_008816226.1;Parent=rna-W848_p085
 #NC_022868.1  RefSeq  CDS  97299  97530  .  -  0  ID=cds-YP_008816226.1;Parent=rna-W848_p085
 #NC_022868.1  RefSeq  CDS  96742  96767  .  -  2  ID=cds-YP_008816226.1;Parent=rna-W848_p085
 #
-# ## outdated: For this one, let's rather preserve coordinates > contig_len
-# ## outdated: drop gene part 1 (gene 68177 68302) and change part 2 (gene 96742 97530) to 
-# ## outdated: NC_022868.1  RefSeq  gene  96742  220519 .  -  .  ID=gene-W848_p085;Dbxref=GeneID:17675718
-# Unfortunately this(^^^outdated^^^) doesn't work. CDS and exon coordinates should be <= seq_region_len
-# so 1) change exon/CDS (220394 220519 -) to
-# NC_022868.1  RefSeq  exon/CDS  68177  68302  .  -
-# 2) drop gene part 1 (gene 68177 68302) and change part 2 (gene 96742 97530) to
-# NC_022868.1  RefSeq  gene  68177  97530  .  -
-# 3) change mRNA (96742  220519) to
-# NC_022868.1  RefSeq  mRNA  68177 97530  .  -
-# N.B. protein sequence will be preserved because of the peptide seq_edit
-#
-# thus we had
-#outdated CONF	DATA_INIT	zcat GCF_004193775.1_ASM419377v2_genomic.gff.gz | grep -vP '^NC_022868.1\tRefSeq\tgene\t68177\t68302\t' | perl -pe 'if (m/^NC_022868.1\tRefSeq\tmRNA\t220394\t138650\t/) { s/\t220394\t/\t68177\t/; s/\t\?\t/\t+\t/; }; s/\t137862\t/\t68177\t/ if m/^NC_022868.1\tRefSeq\tgene\t137862\t138650\t/;    s/\t97530\t/\t220519\t/ if m/^NC_022868.1\tRefSeq\tgene\t96742\t97530\t/;' | gzip - > fixed.gff3.gz
+# For this one, let's rather preserve coordinates > contig_len
+# drop gene part 1 (gene 68177 68302) and change part 2 (gene 96742 97530) to
+# NC_022868.1  RefSeq  gene  96742  220519 .  -  .  ID=gene-W848_p085;Dbxref=GeneID:17675718
 
-# outdated: sdiff -s GCF_004193775.1_ASM419377v2_genomic.gff fixed.gff3
-# outdated: NC_022868.1     RefSeq  gene    68177   68302   .       -     | NC_022868.1     RefSeq  gene    68177   138650  .       +
-# outdated: NC_022868.1     RefSeq  gene    137862  138650  .       +     | NC_022868.1     RefSeq  mRNA    68177   138650  .       +
-# outdated: NC_022868.1     RefSeq  mRNA    220394  138650  .       ?     <
-# outdated: NC_022868.1     RefSeq  gene    68177   68302   .       -     | NC_022868.1     RefSeq  gene    96742   220519  .       -
-# outdated: NC_022868.1     RefSeq  gene    96742   97530   .       -     <
-
-# now we have
-
-#CONF	DATA_INIT	zcat GCF_004193775.1_ASM419377v2_genomic.gff.gz | grep -vP '^NC_022868.1\tRefSeq\tgene\t68177\t68302\t' | perl -pe 'if (m/^NC_022868.1\tRefSeq\tmRNA\t220394\t138650\t/) { s/\t220394\t/\t68177\t/; s/\t\?\t/\t+\t/; }; s/\t137862\t/\t68177\t/ if m/^NC_022868.1\tRefSeq\tgene\t137862\t138650\t/;     s/\t220394\t220519\t/\t68177\t68302\t/ if m/^NC_022868.1\tRefSeq\t(?:CDS|exon)\t220394\t220519\t/; s/\t96742\t/\t68177\t/ if m/^NC_022868.1\tRefSeq\tgene\t96742\t97530\t/; s/\t96742\t220519\t/\t68177\t97530\t/ if m/^NC_022868.1\tRefSeq\tmRNA\t96742\t220519\t/;' | gzip - > fixed.gff3.gz
+# thus we have
 
 # sdiff -s GCF_004193775.1_ASM419377v2_genomic.gff fixed.gff3
-# NC_022868.1     RefSeq  gene    68177   68302   .       -     | NC_022868.1     RefSeq  gene    68177   138650  .       +
-# NC_022868.1     RefSeq  gene    137862  138650  .       +     | NC_022868.1     RefSeq  mRNA    68177   138650  .       +
-# NC_022868.1     RefSeq  mRNA    220394  138650  .       ?     <
-# NC_022868.1     RefSeq  gene    68177   68302   .       -     | NC_022868.1     RefSeq  gene    68177   97530   .       -
-# NC_022868.1     RefSeq  gene    96742   97530   .       -     | NC_022868.1     RefSeq  mRNA    68177   97530   .       -
-# NC_022868.1     RefSeq  mRNA    96742   220519  .       -     | NC_022868.1     RefSeq  exon    68177   68302   .       -
-# NC_022868.1     RefSeq  exon    220394  220519  .       -     <
-# NC_022868.1     RefSeq  CDS     220394  220519  .       -     | NC_022868.1     RefSeq  CDS     68177   68302   .       -
+#  NC_022868.1     RefSeq  gene    68177   68302   .       -     | NC_022868.1     RefSeq  gene    68177   138650  .       +
+#  NC_022868.1     RefSeq  gene    137862  138650  .       +     | NC_022868.1     RefSeq  mRNA    68177   138650  .       +
+#  NC_022868.1     RefSeq  mRNA    220394  138650  .       ?     <
+#  NC_022868.1     RefSeq  gene    68177   68302   .       -     | NC_022868.1     RefSeq  gene    96742   220519  .       -
+#  NC_022868.1     RefSeq  gene    96742   97530   .       -     <
+
+#CONF	DATA_INIT	zcat GCF_004193775.1_ASM419377v2_genomic.gff.gz | grep -vP '^NC_022868.1\tRefSeq\tgene\t68177\t68302\t' | perl -pe 'if (m/^NC_022868.1\tRefSeq\tmRNA\t220394\t138650\t/) { s/\t220394\t/\t68177\t/;  s/\t\?\t/\t+\t/; }; s/\t137862\t/\t68177\t/ if m/^NC_022868.1\tRefSeq\tgene\t137862\t138650\t/;   s/\t97530\t/\t220519\t/ if m/^NC_022868.1\tRefSeq\tgene\t96742\t97530\t/;' | gzip - > fixed.gff3.gz
 
 
 #CONF	GBFF_FILE	GCF_004193775.1_ASM419377v2_genomic.gbff.gz
@@ -132,7 +105,7 @@ species.annotation_source	RefSeq
 #CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna,ignore_mt_gene_exon
 
 #no CONF	GFF_PARSER_PFX_TRIM	NO
-#CONF	GFF_LOADER_OPTIONS	--external_db_map_name default.txt --xref_display_db_default Ensembl_Plants -division EnsemblPlants --check_manifest 0
+#CONF	GFF_LOADER_OPTIONS	--external_db_map_name default.txt --xref_display_db_default Ensembl_Plants -division EnsemblPlants --check_manifest 1
 #  FlyBase: --external_db_map_name default.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
 #  minimal: --external_db_map_name minimal.txt --skip_unknown_xref_source 1
 #  add to ignore manifest integrity check: --check_manifest 0
@@ -189,27 +162,6 @@ annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Glyci
 
 #
 # FINALIZE
-#
-# FIX W848_p084 / GeneID_17675718 related exons
-# CDS             join(complement(68177..68302),137862..138093,138625..138650)
-#NC_022868.1  RefSeq  CDS  68177  68302  .  -  0  ID=cds-YP_008816270.1;Parent=rna-W848_p084
-#NC_022868.1  RefSeq  CDS  137862  138093  .  +  0  ID=cds-YP_008816270.1;Parent=rna-W848_p084
-#NC_022868.1  RefSeq  CDS  138625  138650  .  +  2  ID=cds-YP_008816270.1;Parent=rna-W848_p084
-# exon_id seq_region_id   seq_region_start        seq_region_end  seq_region_strand       phase   end_phase       is_current      is_constitutive stable_id       version created_datemodified_date    exon_id transcript_id   rank
-# 11413   1120    138625  138650  1       0       2       1       0       W848_p084_t1-E1 NULL    <DATE>     <DATE>     11413   2760    1
-# 11414   1120    68177   68302   -1      -1      -1      1       0       W848_p084_t1-E2 NULL    <DATE>     <DATE>     11414   2760    2
-# 11415   1120    137862  138093  1       -1      -1      1       0       W848_p084_t1-E3 NULL    <DATE>     <DATE>     11415   2760    3
-# change ranks (1,2,3) to (3,1,2):
-# change phase to (2, 0, 0)
-# $CMD_W -D prepl_glycine_soja_gca004193775v2rs_core_57_110_1 -e '
-#   update exon_transcript set rank = 3 where exon_id = 11413;
-#   update exon_transcript set rank = 1 where exon_id = 11414;
-#   update exon set phase = 0, end_phase = 0 where exon_id = 11414;
-#   update exon_transcript set rank = 2 where exon_id = 11415;
-#   update exon set phase = 0, end_phase = 1 where exon_id = 11415;
-#   update translation set  start_exon_id = 11414, end_exon_id = 11413, seq_end = 25 where translation_id = 2233;
-#   update translation_attrib set value = replace(value, "50", "128")  where translation_id = 2233 and attrib_type_id  = 144;
-# '
 #
 # FIX missing MT code table (1 in this case)
 # $CMD_W -D prepl_glycine_soja_gca004193775v2rs_core_57_110_1 -e '
