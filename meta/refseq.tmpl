@@ -63,6 +63,7 @@ annotation.provider_url	_REFSEQ_ANN_REPORT_URL_
 #  to change the lower allowed length [default 5000]: -min_slice_length 1000
 #  to change the splitting length threshold [default 10_000_000]: -max_seq_length 19000000
 
+#large CONF	DNA_FEATURES_OPTIONS	-repeatmasker_exe .../shared_data/pkgs/RepeatMasker.4_0_7/RepeatMasker -repeatmasker_sensitivity all=low
 #plants CONF	DNA_FEATURES_OPTIONS	-redatrepeatmasker 1
 
 #no CONF	IGNORE_EMPTY_REP_LIB	YES
@@ -71,6 +72,7 @@ annotation.provider_url	_REFSEQ_ANN_REPORT_URL_
 
 # rna features and genes
 #CONF	RNA_FEAT_PARAMS	-cmscan_threshold 1e-6 -taxonomic_lca 1
+# for genome with large contigs add:  -splitdump_resource_class 32Gb_mem
 
 #CONF	RUN_RNA_GENES	NO
 
