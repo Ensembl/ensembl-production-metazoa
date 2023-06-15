@@ -55,7 +55,9 @@ if [ ! -e "$dir" ]; then
     mkdir -p $dir
 fi
 
-echo "Creating Ensembl work directory in $dir" >> /dev/stderr
+dir_full_path=$(readlink -f $dir)
+
+echo "Creating Ensembl work directory in $dir ($dir_full_path)" >> /dev/stderr
 echo >> /dev/stderr
 
 cd $dir
@@ -172,6 +174,13 @@ plenv local ${PL_ENV_VERSION}
 mkdir -p ${dir}/perl5
 cpanm --local-lib=${dir}/perl5 Text::Levenshtein::Damerau::XS
 
+# installing NextFlow
+nf_dir=${dir_full_path}/nextflow
+mkdir -p $nf_dir
+export NXF_HOME=${nf_dir}/dot.nextflow
+#   get nextflow and install almost like here: https://www.nextflow.io/index.html#GetStarted
+wget -O - https://get.nextflow.io > ${nf_dir}/nextflow.install.bash
+cat ${nf_dir}/nextflow.install.bash |  bash 2>&1 | tee ${nf_dir}/nextflow.install.log
 
 ## Gasp!
 
@@ -179,8 +188,6 @@ echo "Checkout complete" >> /dev/stderr
 echo "Creating a setup script" >> /dev/stderr
 
 ${create_setup_script} $dir
-
-dir_full_path=$(readlink -f $dir)
 
 # adding plenv initialization
 echo "plenv local ${PL_ENV_VERSION}" >> $dir/setup.sh.plenv
@@ -211,6 +218,10 @@ echo 'export PYTHONPATH='${dir_full_path}'/ensembl-production-imported/lib/pytho
 
 echo 'export PERL5LIB='${dir_full_path}'/ensembl-production-imported-private/lib/perl:$PERL5LIB' >> $dir/setup.sh
 echo 'export PYTHONPATH='${dir_full_path}'/ensembl-production-imported-private/lib/python:$PYTHONPATH' >> $dir/setup.sh
+
+echo '# nextflow bit' >> $dir/setup.sh
+echo 'export NXF_HOME='${nf_dir}'/dot.nextflow' >> $dir/setup.sh
+echo 'PATH='${nf_dir}':$PATH' >> $dir/setup.sh
 
 echo 'export PERL5LIB ENSEMBL_ROOT_DIR ENSEMBL_CVS_ROOT_DIR PYTHONPATH PATH' >> $dir/setup.sh
 
