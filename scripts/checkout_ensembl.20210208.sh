@@ -180,7 +180,9 @@ mkdir -p $nf_dir
 export NXF_HOME=${nf_dir}/dot.nextflow
 #   get nextflow and install almost like here: https://www.nextflow.io/index.html#GetStarted
 wget -O - https://get.nextflow.io > ${nf_dir}/nextflow.install.bash
-cat ${nf_dir}/nextflow.install.bash |  bash 2>&1 | tee ${nf_dir}/nextflow.install.log
+pushd $nf_dir
+  cat ${nf_dir}/nextflow.install.bash |  bash 2>&1 | tee ${nf_dir}/nextflow.install.log
+popd
 
 ## Gasp!
 
