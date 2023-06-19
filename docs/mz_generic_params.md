@@ -77,7 +77,7 @@ export PROD_SERVER=<prod_server_alias>
 export ENS_VERSION=107
 
 # setup environment (you should have proper github keys/permissions in place)
-./ensembl-production-metazoa/scripts/mz_generic.sh env_setup_only
+./ensembl-production-metazoa/scripts/mz_generic.sh env_setup_only 2>&1 | tee env_setup.log
 
 cd ${configs_dir}
 ln -s ensembl.prod.${ENS_VERSION} ensembl.prod
