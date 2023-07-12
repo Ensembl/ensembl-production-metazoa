@@ -114,6 +114,7 @@ Same parser, different configs to generate seq_region.json from `SR_GFF_FILE` (s
 `MT_CODON_TABLE`| 5 | `int` | [Sets](https://github.com/Ensembl/ensembl-genomio/blob/master/scripts/gff_metaparser/genmetaconf/seqregionconf.py) seq_region's [`codon_table`](https://github.com/Ensembl/ensembl-genomio/blob/master/schema/seq_region_schema.json) | Parsed only if `CONTIG_CHR_MT` present.
 `MT_CIRCULAR`| YES | `str:` `1`, `YES`, `TRUE` -- enabled, empty and everything else -- disabled| [Enables](https://github.com/Ensembl/ensembl-genomio/blob/master/scripts/gff_metaparser/genmetaconf/seqregionconf.py) seq_region `circular` [flag](https://github.com/Ensembl/ensembl-genomio/blob/master/schema/seq_region_schema.json). | Parsed only if `CONTIG_CHR_MT` present
 `ANNOTATION_SOURCE_SFX`|  | `str:` `rs`|  `species.annotation_source` derived suffix to be appended to the `species.production_name` (and core db name) | Should match mapping `RefSeq`->`rs`, `GenBank`->`gb`, `FlyBase`->`fb`, `WormBase`->`wb`, `VEuPathDB`->`vb`, `Community`->`cm`, `NonINSDC`->`ni`
+`GEN_META_CONF_OPTIONS`| `--species_division EnsemblPlants` | `str:` `options`| additional options to be passed to [gen_meta_conf.py](https://github.com/Ensembl/ensembl-genomio/blob/master/scripts/gff_metaparser/gen_meta_conf.py) |
 
 #### BRC4 related options
 | Option | Example | Type: possible values | Action | Comment|
@@ -177,6 +178,7 @@ wrappers from [lib.sh](script/lib.sh) used to construct de-novo repeat library, 
 `REPBASE_FILTER`| NO | `str:` `NO` -- disable, empty and everything else -- enable | Disable filtering the de-novo repeat library | Better not to use, keep enabled
 `REPBASE_FILE`| /path/to/curated.lib | `str: ` empty, `abs path` | If non-empty, the provided curated library is used imnstead of RepBase slice to filter proteome against. |
 `IGNORE_EMPTY_REP_LIB`| 1 | `str:` empty or anything  | If empty and the inferred (produced by the previous steps) de-novo library is empty terminates execution. If non-empty -- execution is not terminated. | Better not to enable it for the first run as a sanity check measure.
+`DNA_FEATURES_OPTIONS` | `-repeatmasker_exe .../pkgs/RepeatMasker.4_0_7/RepeatMasker` , `-redatrepeatmasker 1` | `str:` `options ` | Options to be passed to the [`DNAFeatures`](https://github.com/Ensembl/ensembl-production-imported/blob/trunk/lib/perl/Bio/EnsEMBL/EGPipeline/PipeConfig/DNAFeatures_conf.pm) pipeline called from [`run_repeat_masking`](scripts/lib.sh)
 
 ### Various pipeline options
 #### RNAFeatures and RNAGenes pipeline related options
@@ -184,6 +186,7 @@ Options for `run_rna_features` and `run_rna_genes` wrappers from [lib.sh](script
 
 | Option | Example | Type: possible values | Action | Comment|
 | - | - | - | -  | - |
+`RUN_RNA_FEATURES` | NO | `str:` `NO` or empty -- don't run; anything else -- do run | Run [`RNAFeatures`](https://github.com/Ensembl/ensembl-production-imported/blob/trunk/lib/perl/Bio/EnsEMBL/EGPipeline/PipeConfig/RNAFeatures_conf.pm) pipeline (called from `run_rna_features` wrapper) or not  | If `NO` -- `RNA_FEAT_PARAMS` are ignored
 `RNA_FEAT_PARAMS` |  `-cmscan_threshold 1e-6 -taxonomic_lca 1` | `str:` `pipeline options` | Options to be forwarded to [`RNAFeatures`](https://github.com/Ensembl/ensembl-production-imported/blob/trunk/lib/perl/Bio/EnsEMBL/EGPipeline/PipeConfig/RNAFeatures_conf.pm) pipeline (called from `run_rna_features` wrapper). | Pipeline, not run if there's no `GFF_FILE`
 `RUN_RNA_GENES` | NO | `str:` `NO` or empty -- don't run; anything else -- do run | Run [`RNAGenes`](https://github.com/Ensembl/ensembl-production-imported/blob/trunk/lib/perl/Bio/EnsEMBL/EGPipeline/PipeConfig/RNAGenes_conf.pm) pipeline (called from `run_rna_genes` wrapper) or not  | Better not to run, especially for the annotations with present RNA gene models (i.e. from *RefSeq*). If enabled, *species.stable_id_prefix* should present in meta data, i.e.:  `species.stable_id_prefix	ENSTCAL_` (tab-separated, no comments). Pipeline is not run if there's no `GFF_FILE` (no annotaion provided).
 `RNA_GENE_PARAMS` | -run_context vb | `str:` `pipeline options` | Options to be forwarded to [`RNAGenes`](https://github.com/Ensembl/ensembl-production-imported/blob/trunk/lib/perl/Bio/EnsEMBL/EGPipeline/PipeConfig/RNAGenes_conf.pm) pipeline (called from `run_rna_genes` wrapper). | Better always to use `-run_context vb`
@@ -193,8 +196,8 @@ Options for `run_xref` wrapper from [lib.sh](script/lib.sh).
 
 | Option | Example | Type: possible values | Action | Comment|
 | - | - | - | -  | - |
-`XREF_PARAMS` |  `-description_source reviewed -description_source unreviewed -gene_name_source reviewed` | `str:` `pipeline options` | Options to be forwarded to [`AllXref`](https://github.com/Ensembl/ensembl-production-imported/blob/trunk/lib/perl/Bio/EnsEMBL/EGPipeline/PipeConfig/AllXref_conf.pm) pipeline (called from `run_xref` wrapper). | Sometimes  `-overwrite_description 1` can be used. For dmel use `-refseq_dna -refseq_peptide 1 -refseq_tax_level invertebrate`. Pipeline is not run if there's no `GFF_FILE` (no annotaion provided).
 `RUN_XREF` |  `NO` | `str:` `NO` -- to prevent `AllXref` pipeline from running | Set to `NO` to prevent [`AllXref`](https://github.com/Ensembl/ensembl-production-imported/blob/trunk/lib/perl/Bio/EnsEMBL/EGPipeline/PipeConfig/AllXref_conf.pm) pipeline from runing |
+`XREF_PARAMS` |  `-description_source reviewed -description_source unreviewed -gene_name_source reviewed` | `str:` `pipeline options` | Options to be forwarded to [`AllXref`](https://github.com/Ensembl/ensembl-production-imported/blob/trunk/lib/perl/Bio/EnsEMBL/EGPipeline/PipeConfig/AllXref_conf.pm) pipeline (called from `run_xref` wrapper). | Sometimes  `-overwrite_description 1` can be used. For dmel use `-refseq_dna -refseq_peptide 1 -refseq_tax_level invertebrate`. Pipeline is not run if there's no `GFF_FILE` (no annotaion provided).
 
 #### Filling samle meta data options
 If there's no `sample.location_param` meta data,

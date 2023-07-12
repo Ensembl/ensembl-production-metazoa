@@ -329,9 +329,12 @@ backup_relink $DBNAME $CMD repeat_masking $DATA_DIR/bup
 if [ -n "$GFF_FILE" ]; then
 
   # RNA features
-  run_rna_features $CMD_W $DBNAME $SPECIES $ENSEMBL_ROOT_DIR \
-    $DATA_DIR/data/pipeline_out/rna_features '_opt' "$(get_meta_conf $META_FILE_RAW RNA_FEAT_PARAMS)"
-  backup_relink $DBNAME $CMD rna_features $DATA_DIR/bup
+  RUN_RNA_FEATURES="$(get_meta_conf $META_FILE_RAW RUN_RNA_FEATURES)"
+  if [ -z "$RUN_RNA_FEATURES" -o "x$RUN_RNA_FEATURES" != "xNO" ]; then
+    run_rna_features $CMD_W $DBNAME $SPECIES $ENSEMBL_ROOT_DIR \
+      $DATA_DIR/data/pipeline_out/rna_features '_opt' "$(get_meta_conf $META_FILE_RAW RNA_FEAT_PARAMS)"
+    backup_relink $DBNAME $CMD rna_features $DATA_DIR/bup
+  fi
 
   # RNA genes
   RUN_RNA_GENES=$(get_meta_conf $META_FILE_RAW RUN_RNA_GENES)
