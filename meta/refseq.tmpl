@@ -25,12 +25,18 @@ species.annotation_source	RefSeq
 # stats and metadata generation options
 #CONF	STOP_AFTER_CONF	NO
 
-#CONF	GFF_PARSER_CONF_PATCH	NO
-
 # disabling default [transcript -> mRNA] gff3 feature type convesion
 #CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna
 
+#CONF	GFF_PARSER_CONF_PATCH	NO
 #no CONF	GFF_PARSER_PFX_TRIM	NO
+
+# no species.alias(es) are geenerated by default, enable below option if you need them
+#no CONF	GEN_META_CONF_OPTIONS	--generate_species_aliases
+
+#CONF	GFF3_LOAD_LOGIC_NAME	refseq_import_visible
+# For generic imports use "gff3_genes"
+
 #CONF	GFF_LOADER_OPTIONS	--external_db_map_name default.txt
 #  Default: --external_db_map_name default.txt
 #  FlyBase: --external_db_map_name default.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
