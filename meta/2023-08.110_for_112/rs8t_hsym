@@ -71,7 +71,7 @@ annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Hydra
 #  to change the lower allowed length [default 5000]: -min_slice_length 1000
 #  to change the splitting length threshold [default 10_000_000]: -max_seq_length 19000000
 
-#large CONF	DNA_FEATURES_OPTIONS	-repeatmasker_exe .../shared_data/pkgs/RepeatMasker.4_0_7/RepeatMasker -repeatmasker_sensitivity all=low
+#CONF	DNA_FEATURES_OPTIONS	-repeatmasker_exe .../shared_data/pkgs/RepeatMasker.4_0_7/RepeatMasker -repeatmasker_sensitivity all=low
 #plants CONF	DNA_FEATURES_OPTIONS	-redatrepeatmasker 1
 
 #no CONF	IGNORE_EMPTY_REP_LIB	YES
