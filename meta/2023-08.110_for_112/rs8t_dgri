@@ -6,7 +6,7 @@
 #  * uncomment "species.production_name" below
 # # updated, prev was _PREV_CORE_NAME_
 # species.production_name	_PROD_NAME_
-species.common_name	Flies
+species.common_name	Fruit fly
 
 # GCA_018153295.1
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_018153295.1
