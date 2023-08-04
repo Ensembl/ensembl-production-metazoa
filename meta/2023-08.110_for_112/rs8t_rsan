@@ -13,8 +13,18 @@ species.common_name	Brown dog tick
 # https://https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/339/695/GCF_013339695.2_BIME_Rsan_1.4
 # RefSeq Annotation Name: NCBI Rhipicephalus sanguineus Annotation Release 101
 # RefSeq Annotation Url: https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Rhipicephalus_sanguineus/101/
+# https://bigd.big.ac.cn/gwh/Assembly/8868/show
+# https://ngdc.cncb.ac.cn/gwh/Genome/521/show
 
 #CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/339/695/GCF_013339695.2_BIME_Rsan_1.4
+
+#CONF	ASM_SINGLE	ftp://download.big.ac.cn/gwh/Animals/Rhipicephalus_sanguineus_Rhipicephalus_sanguineus_GWHAMMM00000000/GWHAMMM00000000.gff.gz
+ 
+# getting seq_region synonyms from CNCB-NGDC gff (#OriSeqID=Seq10 Accession=GWHAMMM00000010)
+#CONF	DATA_INIT	zgrep -F '#OriSeqID=' GWHAMMM00000000.gff.gz | perl -pe 's/[ \t=]+/\t/g' | cut -f 2,4 | perl -pe 's/$/\tCNCB_NGDC/'> orig2ngdc.sr_syns
+
+#CONF	SR_SYNS_FILE	orig2ngdc.sr_syns
+
 
 # RefSeq related defaults
 #CONF	GCF_TO_GCA	1
@@ -61,8 +71,8 @@ assembly.accession	GCA_013339695.2
 # Provider metadata
 #CONF	GFF3_LOAD_SOURCE_NAME	RefSeq
 
-assembly.provider_name	TIGMIC Group
-assembly.provider_url	Beijing Institute of Microbiology and Epidemiology
+assembly.provider_name	TIGMIC Group, Beijing Institute of Microbiology and Epidemiology
+assembly.provider_url	https://bigd.big.ac.cn/gwh/Assembly/8868/show
 
 annotation.provider_name	NCBI
 annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Rhipicephalus_sanguineus/101/
@@ -71,7 +81,7 @@ annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Rhipi
 #  to change the lower allowed length [default 5000]: -min_slice_length 1000
 #  to change the splitting length threshold [default 10_000_000]: -max_seq_length 19000000
 
-#large CONF	DNA_FEATURES_OPTIONS	-repeatmasker_exe .../shared_data/pkgs/RepeatMasker.4_0_7/RepeatMasker -repeatmasker_sensitivity all=low
+#CONF	DNA_FEATURES_OPTIONS	-repeatmasker_exe .../shared_data/pkgs/RepeatMasker.4_0_7/RepeatMasker -repeatmasker_sensitivity all=low
 #plants CONF	DNA_FEATURES_OPTIONS	-redatrepeatmasker 1
 
 #no CONF	IGNORE_EMPTY_REP_LIB	YES
