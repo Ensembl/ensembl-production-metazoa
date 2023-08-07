@@ -17,9 +17,9 @@ species.common_name	Parasitoid wasp
 #CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/030/347/285/GCA_030347285.1_UoO_Mhyp
 
 # RefSeq related defaults
-#CONF	GCF_TO_GCA	1
-#CONF	ANNOTATION_SOURCE_SFX	rs
-species.annotation_source	RefSeq
+#CONF	GCF_TO_GCA	0
+#CONF	ANNOTATION_SOURCE_SFX	cm
+species.annotation_source	Community
 
 
 # stats and metadata generation options
