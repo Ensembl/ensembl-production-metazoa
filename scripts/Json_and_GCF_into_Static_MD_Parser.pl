@@ -87,7 +87,7 @@ foreach my $refseq_sum_file (@input_refseq_anno_summarys){
 		print BOLD RED "RefSeq Annotation summary file :\t$refseq_sum_file\nAnnotation README file is empty. Need to approximate information from assembly report file instead!!\n";
 			
 		# Define unknown annotation report ftp and version
-        $Anno_file_populated = 0;
+        	$Anno_file_populated = 0;
 
 		my $grep_raw_asm = `grep -e "Organism name" < $assembly_file`;
 		my @temp_split_rawname = split (": ", $grep_raw_asm);
@@ -113,12 +113,12 @@ foreach my $refseq_sum_file (@input_refseq_anno_summarys){
 			$gca_accession=$&;
 			chomp $gca_accession;
 			$core_prodname = $gca_accession;
-	        $gca_accession_escape = $gca_accession;
-        	$gca_accession_escape =~ s/GCA_/GCA\\_/;
-            $core_prodname =~ s/GCA_/gca/;
-            $core_prodname =~ s/\.[0-9]$//;
-            chomp $core_prodname;
-            $core_prodname = "${species_name}_${core_prodname}";
+	        	$gca_accession_escape = $gca_accession;
+        		$gca_accession_escape =~ s/GCA_/GCA\\_/;
+            		$core_prodname =~ s/GCA_/gca/;
+            		$core_prodname =~ s/\.[0-9]$//;
+            		chomp $core_prodname;
+            		$core_prodname = "${species_name}_${core_prodname}";
 		}
 
 	}# Ends test on missing anno report
@@ -129,18 +129,20 @@ foreach my $refseq_sum_file (@input_refseq_anno_summarys){
 	chomp $species_name;
 	$scientific_name = $species_name;
 	$species_name =~ tr/ /_/;
-	$static_output_folder = $static_output_folder."/".$species_name;
 	}
 	my @temp_split_sp_name = split ("_", $species_name);
 
 	#Check whether or not the species name is bionomial or trinomial
-	if ((scalar @temp_split_sp_name == 3 ) && ($temp_split_sp_name[1] eq $temp_split_sp_name[2])){
+	if (scalar @temp_split_sp_name == 3 ){
 		print YELLOW "!!! Found trinomial species name instance !!!! \"$species_name\" --> Utilizing just the bionomial: ";
 		$species_name = "$temp_split_sp_name[0]_$temp_split_sp_name[1]";
 		print "\"$species_name\"\n";
+		print "Dropped name portion: \"$temp_split_sp_name[2]\"."
+		$static_output_folder = $static_output_folder."/".$species_name;
 	}
 	else{
 		print "Species name: \"$scientific_name\".\n";
+		$static_output_folder = $static_output_folder."/".$species_name;
 	}
 
 	$species_name = lc$species_name;
@@ -162,16 +164,16 @@ foreach my $refseq_sum_file (@input_refseq_anno_summarys){
 		@ncbi_rel = split ("/",$anno_report);
 		$release_version = $ncbi_rel[-1];
 		$asseb_accession = `grep -e "^ASSEMBLY ACCESSION" < $refseq_sum_file | cut -f2`;
-        chomp $asseb_accession;
-        $gca_accession = $asseb_accession;
-        $gca_accession =~ s/GCF_/GCA_/;
-        $core_prodname = $gca_accession;
-        $gca_accession_escape = $gca_accession;
-        $gca_accession_escape =~ s/GCA_/GCA\\_/;
-        $core_prodname =~ s/GCA_/gca/;
-        $core_prodname =~ s/\.[0-9]$//;
-        chomp $core_prodname;
-        $core_prodname = "${species_name}_${core_prodname}";
+	        chomp $asseb_accession;
+       		$gca_accession = $asseb_accession;
+        	$gca_accession =~ s/GCF_/GCA_/;
+        	$core_prodname = $gca_accession;
+        	$gca_accession_escape = $gca_accession;
+        	$gca_accession_escape =~ s/GCA_/GCA\\_/;
+        	$core_prodname =~ s/GCA_/gca/;
+        	$core_prodname =~ s/\.[0-9]$//;
+        	chomp $core_prodname;
+        	$core_prodname = "${species_name}_${core_prodname}";
 	}
 	else{
 		my $GCF_from_GCA = $gca_accession;
@@ -300,36 +302,38 @@ General information about this species can be found in [Wikipedia](https://en.wi
 
 #check if a file has JSON before attempting to parse it
 if ($has_wiki_json_data == 1){
-		my $fixed_json;
-		$fixed_json = "${json_file_path}.fixed";
-		my $file_contents = `cat $json_file_path`;
-		chomp $file_contents;
-		$fixed_json =~ s/\.json\.fixed/.fixed.json/;
-			open(TEMPOUT, ">$fixed_json") || die "can't open $fixed_json\n";
-			print TEMPOUT "[".$file_contents."]";
-			close TEMPOUT;
+	my $fixed_json;
+	$fixed_json = "${json_file_path}.fixed";
+	my $file_contents = `cat $json_file_path`;
+	chomp $file_contents;
+	$fixed_json =~ s/\.json\.fixed/.fixed.json/;
 	
-		my $json_text = do {
-		open(my $json_fh, "<:encoding(UTF-8)", $fixed_json) or die ("Can't open JSON file: $fixed_json: $!\n");
-		local $/;
-		<$json_fh>
-		};
+	#Open IO channel to print
+	open(TEMPOUT, ">$fixed_json") || die "can't open $fixed_json\n";
+	print TEMPOUT "[".$file_contents."]";
+	close TEMPOUT;
 	
-		# Create JSON object and data vars we want to capture
-		my $json_ob = JSON->new;
-		my $jsondata = $json_ob->decode($json_text);
-		# print Dumper(\$jsondata);
+	my $json_text = do {
+	open(my $json_fh, "<:encoding(UTF-8)", $fixed_json) or die ("Can't open JSON file: $fixed_json: $!\n");
+	local $/;
+	<$json_fh>
+	};
 	
-		# Extract data from json.
-		foreach (@$jsondata){
-			$extract = $_->{extract};
-			$extract =~ s/$scientific_name/\*$scientific_name\*/;
-			$extract =~ s/$common_name/$common_name (*$scientific_name*)/;
-			$jpg_source = $_->{'thumbnail'}{'source'};
-			$wiki_url = $_->{'content_urls'}{'desktop'}{'page'};
-		}
-		#Wrap the summary text
-		($wiki_about = $extract) =~ s/(.{0,$wrap_at}(?:\s|$))/$1\n/g;
+	# Create JSON object and data vars we want to capture
+	my $json_ob = JSON->new;
+	my $jsondata = $json_ob->decode($json_text);
+	# print Dumper(\$jsondata);
+	
+	# Extract data from json.
+	foreach (@$jsondata){
+		$extract = $_->{extract};
+		$extract =~ s/$scientific_name/\*$scientific_name\*/;
+		$extract =~ s/$common_name/$common_name (*$scientific_name*)/;
+		$jpg_source = $_->{'thumbnail'}{'source'};
+		$wiki_url = $_->{'content_urls'}{'desktop'}{'page'};
+	}
+	#Wrap the summary text
+	($wiki_about = $extract) =~ s/(.{0,$wrap_at}(?:\s|$))/$1\n/g;
 
 $about_content = "**About *$scientific_name***
 -------------------------
@@ -345,7 +349,7 @@ General information about this species can be found in [Wikipedia]($wiki_url)\n"
 	
 print OUT_ABOUT $about_content;
 
-	}
+}
 
 $annotation_content = "**Annotation**
 ----------
