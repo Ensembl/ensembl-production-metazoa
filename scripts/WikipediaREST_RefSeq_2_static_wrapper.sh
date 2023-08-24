@@ -32,7 +32,7 @@ RED='\033[0;31m'
 ORANGE='\033[0;33m'
 NC='\033[0m' # No Color
 
-###Check for required env variables 
+###Check for required env variables
 # WorkDir ENV
 if [[ -z $MAIN_BASE_DIR ]]; then
 	MAIN_BASE_DIR=`readlink -f $PWD`
@@ -68,8 +68,8 @@ if [[ $RUN_STAGE == template ]]; then
 		cp ${ENS_MAIN_METAZOA_PROD}/scripts/template${EXTENSION} $MAIN_BASE_DIR/${PROD_NAME}${EXTENSION};
 		done
 	echo -e -n "\n${GREEN}Generated generic template Markdown files:${NC}\n[${PROD_NAME}_about.md, ${PROD_NAME}_annotation.md, ${PROD_NAME}_assembly.md]\n\n \
-${ORANGE}!!! Please amend these files and fill in the required meta info !!!${NC}\n\nBasic run finished. Exiting.\n"
-	
+	${ORANGE}!!! Please amend these files and fill in the required meta info !!!${NC}\n\nBasic run finished. Exiting.\n"
+
 	sed -i "s/scientific_name/$BINOMIAL/" $MAIN_BASE_DIR/${PROD_NAME}_about.md;
 	exit 0
 fi
@@ -90,11 +90,11 @@ TRACKING="$MAIN_BASE_DIR/${RELEASE}_checkDone"
 mkdir -p $TRACKING
 
 ## Stage one: Obtain wikipedia JSON for each species
-if [[ $RUN_STAGE == "All" ]] || [[ $RUN_STAGE == "Wiki" ]]; then 
+if [[ $RUN_STAGE == "All" ]] || [[ $RUN_STAGE == "Wiki" ]]; then
 
 	mkdir -p $OUTPUT_JSONS
 
-	#Make sure to remove any old generate_Wiki_JSON_Summary.sh 
+	#Make sure to remove any old generate_Wiki_JSON_Summary.sh
 	if [[ -e $MAIN_BASE_DIR/generate_Wiki_JSON_Summary.sh ]]; then
 		echo "Deleting old generate_Wiki_JSON_Summary.sh"
 		rm $MAIN_BASE_DIR/generate_Wiki_JSON_Summary.sh
@@ -126,7 +126,7 @@ if [[ $RUN_STAGE == "All" ]] || [[ $RUN_STAGE == "Wiki" ]]; then
 fi
 
 ## Stage two: OUTPUT FROM & 2 FILES: 1) Wikipedia urls to check (Done manually), 2) List of wget cmds to scrape Wiki summarys from Wikimedia REST API
-if [[ $RUN_STAGE == "All" ]] || [[ $RUN_STAGE == "NCBI" ]]; then 
+if [[ $RUN_STAGE == "All" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 
 	if [[ -e $TRACKING/_s1_wiki_gather ]]; then
 
@@ -143,11 +143,11 @@ if [[ $RUN_STAGE == "All" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 			' |
 		cat > ${GCF_name}.refseq.anno.txt
 		done < $INPUT_REFSEQ_URL
-	
+
 		OUTPUT_REFSEQ_ANNO="$MAIN_BASE_DIR/RefSeq_Annotation_Reports"
 		mkdir -p $OUTPUT_REFSEQ_ANNO
 		mv $MAIN_BASE_DIR/*.refseq.anno.txt $OUTPUT_REFSEQ_ANNO
-	
+
 		## Get assembly stats reports
 		while read URL
 		do
@@ -160,14 +160,14 @@ if [[ $RUN_STAGE == "All" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 			' |
 		cat > ${GCF_name}.assemblystats.txt
 		done < $INPUT_REFSEQ_URL
-	
+
 		OUTPUT_ASSEMB_STATS="$MAIN_BASE_DIR/RefSeq_Assembly_Reports"
 		mkdir -p $OUTPUT_ASSEMB_STATS
 		mv $MAIN_BASE_DIR/*.assemblystats.txt $OUTPUT_ASSEMB_STATS
 		## Output from above ^ set of files, one per RefSeq url which will need to be parsed into json format and then output as markdown.
-	
+
 		echo -e -n "${GREEN}*Finished generating NCBI resource wget commands.\n${NC}"
-	
+
 		# Generate tracking files and set run next stage
 		touch ${TRACKING}/_s2_ncbi_gather
 		RUN_STAGE="Static"
@@ -178,15 +178,15 @@ fi
 
 ## Stage three:  Run the main parser to generate static content and create ensembl-static dirs/*.md files.
 if [[ $RUN_STAGE == "All" ]] || [[ $RUN_STAGE == "Static" ]]; then
-	
+
 	if [[ -e $TRACKING/_s2_ncbi_gather ]]; then
 
 		echo -e -n "\n\n${ORANGE}*** Now running JSON to Static Parser in 5 secs.....OR - Stop here 'CTRL+C' and continue later by calling:${NC}\n \
 ---> \"perl Json_and_GCF_into_Static_MD_Parser.pl  $OUTPUT_JSONS $OUTPUT_REFSEQ_ANNO $OUTPUT_ASSEMB_STATS $INPUT_DB_LIST $INPUT_REFSEQ_URL $HOST $RELEASE\"\n"
 		sleep 5
-		
+
 		perl $ENS_MAIN_METAZOA_PROD/scripts/Json_and_GCF_into_Static_MD_Parser.pl $OUTPUT_JSONS $OUTPUT_REFSEQ_ANNO $OUTPUT_ASSEMB_STATS $INPUT_DB_LIST $INPUT_REFSEQ_URL $HOST $RELEASE 2>&1 | tee StaticContent_Gen_${RELEASE}_${HOST}.log
-		
+
 		touch ${TRACKING}/_s3_generate_markdown
 		RUN_STAGE="Image"
 	else
@@ -196,20 +196,20 @@ fi
 
 ## Stage four:  Run the Wiki image resource gathering. Locate species images for each JSON dump file from earlier
 if [[ $RUN_STAGE == "All" ]] || [[ $RUN_STAGE == "Image" ]]; then
-	
+
 	if [[ -e $TRACKING/_s3_generate_markdown ]]; then
 
 		echo -e -n "\n\n${ORANGE}*** Gathering Species image resources from wikipedia.....${NC}\n\
 		---> \"Image_resource_gather.sh $OUTPUT_JSONS\"\n\n"
 		sh ${ENS_MAIN_METAZOA_PROD}/scripts/Image_resource_gather.sh $OUTPUT_JSONS $MAIN_BASE_DIR
-		
+
 		## Now Update any static '_about.md' markdown files with the relevant image resource licenses where they exist (Input being 'Output_Image_Licenses.tsv').
 		echo -e -n "\n\n${ORANGE}*** Updating species '_about.md' static files with full image license information${NC}\n\
 		---> \"Update_image_licenses.pl $RELEASE\"\n\n"
 		# sleep 5
-		
+
 		perl $ENS_MAIN_METAZOA_PROD/scripts/Update_image_licenses.pl $RELEASE $MAIN_BASE_DIR
-	
+
 		# Generate tracking files and set run next stage
 		touch ${TRACKING}/_s4_image_retrieval
 		RUN_STAGE="WhatsNew"
@@ -222,21 +222,21 @@ fi
 if [[ $RUN_STAGE == "All" ]] || [[ $RUN_STAGE == "WhatsNew" ]]; then
 
 	if [[ -e $TRACKING/_s4_image_retrieval ]]; then
-	
+
 		echo -e -n "\n\n${ORANGE}*** Generating 'whats_new.md' file to output MD formated species content.....${NC}\n\
 		---> \"sh Generate_whatsnew_content.sh $INPUT_DB_LIST\"\n\n"
-		
+
 		sh $ENS_MAIN_METAZOA_PROD/scripts/Generate_whatsnew_content.sh $HOST $INPUT_DB_LIST 'pipe'
-		
+
 		if [[ -e $MAIN_BASE_DIR/StaticContent_MD_Output-${RELEASE} ]]; then
 			mv ${MAIN_BASE_DIR}/WhatsNewContent.md ${MAIN_BASE_DIR}/StaticContent_MD_Output-${RELEASE}/
 		else
 			mkdir -p StaticContent_MD_Output-${RELEASE}
 			mv ${MAIN_BASE_DIR}/WhatsNewContent.md ${MAIN_BASE_DIR}/StaticContent_MD_Output-${RELEASE}/
 		fi
-	
+
 		echo -e -n "\n${GREEN}* Generated generic whatsnew.md species content. MODIFY AS NEEDED!.${NC}\n"
-	
+
 		# Generate tracking files and set run next stage
 		touch ${TRACKING}/_s5_whats_new_md
 		RUN_STAGE="Tidy"
@@ -248,7 +248,7 @@ fi
 ## Tidy output / intermediate files
 if [[ $RUN_STAGE == "All" ]] || [[ $RUN_STAGE == "Tidy" ]]; then
 	echo -e -n "\n\n${ORANGE}*** Tidying up WorkDir data${NC}\n"
-	
+
 	mkdir -p ${MAIN_BASE_DIR}/Log_Outputs_and_intermediates
 	mkdir -p ${MAIN_BASE_DIR}/$RELEASE
 	STATIC_DIR="StaticContent_MD_Output-${RELEASE}"
