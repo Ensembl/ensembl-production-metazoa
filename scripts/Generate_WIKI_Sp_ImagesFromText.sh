@@ -18,6 +18,7 @@
 ## Species name(s) should be prodived as the sole input to this script inside a flat text file. Format = Apis_melifera (one sp per line)
 
 INPUT_SP=$1
+CWD=`readlink -f $PWD`
 if [ -z $INPUT_SP ]; then
 
 	echo "usage: sh Generate_WIKI_Sp_ImagesFromText.sh <Species_names_infile>"
@@ -56,7 +57,7 @@ echo "....done"
 
 # Process images using input JSON folder
 echo "Downloading species source image(s)"
-`sh Image_resource_gather.sh $WIKI_DIR 2>&1 | tee image_download.log`
+`sh Image_resource_gather.sh $WIKI_DIR $CWD 2>&1 | tee image_download.log`
 echo "....done"
 
 echo -e -n "\n\n### Log from image downloading:\n"
