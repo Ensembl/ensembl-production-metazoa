@@ -3620,7 +3620,7 @@ function get_repbase_lib () {
       perl -pe 's/[ _]+/_/g' >> $OUT_DIR/name_set.pre
 
     local name=
-    for name in $(cat $OUT_DIR/name_set.pre); do
+    for name in $(cat $OUT_DIR/name_set.pre | perl -pe 's/^\s*//; s/\s*$/\n/; s/ /_/g'); do
       local repname="$(echo $name | perl -pe 's/_/ /g' )"
       echo getting RepBase data for "'$repname'" >> /dev/stderr
       $REPUTIL -species "$repname" > $OUT_DIR/repbase.lib 2> $OUT_DIR/err.log
