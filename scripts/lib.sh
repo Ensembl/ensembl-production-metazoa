@@ -1969,7 +1969,7 @@ function set_core_random_samples () {
     fi
 
     if [ -z "$SAMPLE_GENE" ]; then
-      local RAND_GENE=$($CMD -D "$DBNAME" -N -e 'select stable_id from gene order by rand() limit 1;')
+      local RAND_GENE=$($CMD -D "$DBNAME" -N -e 'SELECT stable_id FROM gene g LEFT JOIN seq_region sr ON g.seq_region_id = sr.seq_region_id LEFT JOIN coord_system USING (coord_system_id) where g.biotype = "protein_coding" AND coord_system.name = "primary_assembly" ORDER BY RAND() LIMIT 1;')
       echo "using $RAND_GENE as sample" >> /dev/stderr
       SAMPLE_GENE="$RAND_GENE"
     fi
