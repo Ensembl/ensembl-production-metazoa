@@ -100,8 +100,8 @@ push @$optsd, "gene_id:s";
 my $opts = $cli_helper->process_args( $optsd, \&pod2usage );
 
 if ( !$opts->{user} ||
-     !$opts->{pass}          ||
-     !$opts->{host}          ||
+     !$opts->{pass} ||
+     !$opts->{host} ||
      !$opts->{port}) {
     pod2usage(1);
 }
