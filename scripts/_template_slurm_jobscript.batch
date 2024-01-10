@@ -1,0 +1,22 @@
+#!/bin/bash
+
+#Submit this script with: sbatch thefilename
+#For more details about each parameter, please check SLURM sbatch documentation https://slurm.schedmd.com/sbatch.html
+
+#SBATCH --time=24:00:00   # walltime
+#SBATCH --ntasks=1   # number of tasks
+#SBATCH --cpus-per-task=1   # number of CPUs Per Task i.e if your code is multi-threaded
+#SBATCH --nodes=1   # number of nodes
+#SBATCH -p production   # partition(s)
+#SBATCH --mem=32G   # memory per node
+#SBATCH -J "load_XXX"   # job name
+#SBATCH -o "logs/XXX.stdout"   # job output file
+#SBATCH -e "logs/XXX.stderr"   # job error file
+
+
+## LOAD MODULES, INSERT CODE, AND RUN YOUR PROGRAMS HERE
+module load libffi-3.3-gcc-9.3.0-cgokng6
+
+## JOB CMD(S):
+
+
