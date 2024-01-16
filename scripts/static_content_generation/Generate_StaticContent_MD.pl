@@ -319,8 +319,8 @@ Ensembl Metazoa displaying genes linked to the assembly with accession [$gca_acc
 Genomic assembly deposited to the INSDC by [Wellcome Sanger Institute](https://www.sanger.ac.uk/). Genome annotation performed by Ensembl as part of the
 partnership with the [Darwin Tree of Life (DToL)](https://www.darwintreeoflife.org/) project.
 
-Genome annotation was obtained for protein-coding and non-coding RNA gene structures using re-engineered versions of our Gene Annotation 
-System [Aken *et al.*](https://europepmc.org/article/MED/27337980).
+Genome annotation was obtained using re-engineered versions of our Gene Annotation System [Aken *et al.*](https://europepmc.org/article/MED/27337980) with
+refinements implemented for [non-vertebrate genomic annotation](https://rapid.ensembl.org/info/genome/genebuild/anno.html).
 
 Find more information regarding DToL and Ensembl partnership [here](https://projects.ensembl.org/darwin-tree-of-life/).
 ";
