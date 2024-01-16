@@ -2,7 +2,7 @@
 
 ## set and ENS_VERSION and MZ_RELEASE number
 ENS_VERSION= # e.g 111
-MZ_RELEASE= # e.g 58
+MZ_RELEASE=$(( ${ENS_VERSION} - 53 ))
 MAIN_BASE_DIR= #Work dir, location of base working space for loading
 SLURM_BATCH_TEMPLATE= #Template containing sbatch params used to construct `sptags_batch_#' Slurm submission batch file
 
