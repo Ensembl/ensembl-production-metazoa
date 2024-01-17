@@ -63,7 +63,7 @@ NEW_SP_ASM_FILE=NewAsmVersions.species.tmp
 
 #Check for user input of new static content folders/md files to be copied into ensembl-static repo
 if [[ -z $1 ]]; then
-	echo "Usage: sh Update_EnsStatic.sh < Path to new static content dirs> Optional: < --images + Dir of new static content images >"
+	echo "Usage: sh Automatic_Ensembl-Static_Update.sh < Path to new static content dirs> Optional: < --images + Dir of new static content images >"
 	exit 0
 else
 	echo -e -n "\n--------------Starting MD file move-------------\n\n"
