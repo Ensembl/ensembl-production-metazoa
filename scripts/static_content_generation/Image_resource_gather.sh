@@ -19,7 +19,7 @@
 ## Get file image names from Wikipedia summary ".json" files. 
 
 JSON_WIKI_DIR_USER=$1
-CWD=$2
+CWD=$PWD
 
 ##Vars for STDOUT colour formatting
 GREEN='\033[0;32m'
@@ -179,7 +179,7 @@ if [[ -e ${CWD}/Download_species_image_from_url.sh ]]; then
 	grep -e 'wget' Download_species_image_from_url.sh | awk -F" " '{print $NF}' | xargs -n 1 -I XXX mv XXX $CWD/Source_Images_wikipedia
  
 else
-	echo "${RED}WARNING: No source images were located !! Noting to do...Exiting !!${NC}"
+	echo -e -n "${RED}WARNING: No source images were located !! Noting to do...Exiting !!${NC}"
 	exit 1
 fi
 
@@ -232,12 +232,12 @@ if [[ -e ${CWD}/wiki_sp2image_NoMissing.tsv ]]; then
 	cat Output_Image_Licenses.final.tsv | sed 's/ =>//g' | sed '/^$/d' | grep -v -e "Picture credit: \[\]()" > temp_output_license.tsv
 else
 
-	echo "${ORANGE}No source images located. Nothing to do !!"
+	echo -e -n "${ORANGE}No source images located. Nothing to do !!${NC}"
 	exit 1
 
 fi
 
-echo -e -n "${GREEN}* Finished Species image download stage !!!\n\n"
+echo -e -n "${GREEN}* Finished Species image download stage !!!${NC}\n\n"
 
 exit 0
 
