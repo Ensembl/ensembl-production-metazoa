@@ -115,6 +115,12 @@ do
     echo
 done
 
+# slurm related bit
+mv ensembl-hive ensembl-hive.lsf
+ln -s ensembl-hive.lsf ensembl-hive
+git clone -b  feature/slurm_meadow --depth 1 --no-single-branch ${URL_PFX}Ensembl/ensembl-hive ensembl-hive.slurm 
+echo "Point symlink ${dir_full_path}/`ensembl-hive` to ${dir_full_path}/`ensembl-hive.slurm` if you're on SLURM" >> /dev/stderr
+
 
 
 ## Now checkout taxonomy (no release branch!)
