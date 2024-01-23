@@ -79,6 +79,10 @@ for module in \
     ensembl-tools \
     ensembl-variation \
     ensembl-vep \
+    ensembl-genes \
+    ensembl-anno \
+    ensembl-orm \
+    ensembl-killlist \
   ;
 do
     echo "Checking out $module ($branch)" >> /dev/stderr
@@ -167,6 +171,11 @@ pip3 install Cython
 
 pip3 install -e './ensembl-genomio[dev]'
 
+# gene annotation related bits
+pip3 install deepTools pyBigWig PyMySQL
+pip3 install google-auth-oauthlib pyasn1-modules
+pip3 install typing-extensions typed-ast chardet gspread
+pip3 install pytz toml py retrying
 
 echo "Adding perl deps" >> /dev/stderr
 PL_ENV_VERSION=5.26.2
@@ -224,6 +233,15 @@ echo 'export PYTHONPATH='${dir_full_path}'/ensembl-production-imported-private/l
 echo '# nextflow bit' >> $dir/setup.sh
 echo 'export NXF_HOME='${nf_dir}'/dot.nextflow' >> $dir/setup.sh
 echo 'PATH='${nf_dir}':$PATH' >> $dir/setup.sh
+
+echo '# gene annotation related bit' >>  $dir/setup.sh
+echo 'PERL5LIB='${dir_full_path}'/ensembl-genes/lib:$PERL5LIB' >> $dir/setup.sh
+echo 'PATH='${dir_full_path}'/ensembl-genes/bin:$PATH' >> $dir/setup.sh
+echo 'PERL5LIB='${dir_full_path}'/ensembl-killlist/modules:$PERL5LIB' >> $dir/setup.sh
+echo 'PATH='${dir_full_path}'/ensembl-killlist/bin:$PATH' >> $dir/setup.sh
+echo 'PERL5LIB='${dir_full_path}'/ensembl-orm/modules:$PERL5LIB' >> $dir/setup.sh
+echo 'PATH='${dir_full_path}'/ensembl-orm/bin:$PATH' >> $dir/setup.sh
+echo 'export ENSCODE=$ENSEMBL_ROOT_DIR' >> $dir/setup.sh
 
 echo 'export PERL5LIB ENSEMBL_ROOT_DIR ENSEMBL_CVS_ROOT_DIR PYTHONPATH PATH' >> $dir/setup.sh
 
