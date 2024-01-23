@@ -175,7 +175,7 @@ python3.9 -m venv venv
 source venv/bin/activate
 pip3 install Cython
 
-pip3 install -e './ensembl-genomio[dev]'
+pip3 install -e './ensembl-genomio[cicd]'
 
 # gene annotation related bits
 pip3 install deepTools pyBigWig PyMySQL
