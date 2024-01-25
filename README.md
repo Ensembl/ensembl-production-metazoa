@@ -65,7 +65,36 @@ cat sptags | grep -vF '#' | head -n 3 |
 #        restore pre_final_dc finalise
 #      (see docs/mz_generic_params.md for the full list)
 ```
-  In this case you'll have to use `tail -f logs/*.stderr` or any other way to peek into logs.
+
+If running on SLURM make sure that `ensembl.prod.${ENS_VERSION}/ensembl-hive` point to the SLURM version:
+```
+pushd ensembl.prod.${ENS_VERSION}/ensembl-hive
+ln -s ensembl-hive.slurm ensembl-hive
+popd
+```
+(don't forget to switch back to the LSF version `ensembl-hive.lsf` if you need to)
+
+and seed your runs like this
+```
+SLURM_QUEUE=<slurm_partition_name>
+
+cat sptags | grep -vF '#' | head -n 3 |
+  xargs -n 1 echo |
+  xargs -n 1 -I XXX -- sh -c \
+    "sleep 1; \
+     echo XXX; \
+     sbatch -J load_XXX \
+          --time=168:00:00 \
+          -p '$SLURM_QUEUE' --mem 32G \
+          --nodes=1 --ntasks=1 --cpus-per-task=1 \
+          -o logs/XXX.stdout -e logs/XXX.stderr \
+          --wrap='flock -n locks/XXX \
+            ./ensembl-production-metazoa/scripts/mz_generic.sh ${METACONF_DIR}/XXX pre_final_dc'; \
+     sleep 7200"
+```
+
+
+  If starting your runs like this you'll have to use `tail -f logs/*.stderr` or any other way to peek into logs.
 
   Instead of setting each environment variable to configure `mz_generic.sh` run,
    you can either create a copy and edit [`conf/_mz.conf`](conf/_mz.conf) specifying each parameter,
