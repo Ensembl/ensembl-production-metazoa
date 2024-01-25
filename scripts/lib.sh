@@ -111,7 +111,11 @@ function get_ensembl_prod () {
 #      perl -pe 's/^/#/ if m,/bioperl/stable,; s,bioperl/run-stable,bioperl/ensembl-stable,' > "$BASE"/tmp
 #    mv "$BASE"/tmp "$BASE"/setup.sh
 
-    touch $BASE/_CAN_USE
+    # patching production default class mem usage
+    perl -i -pe "s/100M/2GB/ if m/\\\$memory\{'100M'\}/" \
+        "$BASE"/ensembl-production/modules/Bio/EnsEMBL/Production/Pipeline/PipeConfig/Base_conf.pm
+
+    touch "$BASE"/_CAN_USE
   fi
 
   source $BASE/setup.sh
