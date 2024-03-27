@@ -60,7 +60,7 @@ assembly.accession	GCA_006496715.1
 # Provider metadata
 #CONF	GFF3_LOAD_SOURCE_NAME	RefSeq
 
-assembly.provider_name	Ministero dell'istruzione, dell'università e della ricerca
+assembly.provider_name	The Ministry of University and Research (MUR)
 assembly.provider_url	https://www.mur.gov.it/it
 
 annotation.provider_name	NCBI
