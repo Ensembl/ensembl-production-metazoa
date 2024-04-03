@@ -86,6 +86,11 @@ I.e.
 `GFF_STATS_CONF` | /abs/path/valid_structures.conf | `str:` empty, `abs path`, `rel path`(to [conf](https://github.com/Ensembl/ensembl-genomio/blob/master/config/gff_metaparser) ) | Sets [gff_stats.py](https://github.com/Ensembl/ensembl-genomio/blob/master/scripts/gff_metaparser/gff_stats.py) `--conf ` option | [`valid_structures.conf`](https://github.com/Ensembl/ensembl-genomio/blob/master/config/gff_metaparser/valid_structures.conf) is used by default
 `GFF_STATS_OPTIONS`| --rule_options flybase | `str:` `options string` | Used as options passed to  [gff_stats.py](https://github.com/Ensembl/ensembl-genomio/blob/master/scripts/gff_metaparser/gff_stats.py) |
 
+#### GFF3 filtering out CDS with missing IDs (`prepare_metada` [wrapper](scripts/lib.sh)) options
+| Option | Example | Type: possible values | Action | Comment|
+| - | - | - | -  | - |
+`FIX_MISSING_CDS_ID`| `NO` | `str:` `NO | <anything_else>` | If set to `NO`, disables creation of missing CDS `ID` with one derived from the `parentID` | Can leave gff3 with no coding genes, as CDSs without IDs or those with the same ID but sharing different scaffolds are filtered out by [cds_sr_filter.py](scripts/cds_sr_filter.py)
+`IGNORE_LOST_FILTERED_CD`| `NO` | `str:` `NO | <anything_else>` | If anything but `NO` will fail if the number of the original CDS features (parts) is not the same at that number after filtration with [cds_sr_filter.py](scripts/cds_sr_filter.py)
 
 #### Prepare simplified GFF3 and JSON ([gff3_meta_parse.py](https://github.com/Ensembl/ensembl-genomio/blob/master/scripts/gff_metaparser/gff3_meta_parse.py)) options
 | Option | Example | Type: possible values | Action | Comment|

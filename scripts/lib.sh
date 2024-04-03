@@ -81,7 +81,7 @@ function get_ensembl_prod () {
     pushd $BASE
     "$CHECKOUT_SCRIPT" "$CREATE_SETUP_SCRIPT" .
 
-    [ -f '_FAILED' ] && echo "setting up '$BASE' env failed..." >> /dev/stderr  && return 1 
+    [ -f '_FAILED' ] && echo "setting up '$BASE' env failed..." >> /dev/stderr  && return 1
 
     for d in  $(find * -maxdepth 0 -type d); do
       echo $d
@@ -3352,9 +3352,44 @@ function prepare_metada () {
           > $OUT_DIR/gff3_meta_parse.stdout 2> $OUT_DIR/gff3_meta_parse.stderr
 
       # remove CDS ID duplicates not from the first scaffold met
+      # (no CDS with duplicated IDs are allowed on different contigs/scaffolds)
+      #   count original CDSs
+      local cds_before_filter=$(cat $OUT_DIR/pre_models.gff3 | awk -F "\t" '$3 == "CDS"' | wc -l)
+      local cds_with_ids=$(cat $OUT_DIR/pre_models.gff3 | awk -F "\t" '$3 == "CDS" && $9 ~ /(^|;)ID=/' | wc -l)
+      local FIX_MISSING_CDS_ID=$(get_meta_conf $META_RAW 'FIX_MISSING_CDS_ID')
+      echo "$OUT_DIR/pre_models.gff3 have " \
+          $(($cds_before_filter - $cds_with_ids)) \
+          " CDSs without IDs (out of $cds_before_filter)..." >> /dev/stderr
+      if [ "$cds_before_filter" -ne "$cds_with_ids" ]; then
+        if [ "x$FIX_MISSING_CDS_ID" != "xNO" ]; then
+          echo "trying to fix CDs with missing IDs" >> /dev/stderr
+          mv $OUT_DIR/pre_models.gff3 $OUT_DIR/pre_models.gff3.orig
+          cat $OUT_DIR/pre_models.gff3.orig |
+            perl -pe '
+                my @f=split /\t/;
+                s/Parent=([^;\r\n]+)(?:;|$)/Parent=$1;ID=cds:$1/ if ($f[2] =~ m/^CDS$/i && $f[8] !~ m/(^|;)ID=/i);
+              ' > $OUT_DIR/pre_models.gff3
+        else
+          echo "Not trying to fix CDs with missing IDs" >> /dev/stderr
+        fi
+      fi
+      #   filter
       cat $OUT_DIR/pre_models.gff3 |
         python3 $SCRIPTS/ensembl-production-metazoa/scripts/cds_sr_filter.py \
         > $OUT_DIR/pre_models.cds_sr_filtered.gff3
+      #   check that there are any CDS left and the drop is not critical
+      local cds_after_filter=$(cat $OUT_DIR/pre_models.cds_sr_filtered.gff3 | awk -F "\t" '$3 == "CDS"' | wc -l)
+      if [ "$cds_before_filter" -ne "$cds_after_filter" ]; then
+        echo "CDS counts before filter: $cds_before_filter and after: $cds_after_filter are different" >> /dev/stderr
+        local IGNORE_LOST_FILTERED_CDS=$(get_meta_conf $META_RAW 'IGNORE_LOST_FILTERED_CDS')
+        if [ -n "$IGNORE_LOST_FILTERED_CDS" -a "x$IGNORE_LOST_FILTERED_CDS" != "xNO" ]; then
+          echo "failing..." >> /dev/stderr
+          false
+          exit 0
+        else
+           echo "IGNORE_LOST_FILTERED_CDS set to $IGNORE_LOST_FILTERED_CDS. going on..." >> /dev/stderr
+        fi
+      fi
 
       # tidy and validate models gff3
       gt gff3 -tidy -sort -retainids $OUT_DIR/pre_models.cds_sr_filtered.gff3 \
