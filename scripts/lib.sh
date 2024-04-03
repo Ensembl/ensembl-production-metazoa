@@ -3383,11 +3383,11 @@ function prepare_metada () {
         echo "CDS counts before filter: $cds_before_filter and after: $cds_after_filter are different" >> /dev/stderr
         local IGNORE_LOST_FILTERED_CDS=$(get_meta_conf $META_RAW 'IGNORE_LOST_FILTERED_CDS')
         if [ -n "$IGNORE_LOST_FILTERED_CDS" -a "x$IGNORE_LOST_FILTERED_CDS" != "xNO" ]; then
+          echo "IGNORE_LOST_FILTERED_CDS set to $IGNORE_LOST_FILTERED_CDS. going on..." >> /dev/stderr
+        else
           echo "failing..." >> /dev/stderr
           false
           exit 0
-        else
-           echo "IGNORE_LOST_FILTERED_CDS set to $IGNORE_LOST_FILTERED_CDS. going on..." >> /dev/stderr
         fi
       fi
 
