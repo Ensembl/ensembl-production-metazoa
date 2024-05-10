@@ -16,6 +16,7 @@
 genome loading meta config file."""
 
 __all__ = [
+    "check_ncbi_url",
     "download_taxonomy",
     "dump_loading_metadata_to_tsv",
     "get_genome_loading_metadata",
@@ -31,6 +32,7 @@ from pathlib import Path
 from os import PathLike
 from collections import Counter
 
+import requests
 from spython.main import Client
 from sqlalchemy.engine import URL
 
@@ -65,6 +67,26 @@ class LoadingMetaData(dict):
         )
 
 
+def check_ncbi_url(url: str) -> bool:
+    """Checks the urls passed are live and link to active sites.
+
+    Args:
+        url: URL to be checked via requests.get
+
+    Returns:
+        True or False if URL is active and live.
+    """
+
+    try:
+        url_get = requests.get(url)
+        if url_get.status_code == 200:
+            return True
+        else:
+            return False
+    except requests.exceptions.RequestException as error:
+        raise SystemExit(f"{url}: is Not reachable \nErr: {error}")
+
+
 def get_genome_loading_metadata(
     assembly_reports: Dict[str, dict], datasets_image: Client
 ) -> Dict[str, LoadingMetaData]:
@@ -88,6 +110,7 @@ def get_genome_loading_metadata(
         )
 
         asm_meta_info = LoadingMetaData()
+        assembly_provider_base_url = "https://www.ncbi.nlm.nih.gov/datasets/genome/"
 
         scientific_name = asm_report["organism"]["organism_name"]
         asm_meta_info["_SCIENTIFIC_NAME_NOT_USED_"] = scientific_name
@@ -100,7 +123,8 @@ def get_genome_loading_metadata(
         all_abbrevs.append(abbrev)
 
         # Assembly name and FTP URL:
-        asm_name = asm_report["assembly_info"]["assembly_name"]
+        tmp_name = asm_report["assembly_info"]["assembly_name"]
+        assembly_name = tmp_name.replace(" ", "_")
         accession = asm_report["accession"]
         asm_meta_info["_GENBANK_ACCESSION_"] = accession
         first_digits = "".join(accession[4:7])
@@ -108,20 +132,38 @@ def get_genome_loading_metadata(
         third_digits = "".join(accession[10:13])
         base_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF"
         # Generate FTP url from accession:
-        ftp_url = f"{base_url}/{first_digits}/{second_digits}/{third_digits}/{accession}_{asm_name}"
-        asm_meta_info["_REFSEQ_FTP_URL_"] = ftp_url
+        ftp_url = f"{base_url}/{first_digits}/{second_digits}/{third_digits}/{accession}_{assembly_name}"
+        if check_ncbi_url(ftp_url):
+            asm_meta_info["_REFSEQ_FTP_URL_"] = ftp_url
+        else:
+            logging.warning(
+                f'WARNING: RefSeq FTP URL "{ftp_url}" test connection failed.'
+            )
 
         # Annotation meta:
-        asm_meta_info["_REFSEQ_ANN_REPORT_URL_"] = asm_report["annotation_info"][
-            "report_url"
-        ]
+        annotation_provider_url = asm_report["annotation_info"]["report_url"]
+        if check_ncbi_url(annotation_provider_url):
+            asm_meta_info["_REFSEQ_ANN_REPORT_URL_"] = annotation_provider_url
+        else:
+            logging.warning(
+                f'WARNING: Annotation provider URL "{annotation_provider_url}" test connection failed.'
+            )
+
         raw_anno_name = asm_report["annotation_info"]["name"]
         asm_meta_info[
             "_REFSEQ_ANN_NAME_"
         ] = f"NCBI {scientific_name} Annotation Release {raw_anno_name}"
 
         # Assembly provider meta:
+        assembly_provider_url = assembly_provider_base_url + accession + "/"
+        if check_ncbi_url(assembly_provider_url):
+            asm_meta_info["_ASSEMBLY_PROVIDER_URL_"] = assembly_provider_url
+        else:
+            logging.warning(
+                f'Warning: Assembly provider URL "{assembly_provider_url}" test connection failed.'
+            )
         assembly_provider = asm_report["assembly_info"]["biosample"]["owner"]["name"]
+
         if assembly_provider is None or assembly_provider == "None":
             logging.warning(
                 f"Unable to parse assembly assembly_provider for {query_accession} undefined or set to 'None'"
@@ -196,7 +238,7 @@ def dump_loading_metadata_to_tsv(
 
 
 def download_taxonomy(sif_image: Client, taxon_id: int, taxon_level: str) -> str:
-    """Obtain the corresponding linnaean information from a taxon ID using 
+    """Obtain the corresponding linnaean information from a taxon ID using
     datasets cli to populate a species taxonomy meta info.
 
     Args:
