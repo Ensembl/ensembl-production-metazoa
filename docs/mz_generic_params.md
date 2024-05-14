@@ -34,7 +34,7 @@ You can use either:
 
 I.e.
 ```
-./ensembl-production-metazoa/scripts/mz_generic.sh ./ensembl-production-metazoa/meta/104/dmel
+./ensembl-production-metazoa/scripts/mz_generic.sh ./ensembl-production-metazoa/meta/109_for_110/dmel
 ```
 
 Though, you can use "help" and "env_setup_only" (see below) options instead of meta-file path on their own
