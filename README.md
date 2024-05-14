@@ -14,7 +14,7 @@ Simple actions:
 ```
   ENS_VERSION=105
   mkdir -p ensembl-production-metazoa/meta/$ENS_VERSION
-  cp ensembl-production-metazoa/meta/104/dmel ensembl-production-metazoa/meta/$ENS_VERSION
+  cp ensembl-production-metazoa/meta/109_for_110/dmel ensembl-production-metazoa/meta/$ENS_VERSION
   # edit ensembl-production-metazoa/meta/$ENS_VERSION/dmel if needed
 ```
 3. Choose/create path for data
@@ -128,7 +128,7 @@ cat sptags | grep -vF '#' | head -n 3 |
   Now you can rerun the initial (without `restore`) build command once again.
 
 8. Sometimes the script stops as planned.
-In this case edit the raw metadata file by updating stats and metadata generation options (!N.B. tab separated lines, see below for details). I.e. for ensembl-production-metazoa/meta/105/dmel:
+In this case edit the raw metadata file by updating stats and metadata generation options (!N.B. tab separated lines, see below for details). I.e. for ensembl-production-metazoa/meta/109_for_110/dmel:
 ```
 # stats and metadata generation options
 #CONF   IGNORE_UNVALID_SOURCE_GFF       1
@@ -157,8 +157,8 @@ assembly.provider_url   https://www.flybase.org
 ```
 . I.e.
 ```
-#CONF   ASM_URL ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r6.37_FB2020_01
-#CONF   FNA_FILE        fasta/dmel-all-chromosome-r6.37.fasta.gz
+#CONF	ASM_URL	ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r6.46_FB2022_03
+#CONF	FNA_FILE	fasta/dmel-all-chromosome-r6.46.fasta.gz
 ```
 * Anything else having a `#` sign is a comment (pay attention to the strain names, etc., as no quotation is implemented). I.e. `# CONF` is not longer a technical data, and thus ignored.
 
