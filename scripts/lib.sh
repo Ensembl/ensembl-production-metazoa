@@ -3159,7 +3159,7 @@ function conf_from_refseq_url () {
   local META_RAW="$1"
 
   local ASM_URL=$(get_meta_conf $META_RAW ASM_URL)
-  local REFSEQ_NAME=$(echo "$ASM_URL" | grep 'ftp.ncbi.nlm.nih.gov/genomes/all/GC' | perl -ne 'print $1 if m,/([^/]+)\s*$,')
+  local REFSEQ_NAME=$(echo "$ASM_URL" | grep 'ftp.ncbi.nlm.nih.gov/genomes/all/GC' |perl -ne 'print $1 if m,/([^/]+)/*\s*$,')
   if [ -z "$REFSEQ_NAME" ]; then
     return
   fi
