@@ -32,11 +32,12 @@ function gen_wiki_url (){
 	local SCI_NAME=$1
 	local OUT_DIR=$2
 
-	FORMAT_SCI_NAME=`echo $SCI_NAME | sed 's/_/%20/'`;
+	FORMAT_SCI_NAME=`echo $SCI_NAME | sed 's/_/%20/' | sed 's/(/%28/' | sed 's/)/%29/'`;
+        FORMAT_FILE_NAME=`echo $SCI_NAME | sed 's/ /_/' | tr -dc '[:alnum:]\n\r'`
 	echo -e -ne "Downloading Wikipedia information (JSON) on species: $SCI_NAME\n"
 
 	echo $SCI_NAME | xargs -n 1 -I XXX echo "https://en.wikipedia.org/wiki/XXX" >> Wikipedia_URL_listed.check.txt
-	echo "wget -qq --header='accept: application/json; charset=utf-8' --header 'Accept-Language: en-en' 'https://en.wikipedia.org/api/rest_v1/page/summary/${FORMAT_SCI_NAME}?redirect=true' -O ${OUT_DIR}/${SCI_NAME}.wiki.json" >> download_Wiki_JSON_Summary.sh
+	echo "wget -qq --header='accept: application/json; charset=utf-8' --header 'Accept-Language: en-en' 'https://en.wikipedia.org/api/rest_v1/page/summary/${FORMAT_SCI_NAME}?redirect=true' -O ${OUT_DIR}/${FORMAT_FILE_NAME}.wiki.json" >> download_Wiki_JSON_Summary.sh
 }
 
 # Generate the WIikipedia JSON download script and download JSON file per species.
@@ -47,7 +48,7 @@ rm -f ./download_Wiki_JSON_Summary.sh
 
 while read SPECIES
 do
-gen_wiki_url $SPECIES $WIKI_DIR
+gen_wiki_url "$SPECIES" $WIKI_DIR
 done < $INPUT_FILE
 cd ..
 
