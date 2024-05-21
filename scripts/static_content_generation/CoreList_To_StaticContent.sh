@@ -26,8 +26,8 @@ STAGE_LOG="_static_stages_done_${RELEASE}"
 OUTPUT_NCBI="$CWD/NCBI_DATASETS"
 WIKI_OUTPUT_JSONS="$CWD/WIKI_JSON_OUT"
 ENS_PRODUCTION_METAZOA="$CWD/ensembl-production-metazoa"
-DATASETS_SING_IMAGE="library://lcampbell/ensembl-genomio/ncbi-datasets-v16.12.1:latest" #SyLabs hosted image, contact lcampbell@ebi.ac.uk for further details 
-DATASETS_SINGULARITY="$NXF_SINGULARITY_CACHEDIR/ncbi-datasets-v16.12.1:latest.sif"
+DATASETS_SING_IMAGE="library://lcampbell/ensembl-genomio/ncbi-datasets-v16.17.1:latest" #SyLabs hosted image, contact lcampbell@ebi.ac.uk for further details 
+DATASETS_SINGULARITY="$NXF_SINGULARITY_CACHEDIR/ncbi-datasets-v16.17.1:latest.sif"
 
 if [[ -d ${ENS_PRODUCTION_METAZOA} ]]; then
 	STATIC_BASE_DIR="${ENS_PRODUCTION_METAZOA}/scripts/static_content_generation"
