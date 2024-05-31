@@ -26,8 +26,8 @@ STAGE_LOG="_static_stages_done_${RELEASE}"
 OUTPUT_NCBI="$CWD/NCBI_DATASETS"
 WIKI_OUTPUT_JSONS="$CWD/WIKI_JSON_OUT"
 ENS_PRODUCTION_METAZOA="$CWD/ensembl-production-metazoa"
-DATASETS_SING_IMAGE="library://lcampbell/ensembl-genomio/ncbi-datasets-v16.0:latest" #SyLabs hosted image, contact lcampbell@ebi.ac.uk for further details 
-DATASETS_SINGULARITY="$CWD/ncbi-datasets-v16.0_latest.sif"
+DATASETS_SING_IMAGE="library://lcampbell/ensembl-genomio/ncbi-datasets-v16.17.1:latest" #SyLabs hosted image, contact lcampbell@ebi.ac.uk for further details 
+DATASETS_SINGULARITY="$NXF_SINGULARITY_CACHEDIR/ncbi-datasets-v16.17.1:latest.sif"
 
 if [[ -d ${ENS_PRODUCTION_METAZOA} ]]; then
 	STATIC_BASE_DIR="${ENS_PRODUCTION_METAZOA}/scripts/static_content_generation"
@@ -59,7 +59,7 @@ fi
 if [[ -z $INPUT_DB_LIST ]] || [[ -z $HOST ]] || [[ -z $RELEASE ]] || [[ -z $STATIC_BASE_DIR ]]; then
  	echo "Usage: sh CoreList_To_StaticContent.sh Template"
  	echo -e -n "\tOR\n"
- 	echo "Usage: sh CoreList_To_StaticContent.sh <RunStage: All, Wiki, NCBI, Static, Image, WhatsNew, Tidy> <INPUT_DB_LIST> <MYSQL_HOST_SERVER> <Unique_Run_Identifier>"
+ 	echo "Usage: sh CoreList_To_StaticContent.sh <RunStage: All, Wiki, NCBI, Static, Image, LicenseUsage, WhatsNew, Tidy> <INPUT_DB_LIST> <MYSQL_HOST_SERVER> <Unique_Run_Identifier>"
  	exit 0
 fi
 
@@ -130,7 +130,7 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 
 			singularity pull --arch amd64 $DATASETS_SING_IMAGE
 
-			if [[ -f $DATASETS_SINGULARITY ]]; then echo -e -n "\nNCBI-datasets Singualrity image downloaded !"; ls -l $DATASETS_SINGULARITY; fi
+			if [[ -f $CWD/$DATASETS_SING_IMAGE ]]; then echo -e -n "\nNCBI-datasets Singualrity image downloaded !"; ls -l $CWD/$DATASETS_SING_IMAGE; fi
 
 		else
 			echo -e -n "\n\nSingularity doens't appear to be installed. Please verify installation...Exiting\n"
@@ -228,8 +228,8 @@ fi
 if [[ -f $CWD/$STAGE_LOG ]]; then
 	STAGE=`grep -e "image_resources" $CWD/$STAGE_LOG`
 	if [[ $STAGE ]];then
-		echo "## Image resource stage already Done! Moving to whats_new MD generation."
-		RUN_STAGE="WHATSNEW"
+		echo "## Image resource stage already Done! Moving to update image usage licensing (_about.md files)."
+		RUN_STAGE="LICENSEUSAGE"
 	fi
 fi
 
@@ -238,18 +238,34 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "IMAGE" ]]; then
 	echo -e -n "\n\n*** Attempting to gather Species Image Resources from wikipedia.....\n---> \"sh Image_resource_gather.sh $WIKI_OUTPUT_JSONS\"\n\n"
 	sh $STATIC_BASE_DIR/Image_resource_gather.sh $WIKI_OUTPUT_JSONS
 	
+	# Update stage log 
+	echo "image_resources" >> $CWD/$STAGE_LOG
+	RUN_STAGE="LICENSEUSAGE"
+fi
+
+### Run the Wiki image usage license update.
+if [[ -f $CWD/$STAGE_LOG ]]; then
+	STAGE=`grep -e "usage_lisence" $CWD/$STAGE_LOG`
+	if [[ $STAGE ]];then
+		echo "## Image licensing already updated, moving to generation of Whats_New MD content"
+		RUN_STAGE="WHATSNEW"
+	fi
+fi
+
+if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "LICENSEUSAGE" ]]; then
+
 	## Now Update any static '_about.md' markdown files with the relevant image resource licenses where they exist (Input being 'Output_Image_Licenses.tsv').
-	echo -e -n "\n\n*** Updating species '_about.md' static files with full image licenses in 5 secs.....\nOR - Stop here 'CTRL+C' and continue later by calling:\n\n\"perl ./Update_image_licenses.pl $RELEASE\"\n\n"
+	echo -e -n "\n\n*** Attempting update of species '_about.md' static image usage licenses in 5 secs.....\nOR - Stop here 'CTRL+C' and continue later by calling:\n\n\"perl ./Update_image_licenses.pl $RELEASE $CWD\"\n\n"
 	sleep 5
 	
 	perl $STATIC_BASE_DIR/Update_image_licenses.pl $RELEASE $CWD
 
 	# Update stage log 
-	echo "image_resources" >> $CWD/$STAGE_LOG
+	echo "usage_lisence" >> $CWD/$STAGE_LOG
 	RUN_STAGE="WHATSNEW"
 fi
 
-### Run stage to generate whats_new.md file 
+### Run generation of whats_new MD file
 if [[ -f $CWD/$STAGE_LOG ]]; then
 	STAGE=`grep -e "whats_new_MD" $CWD/$STAGE_LOG`
 	if [[ $STAGE ]];then

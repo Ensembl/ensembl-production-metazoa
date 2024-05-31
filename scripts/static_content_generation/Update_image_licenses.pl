@@ -49,7 +49,9 @@ while (<INFILE>){
     $binomial_sp = ucfirst($binomial_sp);    
 
     # Gather paths+files for new and original '_about' MD files
-    my $MD_about_file = $CWD."/".$release_dir."/$binomial_sp/${sp_name}_about.md";
+    my $dir_name = `find ./$release_dir -type d -name "$binomial_sp*" | awk -F "/" {'print \$NF'}`;
+    chomp $dir_name;
+    my $MD_about_file = $CWD."/".$release_dir."/${dir_name}/${sp_name}_about.md";
     my $MD_about_file_old = "${MD_about_file}.old";
     system("mv $MD_about_file $MD_about_file_old");
 

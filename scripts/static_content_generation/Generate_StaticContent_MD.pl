@@ -76,7 +76,7 @@ foreach my $genome_sum_file (@input_genome_reports){
 	my @temp_split_sp_name = split ("_", $species_name);
 
 	#Check whether or not the species name is bionomial or trinomial
-	if ((scalar @temp_split_sp_name == 3 ) && ($temp_split_sp_name[1] eq $temp_split_sp_name[2])){
+	if ((scalar @temp_split_sp_name == 3 )){
 		print YELLOW "!!! Found trinomial species name instance !!!! \"$species_name\" --> Utilizing just the bionomial: ";
 		$species_name = "$temp_split_sp_name[0]_$temp_split_sp_name[1]";
 		print "\"$species_name\"\n";
@@ -138,17 +138,17 @@ foreach my $genome_sum_file (@input_genome_reports){
 
 	$asseb_accession = `jq '.accession' $genome_sum_file | sed 's/"//g'`;
 	chomp $asseb_accession;
-    $gca_accession = $asseb_accession;
-    $gca_accession =~ s/GCF_/GCA_/;
-    $gca_accession_escape = $gca_accession;
-    $gca_accession_escape =~ s/GCA_/GCA\\_/;
+    	$gca_accession = $asseb_accession;
+    	$gca_accession =~ s/GCF_/GCA_/;
+    	$gca_accession_escape = $gca_accession;
+    	$gca_accession_escape =~ s/GCA_/GCA\\_/;
 	chomp $gca_accession_escape;
 
-    $core_prodname = $gca_accession;
-    $core_prodname =~ s/GCA_/gca/;
-    $core_prodname =~ s/\.[0-9]$//;
-    chomp $core_prodname;
-    $core_prodname = "${species_name}_${core_prodname}";
+    	$core_prodname = $gca_accession;
+    	$core_prodname =~ s/GCA_/gca/;
+    	$core_prodname =~ s/\.[0-9]$//;
+    	chomp $core_prodname;
+    	$core_prodname = "${species_name}_${core_prodname}";
 
 	#Initial attempt to locate the correct core DB.
 	my $species_core = `grep -e "^${core_prodname}" < $species_cores_listed\n`;
