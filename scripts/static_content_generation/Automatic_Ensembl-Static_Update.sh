@@ -29,14 +29,45 @@ NC='\033[0m' # No Color
 
 # Run vars
 REPO="ensembl-static"
-RELEASE=$1
-FOR_REPO_URL=$2
+# Input variables
+STATIC_MD_DIR=$1
+RELEASE=$2
+FORK_REPO_URL=$3
+TMP_DIVISION=$4
+STATIC_FLAG=$5
+STATIC_IMAGES_DIR=$6
 
-if [[ -z $RELEASE ]] || [[ -z $FORK_REPO_URL ]]; then
+# #Check for user input of new static content folders/md files to be copied into ensembl-static repo
+if [[ -z $STATIC_MD_DIR ]] || [[ -z $RELEASE ]] || [[ -z $FORK_REPO_URL ]]; then
 
-	echo "Usage: sh Automatic_Ensembl-Static_Update.sh <RELEASE> <FOR_REPO_URL>"
-	echo "e.g. Automatic_Ensembl-Static_Update.sh release/eg/60 git@github.com:GIT-USER-NAME/ensembl-static.git"
+	echo "Usage: sh Automatic_Ensembl-Static_Update.sh < Path to new static content dirs> <RELEASE> <FOR_REPO_URL> <Division> Optional param: '--images' + Path to static content image dir>"
+	echo "e.g. Automatic_Ensembl-Static_Update.sh StaticContent_MD/ release/eg/60 git@github.com:GIT-USER-NAME/ensembl-static.git metazoa "
+	echo "e.g. Automatic_Ensembl-Static_Update.sh StaticContent_MD/ release/eg/60 git@github.com:GIT-USER-NAME/ensembl-static.git metazoa --images SourceImages/"
 	exit 0
+else
+	TEMP_STATIC_IN=`readlink -f $STATIC_MD_DIR`
+	NEW_STATIC_CONTENT="${TEMP_STATIC_IN}/"
+	echo -e -n "\n--------------Starting static MD file move-------------\n\n"
+fi
+
+# Image directory provided ?
+if [[ -e $STATIC_IMAGES_DIR ]]; then
+	NEW_STATIC_IMAGES=`readlink -f $STATIC_IMAGES_DIR` 
+fi
+
+# Ensembl Division set ?
+if [[ -z $TMP_DIVISION ]]; then
+	echo "Ensembl divsion is not set. Please set from: 'bacteria', 'fungi', 'metazoa', 'plants', 'protists')"
+	exit 0
+else
+	DIVISION=$TMP_DIVISION
+fi
+
+# Check on static image param
+if [[ $STATIC_FLAG == '--images' ]]; then
+	STATIC_ONLY=$STATIC_FLAG
+else
+	unset $STATIC_ONLY
 fi
 
 CWD=`readlink -f $PWD`
@@ -54,7 +85,7 @@ else
     cd ../
 fi
 
-DIVISION="metazoa"
+
 STATIC_REPO="${CWD}/$REPO/$DIVISION/species"
 IMAGE_REPO="${CWD}/$REPO/$DIVISION/images/species"
 
@@ -67,20 +98,6 @@ PREXISTING_SP_COUNTER=0
 PREXISTING_SP_FILE=Preexisting.species.tmp
 NEW_SP_ASM_COUNTER=0
 NEW_SP_ASM_FILE=NewAsmVersions.species.tmp
-
-#Check for user input of new static content folders/md files to be copied into ensembl-static repo
-if [[ -z $1 ]]; then
-	echo "Usage: sh Automatic_Ensembl-Static_Update.sh < Path to new static content dirs> Optional: < --images + Dir of new static content images >"
-	exit 0
-else
-	echo -e -n "\n--------------Starting MD file move-------------\n\n"
-fi
-
-# Input variables
-TEMP_STATIC_IN=`readlink -f $1`
-NEW_STATIC_CONTENT="${TEMP_STATIC_IN}/"
-STATIC_ONLY=$2
-NEW_STATIC_IMAGES=`readlink -f $3`
 
 find $NEW_STATIC_CONTENT -type d | awk -F "/" {'print $NF'} | cut -f1 -d "_" | sed 's/\.\///g' | sort | uniq > ${NEW_STATIC_CONTENT}/Genus_list.txt
 sed -i '/^\s*$/d' ${NEW_STATIC_CONTENT}/Genus_list.txt
@@ -185,7 +202,7 @@ done < ${NEW_STATIC_CONTENT}/Genus_list.txt
 echo -e -n "\n^-^-^-^-^-^ Done processing MD files ^-^-^-^-^-^\n\n"
 
 # Now we check for Source images and move accordingly
-if [[ $STATIC_ONLY == "--images" ]] && [[ -e $NEW_STATIC_IMAGES ]]; then
+if [[ $STATIC_ONLY == "--images" ]] && [[ $NEW_STATIC_IMAGES ]]; then
 
 	echo -e -n "-------------- Starting Images processing ensembl-static/$DIVISION/images/species -------------\n"
 	cd $NEW_STATIC_IMAGES
@@ -244,4 +261,5 @@ rm ${NEW_STATIC_CONTENT}/Species_List.txt
 rm ${NEW_STATIC_CONTENT}/*.tmp
 
 exit 0
+
 
