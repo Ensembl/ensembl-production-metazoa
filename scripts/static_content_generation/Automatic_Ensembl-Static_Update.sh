@@ -28,9 +28,16 @@ ORANGE='\033[0;33m'
 NC='\033[0m' # No Color
 
 # Run vars
-BRANCH="release/eg/58"
 REPO="ensembl-static"
-REPO_URL="git@github.com:ens-LCampbell/ensembl-static.git"
+RELEASE=$1
+FOR_REPO_URL=$2
+
+if [[ -z $RELEASE ]] || [[ -z $FORK_REPO_URL ]]; then
+
+	echo "Usage: sh Automatic_Ensembl-Static_Update.sh <RELEASE> <FOR_REPO_URL>"
+	echo "e.g. Automatic_Ensembl-Static_Update.sh release/eg/60 git@github.com:GIT-USER-NAME/ensembl-static.git"
+	exit 0
+fi
 
 CWD=`readlink -f $PWD`
 
@@ -41,7 +48,7 @@ if [[ -e $CWD/ensembl-static ]]; then
     cd ../
 else
 	echo "cloning ensembl-static now..."
-	git clone -b $BRANCH --depth 1 $REPO_URL
+	git clone -b $RELEASE --depth 1 $FORK_REPO_URL
 	cd $CWD/ensembl-static
     git branch
     cd ../
