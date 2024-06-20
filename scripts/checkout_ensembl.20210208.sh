@@ -188,6 +188,7 @@ PL_ENV_VERSION=5.26.2
 plenv local ${PL_ENV_VERSION}
 mkdir -p ${dir}/perl5
 cpanm --local-lib=${dir}/perl5 Text::Levenshtein::Damerau::XS
+cpanm --local-lib=${dir}/perl5 DateTime::Format::ISO8601
 
 # installing NextFlow
 nf_dir=${dir_full_path}/nextflow
