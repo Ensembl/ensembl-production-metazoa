@@ -26,8 +26,9 @@ STAGE_LOG="_static_stages_done_${RELEASE}"
 OUTPUT_NCBI="$CWD/NCBI_DATASETS"
 WIKI_OUTPUT_JSONS="$CWD/WIKI_JSON_OUT"
 ENS_PRODUCTION_METAZOA="$CWD/ensembl-production-metazoa"
-DATASETS_SING_IMAGE="library://lcampbell/ensembl-genomio/ncbi-datasets-v16.17.1:latest" #SyLabs hosted image, contact lcampbell@ebi.ac.uk for further details 
-DATASETS_SINGULARITY="$NXF_SINGULARITY_CACHEDIR/ncbi-datasets-v16.17.1:latest.sif"
+SIF_IMAGE_NAME="datasets-cli.latest.sif"
+DATASETS_DOCKER_URL="docker://ensemblorg/datasets-cli:latest"
+DATASETS_SINGULARITY="${NXF_SINGULARITY_CACHEDIR}/${SIF_IMAGE_NAME}"
 
 if [[ -d ${ENS_PRODUCTION_METAZOA} ]]; then
 	STATIC_BASE_DIR="${ENS_PRODUCTION_METAZOA}/scripts/static_content_generation"
@@ -50,7 +51,8 @@ if [[ $RUN_STAGE == TEMPLATE ]]; then
             do
             cp $ENS_PRODUCTION_METAZOA/scripts/static_content_generation/template${EXTENSION} $CWD/${PROD_NAME}${EXTENSION};
             done
-        	echo -e -n "Generated generic template Markdown files:\n[${PROD_NAME}_about.md, ${PROD_NAME}_annotation.md, ${PROD_NAME}_assembly.md]\n!!! Please amend these files to fill in the missing values !$"
+        	echo -e -n "Generated generic template Markdown files:\n[${PROD_NAME}_about.md, ${PROD_NAME}_annotation.md, \
+				${PROD_NAME}_assembly.md]\n!!! Please amend these files to fill in the missing values !$"
         	exit 0
 		fi
 
@@ -59,8 +61,16 @@ fi
 if [[ -z $INPUT_DB_LIST ]] || [[ -z $HOST ]] || [[ -z $RELEASE ]] || [[ -z $STATIC_BASE_DIR ]]; then
  	echo "Usage: sh CoreList_To_StaticContent.sh Template"
  	echo -e -n "\tOR\n"
- 	echo "Usage: sh CoreList_To_StaticContent.sh <RunStage: All, Wiki, NCBI, Static, Image, LicenseUsage, WhatsNew, Tidy> <INPUT_DB_LIST> <MYSQL_HOST_SERVER> <Unique_Run_Identifier>"
+ 	echo "Usage: sh CoreList_To_StaticContent.sh <RunStage: All, Wiki, NCBI, Static, Image, LicenseUsage, WhatsNew, \
+		Tidy> <INPUT_DB_LIST> <MYSQL_HOST_SERVER> <Unique_Run_Identifier>"
  	exit 0
+fi
+
+## Check if SINGULARITY cache dir ENV variable is defined
+if [[ ! $NXF_SINGULARITY_CACHEDIR ]]; then
+	echo "Required singularity ENV variable 'NXF_SINGULARITY_CACHEDIR' is not defined."
+	echo "Please set this variable to a path you wish to store singularity SIF image files.!"
+	exit 0
 fi
 
 ## First main stage, obtained wikipedia JSON scrape for each species
@@ -88,11 +98,13 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "WIKI" ]]; then
 	while read CORE
 	do
 		echo -e -ne "Downloading Wikipedia information (JSON) on species linked to core_db: $CORE\n";
-		SCI_NAME=`$HOST_NAME -D $CORE -e "select meta_value from meta where meta_key = \"species.scientific_name\";" | tail -n 1 | tr " " "_"`
+		SCI_NAME=`$HOST_NAME -D $CORE -e "select meta_value from meta where meta_key = \"species.scientific_name\";" \
+			| tail -n 1 | tr " " "_"`
 		echo "Scientific name: $SCI_NAME"
 		FORMAT_SCI_NAME=`echo $SCI_NAME | sed 's/_/%20/'`;
 		echo $SCI_NAME | xargs -n 1 -I XXX echo "https://en.wikipedia.org/wiki/XXX" >> Wikipedia_URL_listed.check.txt
-		echo "wget -qq --header='accept: application/json; charset=utf-8' --header 'Accept-Language: en-en' 'https://en.wikipedia.org/api/rest_v1/page/summary/$FORMAT_SCI_NAME?redirect=true' -O ${CORE}.wiki.json" >> generate_Wiki_JSON_Summary.sh
+		echo "wget -qq --header='accept: application/json; charset=utf-8' --header 'Accept-Language: en-en' \
+			'https://en.wikipedia.org/api/rest_v1/page/summary/$FORMAT_SCI_NAME?redirect=true' -O ${CORE}.wiki.json" >> generate_Wiki_JSON_Summary.sh
 	done < $INPUT_DB_LIST
 
 	## Run the JSON REST wgets and place inside a folder:
@@ -119,25 +131,34 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 	## Check if the pre-requisit NCBI-datasets tool singularity image is present
 	if [[ ! -f $DATASETS_SINGULARITY ]]; then
 
-		echo -e -n "Do not detect ncbi-datasets singularity image file in $CWD.\nAttemtping to download ($DATASETS_SING_IMAGE) from SyLabs now...\n\n"
+		echo -e -n "Do not detect ncbi-datasets singularity image file in $CWD.\nAttemtping to download ($DATASETS_DOCKER_URL) from SyLabs now...\n\n"
 
 		# Check we have singularity installed
 		SING_PRESENT=`which singularity`
 		if [[ $SING_PRESENT ]]; then
 
 			# Download the ncbi-datasets singularity image:
-			echo -e -n "Retriving NCBI-datasets tool singularity image from SyLabs:\n -> singularity pull --arch amd64 $DATASETS_SING_IMAGE"
+			echo -e -n "Attempting to retrive NCBI datasets-cli from dockerhub 'https://hub.docker.com/r/ensemblorg/datasets-cli':\n\
+			Image Tag -> '$DATASETS_DOCKER_URL'"
 
-			singularity pull --arch amd64 $DATASETS_SING_IMAGE
+			singularity pull --arch amd64 $DATASETS_SINGULARITY $DATASETS_DOCKER_URL
 
-			if [[ -f $CWD/$DATASETS_SING_IMAGE ]]; then echo -e -n "\nNCBI-datasets Singualrity image downloaded !"; ls -l $CWD/$DATASETS_SING_IMAGE; fi
+			if [[ -f $DATASETS_SINGULARITY ]]; then 
+				echo -e -n "\nNCBI-datasets Singualrity image downloaded !";
+				ls -l $DATASETS_SINGULARITY;
+			else
+				echo "Attempted to singularity pull -> '$DATASETS_DOCKER_URL'. \
+					Something not right. Failed to detect dataset-cli SIF file at path defined in: 'NXF_SINGULARITY_CACHEDIR'. Exiting..."
+					exit 1
+			fi
 
 		else
 			echo -e -n "\n\nSingularity doens't appear to be installed. Please verify installation...Exiting\n"
 			exit 0
 		fi
 	else
-		echo -e -n "INFO: Detected NCBI-datasets singularity image --> $DATASETS_SINGULARITY.\nProceeding with static content generation.\n\n"
+		echo -e -n "INFO: Detected NCBI-datasets singularity image --> $DATASETS_SINGULARITY.\nProceeding with static content generation !...\n\n"
+		sleep 4
 	fi
 
 	## Get annotation release reports
@@ -154,13 +175,12 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 		VERSION=`echo $GCA | awk -F "." {'print $2'}`
 
 		if [[ $VERSION == 1 ]]; then 
-			# GCF=`echo "$GCA" | sed 's/GCA/GCF/'`; 
-			echo "BaseCase: GCF $GCF." 
-     		singularity run $DATASETS_SINGULARITY \
-			datasets summary genome accession $GCF --assembly-source RefSeq --as-json-lines --report genome | \
+			echo "BaseCase: GCF $GCF."
+	     	singularity run $DATASETS_SINGULARITY \
+				datasets summary genome accession $GCF --assembly-source RefSeq --as-json-lines --report genome | \
 			jq '.' > ${GCA}.genomereport.json
-		else 
-			echo "Iterating over GCF versions {$VERSION..1}"
+		else
+			echo "Iterating over RefSeq (GCF_*) assembly versions {$VERSION..1}"
 
 			ITERATE_VERSIONS=1
 		fi
@@ -171,11 +191,11 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 			do
 				echo "Trying GCF $INSDC.$VERSION" 
         		singularity run $DATASETS_SINGULARITY \
-				datasets summary genome accession $INSDC.$VERSION --assembly-source RefSeq --as-json-lines --report genome | \
+					datasets summary genome accession $INSDC.$VERSION --assembly-source RefSeq --as-json-lines --report genome | \
 				jq '.' > ${GCA}.genomereport.json
 
 				if [[ -s ${GCA}.genomereport.json ]]; then
-					echo "Obtained genome report on ($INSDC.$VERSION)"
+					echo "Obtained genome report on RefSeq assembly:> $INSDC.$VERSION"
 					unset ITERATE_VERSIONS
 					break 1
 				fi
@@ -188,9 +208,9 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 
 		## Unless the genome report JSON exists and isn't empty, attempt on GCA accession using genbank source
 		if [[ ! -s ${GCA}.genomereport.json ]]; then
-			echo "Tried RefSeq reports, but missing on [$GCF]. Trying GCA instead"
+			echo "Tried obtaining RefSeq reports, but missing on [$GCF]. Trying GCA instead"
 			singularity run $DATASETS_SINGULARITY \
-			datasets summary genome accession $GCA --assembly-source GenBank --as-json-lines --report genome | \
+				datasets summary genome accession $GCA --assembly-source GenBank --as-json-lines --report genome | \
 			jq '.' > ${GCA}.genomereport.json
 			if [[ ! -s ${GCA}.genomereport.json ]]; then echo "WARNING: Unable to obtained genome report for $CORE [$GCA] !!"; fi
 		fi
@@ -214,7 +234,8 @@ if [[ -f $CWD/$STAGE_LOG ]]; then
 fi
 
 if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "STATIC" ]]; then
-	echo -e -n "\n\n *** Now running JSON to Static Parser\n\t---> \"perl Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE\"\n"
+	echo -e -n "\n\n *** Now running JSON to Static Parser\n\t---> \
+	\"perl Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE\"\n"
 	
 	# echo "perl $STATIC_BASE_DIR/Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE"
 	perl $STATIC_BASE_DIR/Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE 2>&1 | tee StaticContent_Gen_${RELEASE}_${HOST}.log
@@ -235,7 +256,8 @@ fi
 
 if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "IMAGE" ]]; then
 	
-	echo -e -n "\n\n*** Attempting to gather Species Image Resources from wikipedia.....\n---> \"sh Image_resource_gather.sh $WIKI_OUTPUT_JSONS\"\n\n"
+	echo -e -n "\n\n*** Attempting to gather Species Image Resources from wikipedia.....\n---> \
+	\"sh Image_resource_gather.sh $WIKI_OUTPUT_JSONS\"\n\n"
 	sh $STATIC_BASE_DIR/Image_resource_gather.sh $WIKI_OUTPUT_JSONS
 	
 	# Update stage log 
@@ -254,8 +276,10 @@ fi
 
 if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "LICENSEUSAGE" ]]; then
 
-	## Now Update any static '_about.md' markdown files with the relevant image resource licenses where they exist (Input being 'Output_Image_Licenses.tsv').
-	echo -e -n "\n\n*** Attempting update of species '_about.md' static image usage licenses in 5 secs.....\nOR - Stop here 'CTRL+C' and continue later by calling:\n\n\"perl ./Update_image_licenses.pl $RELEASE $CWD\"\n\n"
+	## Now Update any static '_about.md' markdown files with the relevant image resource licenses where 
+	## they exist (Input being 'Output_Image_Licenses.tsv').
+	echo -e -n "\n\n*** Attempting update of species '_about.md' static image usage licenses in 5 secs.....\nOR - Stop here \
+		'CTRL+C' and continue later by calling:\n\n\"perl ./Update_image_licenses.pl $RELEASE $CWD\"\n\n"
 	sleep 5
 	
 	perl $STATIC_BASE_DIR/Update_image_licenses.pl $RELEASE $CWD
@@ -276,7 +300,8 @@ fi
 
 if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "WHATSNEW" ]]; then
 	
-	echo -e -n "\n\n*** Generating static whats_new.md file to output MD formated species content...\n\n\"sh Generate_whatsnew_content.sh $INPUT_DB_LIST\"\n\n"
+	echo -e -n "\n\n*** Generating static whats_new.md file to output MD formated species \
+		content...\n\n\"sh Generate_whatsnew_content.sh $INPUT_DB_LIST\"\n\n"
 	
 	sh $STATIC_BASE_DIR/Generate_whatsnew_content.sh $HOST $INPUT_DB_LIST 'pipe'
 	
@@ -299,7 +324,8 @@ fi
 if [[ -f $CWD/$STAGE_LOG ]]; then
 	STAGE=`grep -e "tidy_output" $CWD/$STAGE_LOG`
 	if [[ $STAGE ]]; then
-		echo -e -n "\n*** Pipeline has already completed for run \"$RELEASE\".\nTo perform a full re-run, delete file or remove stages: -> $CWD/$STAGE_LOG\n"
+		echo -e -n "\n*** Pipeline has already completed for run \"$RELEASE\".\n"
+		echo -e -n "To perform a full re-run, delete file or remove stages: -> $CWD/$STAGE_LOG\n"
 		echo -e -n "## Output gathered and stored here:\n${CWD}/$RELEASE/\n\n"
 		exit 1
 	fi
@@ -312,8 +338,19 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "TIDY" ]]; then
 	mkdir -p ${CWD}/$RELEASE
 	STATIC_DIR="StaticContent_MD_Output-${RELEASE}"
 
+	LOG_FILES=(\
+		generate_Wiki_JSON_Summary.sh" \
+		"Download_species_image_from_url.sh" \
+		"Wikipedia_URL_listed.check.txt" \
+		"wiki_sp2image.tsv" \
+		"wiki_sp2image_NoMissing.tsv" \
+		"Without_Wikipedia_Summary_Content.txt" \
+		"StaticContent_Gen_${RELEASE}_${HOST}.log" \
+		"Output_Image_Licenses.final.tsv\
+		)
+
 	#Tidy log files
-	for LOG_FILE in generate_Wiki_JSON_Summary.sh Download_species_image_from_url.sh Wikipedia_URL_listed.check.txt wiki_sp2image.tsv wiki_sp2image_NoMissing.tsv Without_Wikipedia_Summary_Content.txt StaticContent_Gen_${RELEASE}_${HOST}.log Output_Image_Licenses.final.tsv
+	for LOG_FILE in ${LOG_FILES[@]};
 	do
 		if [[ -e $LOG_FILE ]]; then
 			mv ${CWD}/$LOG_FILE ${CWD}/Log_Outputs_and_intermediates/
@@ -324,7 +361,15 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "TIDY" ]]; then
 
 
 	#Tidy output folders
-	for OUTFOLDER in Commons_Licenses NCBI_DATASETS Source_Images_wikipedia $STATIC_DIR WIKI_JSON_OUT Log_Outputs_and_intermediates
+	OUT_FOLDERS=(\
+		Commons_Licenses" \
+		"NCBI_DATASETS" \
+		"Source_Images_wikipedia" \
+		"$STATIC_DIR" \
+		"WIKI_JSON_OUT" \
+		"Log_Outputs_and_intermediates\
+		)
+	for OUTFOLDER in ${OUT_FOLDERS[@]};
 	do
 		if [[ -e $OUTFOLDER ]]; then
 			mv ${CWD}/$OUTFOLDER ${CWD}/$RELEASE/
