@@ -164,15 +164,22 @@ do
 	fi
 done
 
-echo -e -n "\n\n${RED}***** Unavailable image resources. JSON file(s) *****\n"
-cat wiki_sp2image.tsv | grep -e "NO SPECIES IMAGE FOUND" | awk {'print $1'}
-echo -e -n "****************************************************${NC}\n\n"
+# Check if there were species without available image files on wiki
+COUNT_MISSING_IMAGES=`cat wiki_sp2image.tsv | grep -c "NO SPECIES IMAGE FOUND"`
+if [[ $COUNT_MISSING_IMAGES = 0 ]]; then
+	echo -e -n "\n${GREEN}Great news. All species have images to pull from wikipedia !${NC}\n\n"
+	sleep 2
+else
+	echo -e -n "\n\n${RED}***** Unavailable image resources. JSON file(s) *****\n"
+	cat wiki_sp2image.tsv | grep -e "NO SPECIES IMAGE FOUND" | awk {'print $1'}
+	echo -e -n "****************************************************${NC}\n\n"
+fi
 cat wiki_sp2image.tsv | grep -v "NO SPECIES IMAGE FOUND" > wiki_sp2image_NoMissing.tsv
 
-## Move all species source image files into single folder
+## Move all source image files into single folder
 if [[ -e ${CWD}/Download_species_image_from_url.sh ]]; then
 
-	echo -e -n "!! Downloading all original species source images to folder [20s timeout between image retrieval]:\n--> \"${CWD}/Source_Images_wikipedia\" !!\n\n"
+	echo -e -n "!! Downloading all original species source images to folder [20s timeout between image retrieval]:\n\n"
 
 	sh ${CWD}/Download_species_image_from_url.sh
 	mkdir -p $CWD/Source_Images_wikipedia
