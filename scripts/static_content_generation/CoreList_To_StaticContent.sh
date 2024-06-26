@@ -26,9 +26,11 @@ STAGE_LOG="_static_stages_done_${RELEASE}"
 OUTPUT_NCBI="$CWD/NCBI_DATASETS"
 WIKI_OUTPUT_JSONS="$CWD/WIKI_JSON_OUT"
 ENS_PRODUCTION_METAZOA="$CWD/ensembl-production-metazoa"
-SIF_IMAGE_NAME="datasets-cli.latest.sif"
-DATASETS_DOCKER_URL="docker://ensemblorg/datasets-cli:latest"
-DATASETS_SINGULARITY="${NXF_SINGULARITY_CACHEDIR}/${SIF_IMAGE_NAME}"
+DS_SOFTWARE_URL="https://api.github.com/repos/ncbi/datasets/releases/latest"
+
+# SIF_IMAGE_NAME="datasets-cli.latest.sif"
+# DATASETS_DOCKER_URL="docker://ensemblorg/datasets-cli:latest"
+# DATASETS_SINGULARITY="${NXF_SINGULARITY_CACHEDIR}/${SIF_IMAGE_NAME}"
 
 if [[ -d ${ENS_PRODUCTION_METAZOA} ]]; then
 	STATIC_BASE_DIR="${ENS_PRODUCTION_METAZOA}/scripts/static_content_generation"
@@ -61,8 +63,7 @@ fi
 if [[ -z $INPUT_DB_LIST ]] || [[ -z $HOST ]] || [[ -z $RELEASE ]] || [[ -z $STATIC_BASE_DIR ]]; then
  	echo "Usage: sh CoreList_To_StaticContent.sh Template"
  	echo -e -n "\tOR\n"
- 	echo "Usage: sh CoreList_To_StaticContent.sh <RunStage: All, Wiki, NCBI, Static, Image, LicenseUsage, WhatsNew, \
-		Tidy> <INPUT_DB_LIST> <MYSQL_HOST_SERVER> <Unique_Run_Identifier>"
+ 	echo "Usage: sh CoreList_To_StaticContent.sh <RunStage: All, Wiki, NCBI, Static, Image, LicenseUsage, WhatsNew, Tidy> <INPUT_DB_LIST> <MYSQL_HOST_SERVER> <Unique_Run_Identifier>"
  	exit 0
 fi
 
@@ -71,6 +72,17 @@ if [[ ! $NXF_SINGULARITY_CACHEDIR ]]; then
 	echo "Required singularity ENV variable 'NXF_SINGULARITY_CACHEDIR' is not defined."
 	echo "Please set this variable to a path you wish to store singularity SIF image files.!"
 	exit 0
+else
+	DATASETS_RELEASE=`curl -s $DS_SOFTWARE_URL | grep browser_download_url | cut -d \" -f4 | grep linux-amd64.cli.package.zip | cut -d "/" -f 8`
+	DATASETS_DOCKER_BASE_URL="docker://ensemblorg/datasets-cli"
+	
+	SIF_IMAGE_W_VERSION="datasets-cli.${DATASETS_RELEASE}.sif"
+	SIF_IMAGE_LATEST="datasets-cli.latest.sif"
+	DATASETS_DOCKER_LATEST_URL="${DATASETS_DOCKER_BASE_URL}:latest"
+	DATASETS_DOCKER_VERSION_URL="${DATASETS_DOCKER_BASE_URL}:${DATASETS_RELEASE}"
+	
+	DATASETS_SINGULARITY="${NXF_SINGULARITY_CACHEDIR}/${SIF_IMAGE_W_VERSION}"
+	DATASETS_SINGULARITY_LATEST="${NXF_SINGULARITY_CACHEDIR}/${SIF_IMAGE_LATEST}"
 fi
 
 ## First main stage, obtained wikipedia JSON scrape for each species
@@ -131,27 +143,34 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 	## Check if the pre-requisit NCBI-datasets tool singularity image is present
 	if [[ ! -f $DATASETS_SINGULARITY ]]; then
 
-		echo -e -n "Do not detect ncbi-datasets singularity image file in $CWD.\nAttemtping to download ($DATASETS_DOCKER_URL) from SyLabs now...\n\n"
+		echo -e -n "Do not detect ncbi-datasets singularity image file in $CWD.\nAttemtping to download ($DATASETS_DOCKER_VERSION_URL) from dockerhub...\n\n"
 
 		# Check we have singularity installed
 		SING_PRESENT=`which singularity`
 		if [[ $SING_PRESENT ]]; then
 
 			# Download the ncbi-datasets singularity image from docker hub https://hub.docker.com/r/ensemblorg/datasets-cli:
-			echo -e -n "Attempting to retrive NCBI datasets-cli from docker 'ensemblorg/datasets-cli':\n\
-			Image Tag -> '$DATASETS_DOCKER_URL'"
+			echo -e -n "Attempting to retrive NCBI datasets-cli from docker 'ensemblorg/datasets-cli'\n\
+			Image Tag -> '$DATASETS_DOCKER_VERSION_URL'\n"
 
-			singularity pull --arch amd64 $DATASETS_SINGULARITY $DATASETS_DOCKER_URL
+			# Pull docker image with specific version
+			singularity pull --arch amd64 $DATASETS_SINGULARITY $DATASETS_DOCKER_VERSION_URL
 
 			if [[ -f $DATASETS_SINGULARITY ]]; then 
-				echo -e -n "\nNCBI-datasets Singualrity image downloaded !";
+				echo -e -n "\nNCBI-datasets Singualrity image downloaded with the exact latest version: $DATASETS_RELEASE!\n\n--> ";
 				ls -l $DATASETS_SINGULARITY;
 			else
-				echo "Attempted to singularity pull -> '$DATASETS_DOCKER_URL'. \
-					Something not right. Failed to detect dataset-cli SIF file at path defined in: 'NXF_SINGULARITY_CACHEDIR'. Exiting..."
+				echo -e -n "\n Specific datasets-cli version was not found! attempting to pull Singualrity image with 'latest' tag instead.";
+				
+				# Attempt to pull docker image using 'latest' tag instead:
+				singularity pull --arch amd64 $DATASETS_SINGULARITY $DATASETS_DOCKER_LATEST_URL
+				DATASETS_SINGULARITY="${NXF_SINGULARITY_CACHEDIR}/${SIF_IMAGE_LATEST}"
+				
+				if [[ ! -f $DATASETS_SINGULARITY ]]; then 
+					echo "Unable to pull Specific latest version OR 'latest' tag datasets-cli SIF image. Exiting..."
 					exit 1
+				fi
 			fi
-
 		else
 			echo -e -n "\n\nSingularity doens't appear to be installed. Please verify installation...Exiting\n"
 			exit 0
