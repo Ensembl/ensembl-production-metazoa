@@ -137,8 +137,8 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 		SING_PRESENT=`which singularity`
 		if [[ $SING_PRESENT ]]; then
 
-			# Download the ncbi-datasets singularity image:
-			echo -e -n "Attempting to retrive NCBI datasets-cli from dockerhub 'https://hub.docker.com/r/ensemblorg/datasets-cli':\n\
+			# Download the ncbi-datasets singularity image from docker hub https://hub.docker.com/r/ensemblorg/datasets-cli:
+			echo -e -n "Attempting to retrive NCBI datasets-cli from docker 'ensemblorg/datasets-cli':\n\
 			Image Tag -> '$DATASETS_DOCKER_URL'"
 
 			singularity pull --arch amd64 $DATASETS_SINGULARITY $DATASETS_DOCKER_URL
