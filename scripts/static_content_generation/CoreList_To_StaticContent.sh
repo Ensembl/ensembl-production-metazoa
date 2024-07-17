@@ -61,7 +61,7 @@ if [[ $RUN_STAGE == TEMPLATE ]]; then
 
 fi
 
-if [[ -z $INPUT_DB_LIST ]] || [[ -z $HOST ]] || [[ -z $RELEASE ]] || [[ -z $STATIC_BASE_DIR ]]; then
+if [[ -z $INPUT_DB_LIST ]] || [[ -z $HOST ]] || [[ -z $RELEASE ]] || [[ -z $STATIC_BASE_DIR ]] || [[ -z $ENS_DIVISION ]]; then
  	echo "Usage: sh CoreList_To_StaticContent.sh Template"
  	echo -e -n "\tOR\n"
  	echo "Usage: sh CoreList_To_StaticContent.sh <RunStage: All, Wiki, NCBI, Static, Image, LicenseUsage, WhatsNew, Tidy> <INPUT_DB_LIST> <MYSQL_HOST_SERVER> <Unique_Run_Identifier> <Ensembl divsision>"
@@ -76,12 +76,12 @@ if [[ ! $NXF_SINGULARITY_CACHEDIR ]]; then
 else
 	DATASETS_RELEASE=`curl -s $DS_SOFTWARE_URL | grep browser_download_url | cut -d \" -f4 | grep linux-amd64.cli.package.zip | cut -d "/" -f 8`
 	DATASETS_DOCKER_BASE_URL="docker://ensemblorg/datasets-cli"
-	
+
 	SIF_IMAGE_W_VERSION="datasets-cli.${DATASETS_RELEASE}.sif"
 	SIF_IMAGE_LATEST="datasets-cli.latest.sif"
 	DATASETS_DOCKER_LATEST_URL="${DATASETS_DOCKER_BASE_URL}:latest"
 	DATASETS_DOCKER_VERSION_URL="${DATASETS_DOCKER_BASE_URL}:${DATASETS_RELEASE}"
-	
+
 	DATASETS_SINGULARITY="${NXF_SINGULARITY_CACHEDIR}/${SIF_IMAGE_W_VERSION}"
 	DATASETS_SINGULARITY_LATEST="${NXF_SINGULARITY_CACHEDIR}/${SIF_IMAGE_LATEST}"
 fi
@@ -257,8 +257,10 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "STATIC" ]]; then
 	echo -e -n "\n\n *** Now running JSON to Static Parser\n\t---> \
 	\"perl Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE $ENS_DIVISION\"\n"
 
+	SAFE_DIVISION=`echo "$ENS_DIVISION" | tr " " "_"`
+
 	# echo "perl $STATIC_BASE_DIR/Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE"
-	perl $STATIC_BASE_DIR/Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE $ENS_DIVISION 2>&1 | tee StaticContent_Gen_${RELEASE}_${HOST}.log
+	perl $STATIC_BASE_DIR/Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE $SAFE_DIVISION 2>&1 | tee StaticContent_Gen_${RELEASE}_${HOST}.log
 
 	# Update stage log
 	echo "static_generation" >> $CWD/$STAGE_LOG

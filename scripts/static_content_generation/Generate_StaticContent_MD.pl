@@ -36,10 +36,49 @@ my $genome_report_dir = $ARGV[1];
 my $species_cores_listed = $ARGV[2];
 my $core_host = $ARGV[3];
 my $release = $ARGV[4];
+my $safe_division = $ARGV[5];
 
-die "USAGE: Generate_StaticConten_MD.pl <WIKI_JSON_DIR> <NCBI_GENOME_REPORT_DIR> <List_Ensembl_CORE_FILE> <Core(s) Host> <Run_Identifier>\n" unless (@ARGV==5);
+die "USAGE: Generate_StaticConten_MD.pl <WIKI_JSON_DIR> <NCBI_GENOME_REPORT_DIR> <List_Ensembl_CORE_FILE> <Core(s) Host> <Run_Identifier> <Ensembl Division>\n" unless (@ARGV==6);
 
 my @input_genome_reports = <${genome_report_dir}/*.genomereport.json>;
+
+# Convert machine to lit form of division name
+$safe_division =~ tr/_/ /;
+my $ens_division = $safe_division;
+my $division_url;
+
+if ($safe_division =~ m/[Pp]lants/){
+	print "Division is $ens_division\n";
+	print "Setting url to plants.ensembl.org\n";
+	$division_url = "https://plants.ensembl.org/info/genome/annotation/index.html"
+   }
+elsif ($safe_division =~ m/[Ff]ungi/){
+	print "Division is $ens_division\n";
+	print "Setting url to fungi.ensembl.org\n";
+        $division_url =	"https://fungi.ensembl.org/info/genome/annotation/index.html"
+   }
+elsif ($safe_division =~ m/[Bb]ateria/){
+        print "Division is $ens_division\n";
+        print "Setting url to bacteria.ensembl.org\n";
+        $division_url = "https://bacteria.ensembl.org/info/genome/annotation/index.html"
+   }
+elsif ($safe_division =~ m/[Pp]rotists/){
+        print "Division is $ens_division\n";
+        print "Setting url to protists.ensembl.org\n";
+        $division_url = "https://protists.ensembl.org/info/genome/annotation/index.html"
+   }
+elsif ($safe_division =~ m/[Mm]etazoa/){
+        print "Division is $ens_division\n";
+        print "Setting url to metazoa.ensembl.org\n";
+        $division_url = "https://metazoa.ensembl.org/info/genome/annotation/index.html"
+   }
+else{
+	print "Division default to ensembl\n";
+        print "Setting url to ensembl.org\n";
+	$division_url = "https://www.ensembl.org/info/genome/genebuild/index.html"
+}
+
+
 
 ## For each genome report file, locate and combine its assoicated Wilipedia JSON summary file on GCF/GCA accession
 system ("mkdir -p ./StaticContent_MD_Output-${release}");
@@ -331,7 +370,7 @@ print OUT_ABOUT $about_content;
 $dtol_community_anno_content = "**Annotation**
 ----------
 
-Ensembl Metazoa displaying genes linked to the assembly with accession [$gca_accession_escape](http:\/\/www.ebi.ac.uk\/ena\/data\/view\/$gca_accession).
+$ens_division displaying genes linked to the assembly with accession [$gca_accession_escape](http:\/\/www.ebi.ac.uk\/ena\/data\/view\/$gca_accession).
 
 Genomic assembly deposited to the INSDC by [Wellcome Sanger Institute](https://www.sanger.ac.uk/). Genome annotation performed by Ensembl as part of the
 partnership with the [Darwin Tree of Life (DToL)](https://www.darwintreeoflife.org/) project.
@@ -351,9 +390,9 @@ $refseq_annotation_content = "**Annotation**
 The annotation presented is derived from annotation submitted to
 [INSDC](http:\/\/www.insdc.org) with the assembly accession [$gca_accession_escape](http:\/\/www.ebi.ac.uk\/ena\/data\/view\/$gca_accession).
 
-Ensembl Metazoa displaying genes imported from [NCBI RefSeq]($anno_report_url) annotation release v${release_version}.
+$ens_division displaying genes imported from [NCBI RefSeq]($anno_report_url) annotation release v${release_version}.
 Small RNA features, protein features, BLAST hits and cross-references have been
-computed by [Ensembl Metazoa](https://metazoa.ensembl.org/info/genome/annotation/index.html).
+computed by [$ens_division]($division_url).
 ";
 	print OUT_ANNO $refseq_annotation_content;
 	}
@@ -361,12 +400,12 @@ elsif ( $annotation_source eq "community_annotation" ){
 $community_anno_content = "**Annotation**
 ----------
 
-Ensembl Metazoa displaying genes imported from GenBank entry linked to the assembly with accession [$gca_accession_escape](http:\/\/www.ebi.ac.uk\/ena\/data\/view\/$gca_accession).
+$ens_division displaying genes imported from GenBank entry linked to the assembly with accession [$gca_accession_escape](http:\/\/www.ebi.ac.uk\/ena\/data\/view\/$gca_accession).
 
 Genomic annotation was deposited along with initial assembly submission by [$assembly_submitter](URL_GOES_HERE).
 
 Small RNA features, protein features, BLAST hits and cross-references have been
-computed by [Ensembl Metazoa](https://metazoa.ensembl.org/info/genome/annotation/index.html).
+computed by [$ens_division]($division_url).
 ";
 	print OUT_ANNO $community_anno_content;
 	print YELLOW "Double check Community linked assembly: $scientific_name / $gca_accession for correct annotation information !!\n";
@@ -375,12 +414,12 @@ elsif ( $annotation_source eq "community_sanger" ){
 $community_anno_content = "**Annotation**
 ----------
 
-Ensembl Metazoa displaying genes imported from GenBank entry linked to the assembly with accession [$gca_accession_escape](http:\/\/www.ebi.ac.uk\/ena\/data\/view\/$gca_accession).
+$ens_division displaying genes imported from GenBank entry linked to the assembly with accession [$gca_accession_escape](http:\/\/www.ebi.ac.uk\/ena\/data\/view\/$gca_accession).
 
 Genomic annotation was deposited along with assembly deposited to the INSDC by [Wellcome Sanger Institute](https://www.sanger.ac.uk/).
 
 Small RNA features, protein features, BLAST hits and cross-references have been
-computed by [Ensembl Metazoa](https://metazoa.ensembl.org/info/genome/annotation/index.html).
+computed by [$ens_division]($division_url).
 ";
 	print OUT_ANNO $community_anno_content;
 	print YELLOW "Double check Sanger (Non-DToL) Community assembly: $scientific_name / $gca_accession for correct annotation information !!\n";
@@ -395,6 +434,8 @@ system ("mv ./*.md ./$static_output_folder");
 close OUT_ANNO;
 close OUT_ABOUT;
 close OUT_ASM;
+
+print YELLOW "\n\n--> Be sure to double check all MD files. Particularly _annotation.md for assembly submitter URL <--\n";
 
 print BRIGHT_GREEN "\t** Finished processing **\n\n";
 
