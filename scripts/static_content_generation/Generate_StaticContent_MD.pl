@@ -48,7 +48,7 @@ print BLUE "\nParsing JSON/Refseq files\n\n";
 
 foreach my $genome_sum_file (@input_genome_reports){
 
-	print DARK GREEN "Beginning processing RefSeq annotation:\n[$genome_sum_file]\n";
+	print DARK GREEN "Beginning processing RefSeq annotation:\n[$genome_sum_file] genome JSON\n";
 
 	#Species specific static content folder
 	my $static_output_folder = "StaticContent_MD_Output-${release}";	
@@ -70,21 +70,31 @@ foreach my $genome_sum_file (@input_genome_reports){
 	## Parse species name from ref_seq annotion
 	$species_name = `jq '.organism.organism_name' $genome_sum_file | sed 's/"//g'`;
 	chomp $species_name;
+        print "Retrived organismal name from genome JSON file: $species_name\n";
+
 	$scientific_name = $species_name;
 	$species_name =~ tr/ /_/;
-	$static_output_folder = $static_output_folder."/".$species_name;
 	my @temp_split_sp_name = split ("_", $species_name);
+	my $count_sp_name = scalar @temp_split_sp_name;
 
 	#Check whether or not the species name is bionomial or trinomial
-	if ((scalar @temp_split_sp_name == 3 )){
-		print YELLOW "!!! Found trinomial species name instance !!!! \"$species_name\" --> Utilizing just the bionomial: ";
-		$species_name = "$temp_split_sp_name[0]_$temp_split_sp_name[1]";
-		print "\"$species_name\"\n";
+
+	if (($count_sp_name > 3 )){
+		print YELLOW "!!! Genome JSON contains atypical/long 'organism_name' [$count_sp_name sub names] !!! --> Utilizing just the bionomial: ";
+               $species_name = "$temp_split_sp_name[0]_$temp_split_sp_name[1]";
+               print "\"Species name set as: $species_name\"\n";
+	}
+	elsif (($count_sp_name == 3 )){
+               print YELLOW "!!! Organismal species name is trinomial --> Utilizing just the bionomial: ";
+               $species_name = "$temp_split_sp_name[0]_$temp_split_sp_name[1]";
+               print "\"Species name set as: $species_name\"\n";
 	}
 	else{
-		print "Species name: \"$scientific_name\".\n";
+		print "Organismal species name is binomial....";
+		print "Species name set as: \"$scientific_name\".\n";
 	}
 
+        $static_output_folder = $static_output_folder."/".$species_name;
 	$species_name = lc$species_name;
 	system ("mkdir -p ./$static_output_folder");
 
@@ -157,28 +167,35 @@ foreach my $genome_sum_file (@input_genome_reports){
 	#Find the coreDB from the input core list file. Then locate the appropriate JSON file to parse. 
 	my ($json_file_name, $json_file_path);
 
-	#Test if core was found based on inclusion of GCA_ in the name
+	#Test if core was found based on inclusion of GCA_ in the database name
 	if ($species_core){
-		print "Core DB located: $species_core\n";
+		print "Core database located: $species_core\n";
 		$json_file_name = "$species_core".".wiki.json";
 		$json_file_path = `ls -1 ${wiki_input_dir}/${json_file_name}`;
 		chomp $json_file_path;
 	}
 	else{
-		print YELLOW "No core DB containing \"_gca\" accession found [$asseb_accession].\n";
+		print YELLOW "Core database including \"_gca\" accession in DB name was not located [$asseb_accession].\n";
 
 		$species_core = `grep -E "^${species_name}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed\n`;
 		chomp $species_core;
-		print YELLOW "Located core instead: $species_core\n";
-		$json_file_path = `ls -1 ${wiki_input_dir}/${species_core}.wiki.json`;
-		chomp $json_file_path;
+		if ($species_core){
+			chomp $species_core;
+			print YELLOW "Located core based soley on production name!: $species_core\n";
+			$json_file_path = `ls -1 ${wiki_input_dir}/${species_core}.wiki.json`;
+			chomp $json_file_path;
+		}
+		else{
+			print "Unable to locate any core linked to species $core_prodname. Exiting....";
+			exit;
+		}
 	}
 
 	#Perform query to obtain production name from to ensure static md will match with ensembl core DB
 	my $prod_name=`$core_host -D $species_core -Ne \"SELECT meta_value FROM meta WHERE meta_key = 'species.production_name';"`;
 	chomp $prod_name;
+        print "Linked with Ensembl CORE_DB [$species_core] & species.production_name [$prod_name]\n";
 	$prod_name = ucfirst($prod_name);
-	print "Linked with Ensembl CORE_DB [$species_core] & species.production_name [$prod_name]\n";
 
 	##Open file handles using species.productioin_name to write markdown .md files.
 	open (OUT_ABOUT, ">${prod_name}_about.md") || die "Can\'t open ${prod_name}_about.md\n";
