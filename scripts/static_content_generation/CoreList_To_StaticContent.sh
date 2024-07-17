@@ -20,6 +20,7 @@ RUN_STAGE=${1^^} # All, Wiki, NCBI, Static, Image, WhatsNew, Tidy
 INPUT_DB_LIST=$2 # flat file of core(s) to be processed one per line.
 HOST=$3 #MYSQL server hosting the cores listed in $INPUT_DB_LIST.
 RELEASE=$4 # Name of final output folder
+ENS_DIVISION=$5
 CWD=`readlink -f $PWD`
 
 STAGE_LOG="_static_stages_done_${RELEASE}"
@@ -63,7 +64,7 @@ fi
 if [[ -z $INPUT_DB_LIST ]] || [[ -z $HOST ]] || [[ -z $RELEASE ]] || [[ -z $STATIC_BASE_DIR ]]; then
  	echo "Usage: sh CoreList_To_StaticContent.sh Template"
  	echo -e -n "\tOR\n"
- 	echo "Usage: sh CoreList_To_StaticContent.sh <RunStage: All, Wiki, NCBI, Static, Image, LicenseUsage, WhatsNew, Tidy> <INPUT_DB_LIST> <MYSQL_HOST_SERVER> <Unique_Run_Identifier>"
+ 	echo "Usage: sh CoreList_To_StaticContent.sh <RunStage: All, Wiki, NCBI, Static, Image, LicenseUsage, WhatsNew, Tidy> <INPUT_DB_LIST> <MYSQL_HOST_SERVER> <Unique_Run_Identifier> <Ensembl divsision>"
  	exit 0
 fi
 
@@ -138,7 +139,7 @@ if [[ -f $CWD/$STAGE_LOG ]]; then
 	fi
 fi
 
-if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "NCBI" ]]; then 
+if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 
 	## Check if the pre-requisit NCBI-datasets tool singularity image is present
 	if [[ ! -f $DATASETS_SINGULARITY ]]; then
@@ -156,17 +157,17 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 			# Pull docker image with specific version
 			singularity pull --arch amd64 $DATASETS_SINGULARITY $DATASETS_DOCKER_VERSION_URL
 
-			if [[ -f $DATASETS_SINGULARITY ]]; then 
+			if [[ -f $DATASETS_SINGULARITY ]]; then
 				echo -e -n "\nNCBI-datasets Singualrity image downloaded with the exact latest version: $DATASETS_RELEASE!\n\n--> ";
 				ls -l $DATASETS_SINGULARITY;
 			else
 				echo -e -n "\n Specific datasets-cli version was not found! attempting to pull Singualrity image with 'latest' tag instead.";
-				
+
 				# Attempt to pull docker image using 'latest' tag instead:
 				singularity pull --arch amd64 $DATASETS_SINGULARITY $DATASETS_DOCKER_LATEST_URL
 				DATASETS_SINGULARITY="${NXF_SINGULARITY_CACHEDIR}/${SIF_IMAGE_LATEST}"
-				
-				if [[ ! -f $DATASETS_SINGULARITY ]]; then 
+
+				if [[ ! -f $DATASETS_SINGULARITY ]]; then
 					echo "Unable to pull Specific latest version OR 'latest' tag datasets-cli SIF image. Exiting..."
 					exit 1
 				fi
@@ -238,7 +239,7 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 
     done < $INPUT_DB_LIST
 
-	# Update stage log 
+	# Update stage log
 	echo "ncbi_datasets" >> $CWD/$STAGE_LOG
 	RUN_STAGE="STATIC"
 fi
@@ -254,12 +255,12 @@ fi
 
 if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "STATIC" ]]; then
 	echo -e -n "\n\n *** Now running JSON to Static Parser\n\t---> \
-	\"perl Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE\"\n"
-	
-	# echo "perl $STATIC_BASE_DIR/Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE"
-	perl $STATIC_BASE_DIR/Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE 2>&1 | tee StaticContent_Gen_${RELEASE}_${HOST}.log
+	\"perl Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE $ENS_DIVISION\"\n"
 
-	# Update stage log 
+	# echo "perl $STATIC_BASE_DIR/Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE"
+	perl $STATIC_BASE_DIR/Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE $ENS_DIVISION 2>&1 | tee StaticContent_Gen_${RELEASE}_${HOST}.log
+
+	# Update stage log
 	echo "static_generation" >> $CWD/$STAGE_LOG
 	RUN_STAGE="IMAGE"
 fi
@@ -274,12 +275,12 @@ if [[ -f $CWD/$STAGE_LOG ]]; then
 fi
 
 if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "IMAGE" ]]; then
-	
+
 	echo -e -n "\n\n*** Attempting to gather Species Image Resources from wikipedia.....\n---> \
 	\"sh Image_resource_gather.sh $WIKI_OUTPUT_JSONS\"\n\n"
 	sh $STATIC_BASE_DIR/Image_resource_gather.sh $WIKI_OUTPUT_JSONS
-	
-	# Update stage log 
+
+	# Update stage log
 	echo "image_resources" >> $CWD/$STAGE_LOG
 	RUN_STAGE="LICENSEUSAGE"
 fi
@@ -300,7 +301,7 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "LICENSEUSAGE" ]]; then
 	echo -e -n "\n\n*** Attempting update of species '_about.md' static image usage licenses in 5 secs.....\nOR - Stop here \
 		'CTRL+C' and continue later by calling:\n\n\"perl ./Update_image_licenses.pl $RELEASE $CWD\"\n\n"
 	sleep 5
-	
+
 	perl $STATIC_BASE_DIR/Update_image_licenses.pl $RELEASE $CWD
 
 	# Update stage log 
@@ -318,12 +319,12 @@ if [[ -f $CWD/$STAGE_LOG ]]; then
 fi
 
 if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "WHATSNEW" ]]; then
-	
+
 	echo -e -n "\n\n*** Generating static whats_new.md file to output MD formated species \
 		content...\n\n\"sh Generate_whatsnew_content.sh $INPUT_DB_LIST\"\n\n"
-	
+
 	sh $STATIC_BASE_DIR/Generate_whatsnew_content.sh $HOST $INPUT_DB_LIST 'pipe'
-	
+
 	if [[ -e ./StaticContent_MD_Output-${RELEASE} ]]; then
 		mv ${CWD}/WhatsNewContent.md ${CWD}/StaticContent_MD_Output-${RELEASE}/
 	else
@@ -334,7 +335,7 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "WHATSNEW" ]]; then
 	echo -e -n "\n* Generated whatsnew.md (MD) content found here --> \t"
 	echo "StaticContent_MD_Output-${RELEASE}/WhatsNewContent.md"
 
-	# Update stage log 
+	# Update stage log
 	echo "whats_new_MD" >> $CWD/$STAGE_LOG
 	RUN_STAGE="TIDY"
 fi
