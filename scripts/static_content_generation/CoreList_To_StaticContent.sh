@@ -29,10 +29,6 @@ WIKI_OUTPUT_JSONS="$CWD/WIKI_JSON_OUT"
 ENS_PRODUCTION_METAZOA="$CWD/ensembl-production-metazoa"
 DS_SOFTWARE_URL="https://api.github.com/repos/ncbi/datasets/releases/latest"
 
-# SIF_IMAGE_NAME="datasets-cli.latest.sif"
-# DATASETS_DOCKER_URL="docker://ensemblorg/datasets-cli:latest"
-# DATASETS_SINGULARITY="${NXF_SINGULARITY_CACHEDIR}/${SIF_IMAGE_NAME}"
-
 if [[ -d ${ENS_PRODUCTION_METAZOA} ]]; then
 	STATIC_BASE_DIR="${ENS_PRODUCTION_METAZOA}/scripts/static_content_generation"
 else
@@ -47,15 +43,14 @@ if [[ $RUN_STAGE == TEMPLATE ]]; then
 
        	# ### Generate blank files for species not linked with GCF_
         read -p "Generating blank MD files. Enter species.production_name : " PROD_NAME
-
-		if [[ -d $ENS_PRODUCTION_METAZOA ]]; then
+	read -p "Generating blank MD files. Enter the appropriate Division (e.g. metazoa, plants, protists etc) : " ENS_DIVISION
+	     if [[ -d $ENS_PRODUCTION_METAZOA ]]; then
 
 		    for EXTENSION in _about.md _annotation.md _assembly.md
             do
-            cp $ENS_PRODUCTION_METAZOA/scripts/static_content_generation/template${EXTENSION} $CWD/${PROD_NAME}${EXTENSION};
+            cat $ENS_PRODUCTION_METAZOA/scripts/static_content_generation/template${EXTENSION} | sed s/TEMP_DIVISION/$ENS_DIVISION/g > /$CWD/${PROD_NAME}${EXTENSION};
             done
-        	echo -e -n "Generated generic template Markdown files:\n[${PROD_NAME}_about.md, ${PROD_NAME}_annotation.md, \
-				${PROD_NAME}_assembly.md]\n!!! Please amend these files to fill in the missing values !$"
+        	echo -e -n "Generated generic template Markdown files:\n[${PROD_NAME}_about.md, ${PROD_NAME}_annotation.md, ${PROD_NAME}_assembly.md]\n!!! Please amend these files to fill in the missing values !\n"
         	exit 0
 		fi
 
