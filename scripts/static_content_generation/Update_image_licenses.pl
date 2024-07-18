@@ -41,16 +41,17 @@ while (<INFILE>){
 
     my $sp_name = @split_line[0];
     $sp_name = ucfirst($sp_name);
+
     my $license_full = @split_line[1];
-    print "Processing species: $sp_name\n";
-    
-    my $binomial_sp = $sp_name;
+    my @array_split_sp_name = split ("_", $sp_name);
+    my $binomial_sp = $array_split_sp_name[0]."_".$array_split_sp_name[1];
     $binomial_sp =~ s/_gca[0-9]+v[0-9][cm|fb|gb|rs|vb|wb]*.?//g;
     $binomial_sp = ucfirst($binomial_sp);    
 
     # Gather paths+files for new and original '_about' MD files
     my $dir_name = `find ./$release_dir -type d -name "$binomial_sp*" | awk -F "/" {'print \$NF'}`;
     chomp $dir_name;
+
     my $MD_about_file = $CWD."/".$release_dir."/${dir_name}/${sp_name}_about.md";
     my $MD_about_file_old = "${MD_about_file}.old";
     system("mv $MD_about_file $MD_about_file_old");
@@ -76,8 +77,8 @@ while (<INFILE>){
 #Close input and remove the temporary license file
 close INFILE;
 
-system("rm ${CWD}/temp_output_license.tsv");
-# print "Looking for old MD files\n";
+#system("rm ${CWD}/temp_output_license.tsv");
+print "Looking for old MD files\n";
 system("find ${CWD}/${release_dir}/ -type f -name \"*_about.md.old\" | xargs -n 1 -I XXX rm XXX");
 
 print BRIGHT_GREEN "* Finished updating species *_about.md files <--> On Wiki Image licenses.\n\n";
