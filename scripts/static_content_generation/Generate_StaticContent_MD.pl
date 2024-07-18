@@ -104,7 +104,7 @@ foreach my $genome_sum_file (@input_genome_reports){
 	my ($species_name, $common_name, $taxa_id, $anno_report_url, $asseb_accession, $release_version, @ncbi_rel, $annotation_source, $assembly_submitter);
 
 	# Convert GCF to GCA and locate its wiki JSON file
-	my ($refseq_file, $gca_accession, $core_prodname, $gca_accession_escape);
+	my ($refseq_file, $gca_accession, $core_prodname_gca, $gca_accession_escape, $core_located);
 
 	## Parse species name from ref_seq annotion
 	$species_name = `jq '.organism.organism_name' $genome_sum_file | sed 's/"//g'`;
@@ -126,6 +126,7 @@ foreach my $genome_sum_file (@input_genome_reports){
 	elsif (($count_sp_name == 3 )){
                print YELLOW "!!! Organismal species name is trinomial --> Utilizing just the bionomial: ";
                $species_name = "$temp_split_sp_name[0]_$temp_split_sp_name[1]";
+
                print "\"Species name set as: $species_name\"\n";
 	}
 	else{
@@ -184,7 +185,6 @@ foreach my $genome_sum_file (@input_genome_reports){
 		}
 	}
 	
-
 	$asseb_accession = `jq '.accession' $genome_sum_file | sed 's/"//g'`;
 	chomp $asseb_accession;
     	$gca_accession = $asseb_accession;
@@ -193,41 +193,51 @@ foreach my $genome_sum_file (@input_genome_reports){
     	$gca_accession_escape =~ s/GCA_/GCA\\_/;
 	chomp $gca_accession_escape;
 
-    	$core_prodname = $gca_accession;
-    	$core_prodname =~ s/GCA_/gca/;
-    	$core_prodname =~ s/\.[0-9]$//;
-    	chomp $core_prodname;
-    	$core_prodname = "${species_name}_${core_prodname}";
+    	$core_prodname_gca = $gca_accession;
+    	$core_prodname_gca =~ s/GCA_/gca/;
+    	$core_prodname_gca =~ s/\.[0-9]$//;
+    	chomp $core_prodname_gca;
+    	$core_prodname_gca = "${species_name}_${core_prodname_gca}";
 
-	#Initial attempt to locate the correct core DB.
-	my $species_core = `grep -e "^${core_prodname}" < $species_cores_listed\n`;
-	chomp $species_core;
+	#Attempt to locate the correct core DB which corresponds to the appropriate genome JSON.
+
+	my $species_core;
+	my $species_core_count = `grep -c -E "^${species_name}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed\n`;
+	my $species_gca_core_count = `grep -c -E "^${core_prodname_gca}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed\n`;
+	my $species_trinomial_core_count = `grep -c -E "^${species_name}_[A-Za-z0-9]+_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed\n`;
+
+	if ($species_core_count == 1){
+		print GREEN "Core database located solely on binomial style db name.\n";
+		$species_core = `grep -e "^${species_name}" < $species_cores_listed\n`;
+                $core_located =	1;
+	} 
+	elsif($species_gca_core_count == 1){
+		print GREEN "Core database located on binomial + gca suffic style db name.\n";
+		$species_core = `grep -e "^${core_prodname_gca}" < $species_cores_listed\n`;
+                $core_located =	1;
+	}
+	elsif($species_trinomial_core_count == 1){
+             	print GREEN "Core database located on trinaomal style db name.\n";
+		$species_core = `grep -E "^${species_name}_[A-Za-z0-9]+_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed\n`;
+		$core_located = 1;
+	}
+        else{
+		print RED "Unable to match core database nam in provided list to NCBI genome JSON (organism_name) for species $species_name. Exiting....";
+		exit;
+	}
 
 	#Find the coreDB from the input core list file. Then locate the appropriate JSON file to parse. 
 	my ($json_file_name, $json_file_path);
 
 	#Test if core was found based on inclusion of GCA_ in the database name
-	if ($species_core){
-		print "Core database located: $species_core\n";
-		$json_file_name = "$species_core".".wiki.json";
-		$json_file_path = `ls -1 ${wiki_input_dir}/${json_file_name}`;
-		chomp $json_file_path;
-	}
-	else{
-		print YELLOW "Core database including \"_gca\" accession in DB name was not located [$asseb_accession].\n";
-
-		$species_core = `grep -E "^${species_name}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed\n`;
+	if ($core_located == 1){
 		chomp $species_core;
-		if ($species_core){
-			chomp $species_core;
-			print YELLOW "Located core based soley on production name!: $species_core\n";
-			$json_file_path = `ls -1 ${wiki_input_dir}/${species_core}.wiki.json`;
-			chomp $json_file_path;
-		}
-		else{
-			print "Unable to locate any core linked to species $core_prodname. Exiting....";
-			exit;
-		}
+		print "Core database located: $species_core\n";
+		$json_file_name = "${species_core}.wiki.json";
+		print "CHECKING -> ${wiki_input_dir}/${json_file_name}";
+		$json_file_path = `ls -1 ${wiki_input_dir}/${json_file_name}`;
+		print "FULL JSON PATH ->> $json_file_path";
+		chomp $json_file_path;
 	}
 
 	#Perform query to obtain production name from to ensure static md will match with ensembl core DB
