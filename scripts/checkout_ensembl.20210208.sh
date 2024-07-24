@@ -80,9 +80,11 @@ for module in \
     ensembl-variation \
     ensembl-vep \
     ensembl-genes \
+    ensembl-genes-nf \
     ensembl-anno \
     ensembl-orm \
     ensembl-killlist \
+    core_meta_updates \
   ;
 do
     echo "Checking out $module ($branch)" >> /dev/stderr
@@ -117,9 +119,9 @@ done
 
 # slurm related bit
 mv ensembl-hive ensembl-hive.lsf
-ln -s ensembl-hive.lsf ensembl-hive
 git clone -b  feature/slurm_meadow --depth 1 --no-single-branch ${URL_PFX}Ensembl/ensembl-hive ensembl-hive.slurm 
-echo "Point symlink ${dir_full_path}/`ensembl-hive` to ${dir_full_path}/`ensembl-hive.slurm` if you're on SLURM" >> /dev/stderr
+ln -s ensembl-hive.slurm ensembl-hive
+echo "Point symlink ${dir_full_path}/`ensembl-hive` to ${dir_full_path}/`ensembl-hive.lsf` if you're on LSF" >> /dev/stderr
 
 
 
@@ -127,7 +129,12 @@ echo "Point symlink ${dir_full_path}/`ensembl-hive` to ${dir_full_path}/`ensembl
 branch="main"
 for module in \
     ensembl-analysis \
+    ensembl-anno \
     ensembl-taxonomy \
+    ensembl-genes \
+    ensembl-genes-nf \
+    ensembl-killlist \
+    core_meta_updates \
   ;
 do
     echo "Checking out $module ($branch)" >> /dev/stderr
