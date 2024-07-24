@@ -79,12 +79,7 @@ for module in \
     ensembl-tools \
     ensembl-variation \
     ensembl-vep \
-    ensembl-genes \
-    ensembl-genes-nf \
-    ensembl-anno \
     ensembl-orm \
-    ensembl-killlist \
-    core_meta_updates \
   ;
 do
     echo "Checking out $module ($branch)" >> /dev/stderr
