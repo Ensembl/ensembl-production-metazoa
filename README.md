@@ -66,7 +66,7 @@ cat sptags | grep -vF '#' | head -n 3 |
 #      (see docs/mz_generic_params.md for the full list)
 ```
 
-If running on LSF make sure that `ensembl.prod.${ENS_VERSION}/ensembl-hive` point to the SLURM version:
+If running on LSF make sure that `ensembl.prod.${ENS_VERSION}/ensembl-hive` point to the LSF version:
 ```
 pushd ensembl.prod.${ENS_VERSION}/ensembl-hive
 rm ensembl-hive
