@@ -1,0 +1,138 @@
+#CONF	DB_PFX	premz
+#CONF	ASM_VERSION	11
+
+# updated, prev was drosophila_melanogaster_core_57_110_10 dmel_r6.46_FB2022_03 now dmel_r6.54_FB2023_05
+species.production_name	drosophila_melanogaster
+species.url     Drosophila_melanogaster
+species.common_name	Fruit fly
+
+genebuild.version	dmel_r6.54_FB2023_05
+assembly.default	BDGP6.54
+assembly.name	BDGP6.54
+genebuild.initial_release_date	2023-09
+genebuild.last_geneset_update	2023-09
+
+
+# Assembly metadata
+assembly.accession	GCA_000001215.4
+
+# FlyBase related defaults
+#no CONF	GCF_TO_GCA	1
+#no CONF	ANNOTATION_SOURCE_SFX	fb
+species.annotation_source	FlyBase
+
+# assembly
+#CONF	ASM_URL	ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r6.54_FB2023_05
+#CONF	FNA_FILE	fasta/dmel-all-chromosome-r6.54.fasta.gz
+
+# assigning "no strand" TE (`ID=FBti0215368;Name=Tc1{}6596`) to "+" strand to fix loading
+#CONF	DATA_INIT	zcat gff/dmel-all-no-analysis-r6.54.gff.gz | awk -F "\t" '{OFS="\t"; if ($3 == "transposable_element" && $7 == ".") {$7 = "+"}; print}' | gzip - > fixed_te_strands.gff3.gz
+#CONF	GFF_FILE	fixed_te_strands.gff3.gz
+#CONF	PEP_FILE	fasta/dmel-all-translation-r6.54.fasta.gz
+
+#   add-ons from NCBI
+#CONF	ASM_SINGLE	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/215/GCA_000001215.4_Release_6_plus_ISO1_MT/GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gbff.gz
+#CONF	GBFF_FILE	GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gbff.gz
+
+#CONF	ASM_SINGLE	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/215/GCA_000001215.4_Release_6_plus_ISO1_MT/GCA_000001215.4_Release_6_plus_ISO1_MT_assembly_report.txt
+#CONF	ASM_REP_FILE	GCA_000001215.4_Release_6_plus_ISO1_MT_assembly_report.txt
+
+#CONF	ASM_SINGLE	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/215/GCA_000001215.4_Release_6_plus_ISO1_MT/GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gff.gz
+#CONF	SR_GFF_FILE	GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gff.gz
+
+# stats and metadata generatio options
+#CONF	IGNORE_UNVALID_SOURCE_GFF	YES
+#CONF	STOP_AFTER_GFF_STATS	NO
+#CONF	STOP_AFTER_CONF NO
+
+#CONF	GFF_STATS_OPTIONS	--rule_options flybase
+#CONF	SR_GFF_PARSER_CONF_PATCH	metaparser/regions_no_syns.patch
+
+#CONF	GFF_PARSER_CONF	metaparser/flybase.conf
+#CONF	GFF_PARSER_PFX_TRIM	NO
+
+#CONF	GEN_META_CONF_OPTIONS	--generate_species_aliases
+
+#CONF	GFF3_LOAD_LOGIC_NAME	flybase
+
+#CONF	GFF_LOADER_OPTIONS	--external_db_map_name default.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
+#  Metazoa: --external_db_map_name default.txt
+#  minimal: --external_db_map_name minimal.txt --skip_unknown_xref_source 1
+
+# update stable ids
+#CONF	UPDATE_STABLE_IDS	NO
+
+
+# mark trans_spliced transcripts 503
+# you can find list of them like this:
+# echo "SELECT f.uniquename, f.name, cvt.name || '; ' || cv.name || ':' || dbx.accession
+#    FROM feature f join feature_cvterm fcvt on f.feature_id=fcvt.feature_id
+#    JOIN pub ON fcvt.pub_id=pub.pub_id
+#    JOIN cvterm cvt ON fcvt.cvterm_id=cvt.cvterm_id
+#    JOIN organism o ON f.organism_id=o.organism_id
+#    JOIN cv ON cvt.cv_id=cv.cv_id
+#    JOIN dbxref dbx ON cvt.dbxref_id=dbx.dbxref_id
+#  WHERE cvt.name='trans_spliced_transcript'
+#    AND o.abbreviation='Dmel'
+#    AND f.is_obsolete = False
+#    AND f.is_analysis = False
+#    AND f.uniquename ~ '^FBtr\d+$';
+#" | psql -h chado.flybase.org -U flybase flybase -F $'\t' --no-align
+
+#CONF	TR_TRANS_SPLICED	FBtr0084079,FBtr0084080,FBtr0084081,FBtr0084082,FBtr0084083,FBtr0084084,FBtr0084085,FBtr0307759,FBtr0307760,FBtr0089347
+
+
+# Provider metadata
+#CONF	GFF3_LOAD_SOURCE_NAME	FlyBase
+
+assembly.provider_name	FlyBase
+assembly.provider_url	https://www.flybase.org
+
+annotation.provider_name	FlyBase
+annotation.provider_url	https://www.flybase.org
+
+#no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
+#no CONF	REP_LIB_RAW	/path/to/raw/drosophila_melanogaster.rm.lib
+
+
+# rna features and genes
+#CONF	RNA_FEAT_PARAMS	-cmscan_threshold 1e-6 -taxonomic_lca 1
+
+#CONF	RUN_RNA_GENES	NO
+
+# or
+# using 'vb' context, otherwise ('eg' context) needs special "ena*" database
+#no CONF	RNA_GENE_PARAMS	-run_context vb -score_threshold 65
+#               m.b. updated maximum_per_hit_name { 'pre_miRNA' => 100, 'ribozyme' => 100 }
+# species.stable_id_prefix	ENSLOC
+
+
+# load UniProt gene names and descriptions
+#CONF	XREF_PARAMS	-refseq_dna -refseq_peptide 1 -refseq_tax_level invertebrate
+
+
+# Add sample data
+sample.gene_param	FBgn0052693
+sample.gene_text	FBgn0052693
+sample.location_param	2L:8430000-8440000
+sample.location_text	2L:8430000-8440000
+sample.search_text	Mucin
+sample.transcript_param	FBtr0072021
+sample.transcript_text	FBtr0072021
+sample.variation_param	rs202391697;vf=2L:5084:C_A:EVA
+sample.variation_text	rs202391697
+sample.vep_hgvs	FBtr0089196:c.4A>T\\nFBtr0343930:c.-741+16A>G\\nFBtr0346721:c.6del
+sample.vep_vcf	4 1147550 . A T . . .\\nX 6091584 . A G . . .\\nY 1636577 . GA G . . .
+sample.vep_spdi	4:1147549:A:T\\nX:6091583:A:G\\nY:1636577:A:
+sample.vep_ensembl	4 1147550 1147550 A/T 1\\nX 6091584 6091584 A/G 1\\nY 1636578 1636578 A/- 1
+
+#organism.biosample_id	SAMN02803731
+
+
+
+# FINALIZE
+#
+#  fixing broken objects xrefs
+# ${CMD} -D premz_drosophila_melanogaster_core_57_109_10 -e 'delete from object_xref where object_xref_id = 1087920'
+# ${CMD} -D premz_drosophila_melanogaster_core_57_109_10 -e 'delete from identity_xref where object_xref_id = 1087920'
+#
