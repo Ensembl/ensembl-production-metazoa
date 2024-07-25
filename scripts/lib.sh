@@ -1627,7 +1627,7 @@ function clean_neg_start_repeats () {
   local CMD="$1"
   local DBNAME="$2"
   echo "removing repeats with negative starts for $DBNAME" >> /dev/stderr
-  $CMD -D $DBNAME -e 'delete from repeat_feature where repeat_start < 1'
+  $CMD -D $DBNAME -e 'delete from repeat_feature where repeat_start < 1 or repeat_end <= repeat_start;'
 }
 
 function construct_repeat_libraries () {
