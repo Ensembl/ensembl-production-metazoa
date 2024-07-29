@@ -39,11 +39,12 @@ from sqlalchemy.engine import URL
 from ensembl.io.genomio.assembly.status import singularity_image_setter
 from ensembl.io.genomio.assembly.status import datasets_asm_reports
 from ensembl.io.genomio.assembly.status import UnsupportedFormatError
-from ensembl.io.genomio.utils.archive_utils import extract_file
+from ensembl.io.genomio.database.dbconnection_lite import DBConnectionLite as dbc
 from ensembl.io.genomio.utils.json_utils import get_json
+from ensembl.io.genomio.utils.json_utils import get_json
+from ensembl.utils.archive import extract_file
 from ensembl.utils.logging import init_logging_with_args
 from ensembl.utils.argparse import ArgumentParser
-from ensembl.io.genomio.database.dbconnection_lite import DBConnectionLite as dbc
 
 
 class LoadingMetaData(dict):
