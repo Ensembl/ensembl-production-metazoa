@@ -172,8 +172,8 @@ git clone git@github.com:Ensembl/ensembl-production-imported-private.git || true
 # prepare ensembl-genomio
 echo "Building python3 venv" >> /dev/stderr
 
-# pyenv local 3.9
-python3.9 -m venv venv
+# pyenv local 3.11
+python3.11 -m venv venv
 source venv/bin/activate
 pip3 install Cython
 
