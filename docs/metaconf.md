@@ -184,6 +184,7 @@ wrappers from [lib.sh](script/lib.sh) used to construct de-novo repeat library, 
 `REPBASE_FILE`| /path/to/curated.lib | `str: ` empty, `abs path` | If non-empty, the provided curated library is used imnstead of RepBase slice to filter proteome against. |
 `IGNORE_EMPTY_REP_LIB`| 1 | `str:` empty or anything  | If empty and the inferred (produced by the previous steps) de-novo library is empty terminates execution. If non-empty -- execution is not terminated. | Better not to enable it for the first run as a sanity check measure.
 `DNA_FEATURES_OPTIONS` | `-repeatmasker_exe .../pkgs/RepeatMasker.4_0_7/RepeatMasker` , `-redatrepeatmasker 1` | `str:` `options ` | Options to be passed to the [`DNAFeatures`](https://github.com/Ensembl/ensembl-production-imported/blob/trunk/lib/perl/Bio/EnsEMBL/EGPipeline/PipeConfig/DNAFeatures_conf.pm) pipeline called from [`run_repeat_masking`](scripts/lib.sh)
+`DNA_FEATURES_FORGIVE_REPEAT_MASKER` | `NO`, `YES`, `1` | `str:` `options ` | Automatically forgive failed [`DNAFeatures`](https://github.com/Ensembl/ensembl-production-imported/blob/trunk/lib/perl/Bio/EnsEMBL/EGPipeline/PipeConfig/DNAFeatures_conf.pm) `RepeatMasker` analysis jobs for pipeline called from [`run_repeat_masking`](scripts/lib.sh)
 
 ### Various pipeline options
 #### RNAFeatures and RNAGenes pipeline related options

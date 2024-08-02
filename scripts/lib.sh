@@ -1890,10 +1890,13 @@ function run_repeat_masking () {
       1> $OUT_DIR/loop.stdout || true
     tail $OUT_DIR/loop.stderr $OUT_DIR/loop.stdout
 
-    beekeeper.pl -url "$EHIVE_URL" -analyses_pattern RepeatMasker -forgive_failed_jobs \
-      2>> $OUT_DIR/loop.stderr \
-      1>> $OUT_DIR/loop.stdout
-    tail $OUT_DIR/loop.stderr $OUT_DIR/loop.stdout
+    local DNA_FEATURES_FORGIVE_REPEAT_MASKER="$(get_meta_conf $META_RAW 'DNA_FEATURES_FORGIVE_REPEAT_MASKER')"
+    if [ -n "$DNA_FEATURES_FORGIVE_REPEAT_MASKER" -a "x$DNA_FEATURES_FORGIVE_REPEAT_MASKER" != "xNO" ]; then
+      beekeeper.pl -url "$EHIVE_URL" -analyses_pattern RepeatMasker -forgive_failed_jobs \
+        2>> $OUT_DIR/loop.stderr \
+        1>> $OUT_DIR/loop.stdout
+      tail $OUT_DIR/loop.stderr $OUT_DIR/loop.stdout
+    fi
 
     $LOOP_CMD \
       2>> $OUT_DIR/loop.stderr \
