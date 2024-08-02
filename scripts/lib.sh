@@ -1887,9 +1887,18 @@ function run_repeat_masking () {
 
     $LOOP_CMD \
       2> $OUT_DIR/loop.stderr \
-      1> $OUT_DIR/loop.stdout
+      1> $OUT_DIR/loop.stdout || true
     tail $OUT_DIR/loop.stderr $OUT_DIR/loop.stdout
 
+    beekeeper.pl -url "$EHIVE_URL" -analyses_pattern RepeatMasker -forgive_failed_jobs \
+      2>> $OUT_DIR/loop.stderr \
+      1>> $OUT_DIR/loop.stdout
+    tail $OUT_DIR/loop.stderr $OUT_DIR/loop.stdout
+
+    $LOOP_CMD \
+      2>> $OUT_DIR/loop.stderr \
+      1>> $OUT_DIR/loop.stdout
+    tail $OUT_DIR/loop.stderr $OUT_DIR/loop.stdout
     echo 'update meta set species_id = 1 where meta_key = "repeat.analysis" and species_id is null' | $CMD -D "$DBNAME"
 
     clean_neg_start_repeats $CMD $DBNAME
