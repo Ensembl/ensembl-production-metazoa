@@ -25,8 +25,9 @@ species.annotation_source	FlyBase
 #CONF	ASM_URL	ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r6.54_FB2023_05
 #CONF	FNA_FILE	fasta/dmel-all-chromosome-r6.54.fasta.gz
 
+# remoming anything having "match" in the 3rd column to get "no-analysis" from "all" version of the gff3
 # assigning "no strand" TE (`ID=FBti0215368;Name=Tc1{}6596`) to "+" strand to fix loading
-#CONF	DATA_INIT	zcat gff/dmel-all-no-analysis-r6.54.gff.gz | awk -F "\t" '{OFS="\t"; if ($3 == "transposable_element" && $7 == ".") {$7 = "+"}; print}' | gzip - > fixed_te_strands.gff3.gz
+#CONF	DATA_INIT	 (echo '##gff-version 3'; zcat gff/dmel-all-r6.54.gff.gz  | tail -n +2) | awk -F "\t" '$3 !~ /match/' | awk -F "\t" '{OFS="\t"; if ($3 == "transposable_element" && $7 == ".") {$7 = "+"}; print}' | gzip - > fixed_te_strands.gff3.gz
 #CONF	GFF_FILE	fixed_te_strands.gff3.gz
 #CONF	PEP_FILE	fasta/dmel-all-translation-r6.54.fasta.gz
 
