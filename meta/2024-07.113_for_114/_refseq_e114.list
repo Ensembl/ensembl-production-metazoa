@@ -17,3 +17,4 @@ African malaria mosquito	Anopheles gambiae (ifakara)	Diptera	agam1	GCF_943734735
 
 # cat  meta/2024-07.113_for_114/_refseq_e114.list | grep -vF '#' | grep -vP '^\s*$' | awk -F "\t" '{print NF}' | sort | uniq -c
 # python3 ./scripts/tmpl2meta.py --template meta/refseq_chunk.tmpl --param_table meta/2024-07.113_for_114/_refseq_e114.list --output_dir meta/2024-07.113_for_114 --out_file_pfx rs8t_
+# ls -1 meta/2024-07.113_for_114/rs8t_* | wc -l
