@@ -16,5 +16,5 @@ Mosquitos	Anopheles albimanus	Diptera	aalb2	GCF_013758885.1	https://ftp.ncbi.nlm
 African malaria mosquito	Anopheles gambiae (ifakara)	Diptera	agam1	GCF_943734735.2	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/943/734/735/GCF_943734735.2_idAnoGambNW_F1_1	https://www.ncbi.nlm.nih.gov/refseq/annotation_euk/Anopheles_gambiae/GCF_943734735.2-RS_2023_12/	NCBI Anopheles gambiae Annotation Release GCF_943734735.2-RS_2023_12	Wellcome Sanger Institute	https://www.sanger.ac.uk/
 
 # cat  meta/2024-07.113_for_114/_refseq_e114.list | grep -vF '#' | grep -vP '^\s*$' | awk -F "\t" '{print NF}' | sort | uniq -c
-# python3 ./scripts/tmpl2meta.py --template meta/refseq_chunk.tmpl --param_table meta/2024-07.113_for_114/_refseq_e114.list --output_dir meta/2024-07.113_for_114 --out_file_pfx rs8t_
+# python3 ./scripts/tmpl2meta.py --template meta/refseq.tmpl --param_table meta/2024-07.113_for_114/_refseq_e114.list --output_dir meta/2024-07.113_for_114 --out_file_pfx rs8t_
 # ls -1 meta/2024-07.113_for_114/rs8t_* | wc -l
