@@ -1,0 +1,139 @@
+#CONF	DB_PFX	premz
+#CONF	ASM_VERSION	1
+
+# if substituting existing core
+#  * update ASM_VERSION above
+#  * uncomment "species.production_name" below
+# # updated, prev was _PREV_CORE_NAME_
+# species.production_name	_PROD_NAME_
+species.common_name	Dumeril's clam worm
+
+# GCA_026936325.1
+# https://www.ncbi.nlm.nih.gov/assembly/GCA_026936325.1/
+# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/026/936/325/GCA_026936325.1_EMBL_pdum_1.0/
+# Developmental Biology, EMBL, https://www.embl.org/research/units/developmental-biology/
+# The Platynereis Community, https://platynereis.com/resources/community/
+
+#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/026/936/325/GCA_026936325.1_EMBL_pdum_1.0
+
+
+# copy gff3 and shift JAPTHN010000152.1 scaffold_152 features 36437bp left, ignore those with starts/ends <= 0
+#   NCBI FILTERED BIT Trim: # Sequence name, length, span(s), apparent source
+#     scaffold_152    676117  1..36437    Oryctolagus cuniculus
+#   echo $((676117 - 36437))
+#     639680
+#   assembly report:
+#     scaffold_152 unplaced-scaffold na na JAPTHN010000152.1 <> na Primary Assembly 639680 na
+#   cat pdum/transcripts.fasta.transdecoder.genome.gff3 | awk -F "\t" '$1 == "scaffold_152" && $4 < 36437' | grep -wc gene
+#     1
+#   cat pdum/transcripts.fasta.transdecoder.genome.gff3 | awk -F "\t" '$1 == "scaffold_152" && $4 < 36437' | grep -w gene
+#      scaffold_152 transdecoder gene 34072 44852 . - . ID=XLOC_020954;Name=ORF%20type%3Acomplete%20len%3A842%20%28%2B%29%2Cscore%3D163.66
+#
+#   # no overlaps with other genes
+#   cat pdum/transcripts.fasta.transdecoder.genome.gff3 | awk -F "\t" '$1 == "scaffold_152" && $4 <= 44852' | wc -l
+#   144
+#   cat pdum/transcripts.fasta.transdecoder.genome.gff3 | awk -F "\t" '$1 == "scaffold_152" && $5 <= 44852' | wc -l
+#   144
+#   # check
+#   cat pdum/transcripts.fasta.transdecoder.genome.gff3 |  awk -F "\t" -voff=36437 '$1 == "scaffold_152" {OFS="\t"; $4 -= off; $5 -= off; if ($4 <= 44852-off) print}' | wc -l
+#   144
+
+
+#CONF	DATA_INIT	cat ../../../../../pdum/transcripts.fasta.transdecoder.genome.gff3 | awk -F "\t" -voff=36437 '$1 != "scaffold_152"  {print} $1 == "scaffold_152" {OFS="\t"; $4 -= off; $5 -= off; if ($4 > 44852-off) print}' | gt gff3 -tidy -retainids -sort 2> pdum.gff3.log > pdum.gff3
+
+#CONF	GBFF_FILE	GCA_026936325.1_EMBL_pdum_1.0_genomic.gbff.gz
+#CONF	FNA_FILE	GCA_026936325.1_EMBL_pdum_1.0_genomic.fna.gz
+#CONF	ASM_REP_FILE	GCA_026936325.1_EMBL_pdum_1.0_assembly_report.txt
+
+#CONF	GFF_FILE	pdum.gff3
+
+# RefSeq related defaults
+#no CONF	GCF_TO_GCA	1
+#CONF	ANNOTATION_SOURCE_SFX	cm
+species.annotation_source	Community
+
+# fix missing CDS IDs in the gff3 before filtration and post-filtraion check
+#CONF	FIX_MISSING_CDS_ID	NO
+#CONF	IGNORE_LOST_FILTERED_CDS	NO
+
+
+# stats and metadata generation options
+#CONF	STOP_AFTER_CONF	NO
+
+# disabling default [transcript -> mRNA] gff3 feature type convesion
+#CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna
+
+#CONF	GFF_PARSER_CONF_PATCH	NO
+#no CONF	GFF_PARSER_PFX_TRIM	NO
+
+# no species.alias(es) are geenerated by default, enable below option if you need them
+#no CONF	GEN_META_CONF_OPTIONS	--generate_species_aliases
+
+#CONF	GFF3_LOAD_LOGIC_NAME	gff3_genes
+# For generic imports use "gff3_genes"
+
+#CONF	GFF_LOADER_OPTIONS	--external_db_map_name default.txt --manifest_integrity_rc_name 32GB --load_sequence_data_rc_name 256GB
+#  Default: --external_db_map_name default.txt
+#  FlyBase: --external_db_map_name default.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
+#  Plants: --xref_display_db_default Ensembl_Plants -division EnsemblPlants
+#  minimal: --external_db_map_name minimal.txt --skip_unknown_xref_source 1
+#  add to ignore manifest integrity check: --check_manifest 0
+#  add (if there's a need) for sequences not from INSDC / GenBank / RefSeq: --unversion_scaffolds 0
+
+#no CONF	ORDERED_CS_TAG	scaffold
+
+
+# update stable ids
+#CONF	UPDATE_STABLE_IDS	1
+# it's better not to split version ('-fix_version 0' by default)
+#no CONF	UPDATE_STABLE_IDS_OPTIONS	-fix_version 1
+
+
+# Assembly metadata
+assembly.accession	GCA_026936325.1
+
+# Provider metadata
+#CONF	GFF3_LOAD_SOURCE_NAME	EMBL
+
+assembly.provider_name	Developmental Biology, EMBL
+assembly.provider_url	https://www.embl.org/research/units/developmental-biology/
+
+annotation.provider_name	Developmental Biology, EMBL
+annotation.provider_url	https://www.embl.org/research/units/developmental-biology/
+
+#no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
+#  to change the lower allowed length [default 5000]: -min_slice_length 1000
+#  to change the splitting length threshold [default 10_000_000]: -max_seq_length 19000000
+
+#large CONF	DNA_FEATURES_OPTIONS	-repeatmasker_exe .../shared_data/pkgs/RepeatMasker.4_0_7/RepeatMasker -repeatmasker_sensitivity all=low
+#plants CONF	DNA_FEATURES_OPTIONS	-redatrepeatmasker 1
+
+#no CONF	IGNORE_EMPTY_REP_LIB	YES
+#   to ignore empty de novo repeat libraries
+
+
+# rna features and genes
+#CONF	RNA_FEAT_PARAMS	-cmscan_threshold 1e-6 -taxonomic_lca 1
+# for genome with large contigs add:  -splitdump_resource_class 32Gb_mem
+
+#no CONF	RUN_RNA_GENES	NO
+
+# or
+# using 'vb' context, otherwise ('eg' context) needs special "ena*" database
+#CONF	RNA_GENE_PARAMS	-run_context vb -score_threshold 65
+#               m.b. updated maximum_per_hit_name { 'pre_miRNA' => 100, 'ribozyme' => 100 }
+species.stable_id_prefix	ENSLOC
+
+# NB unset/set toplevel for the MT
+
+
+# load UniProt gene names and descriptions
+#CONF	XREF_PARAMS	-description_source reviewed -description_source unreviewed -gene_name_source reviewed
+#no -overwrite_description 1
+
+# or
+#no CONF	RUN_XREF	NO
+
+#
+# FINALIZE
+#
