@@ -143,14 +143,14 @@ species.stable_id_prefix	ENSLOC
 #     where t.biotype = "nontranslating_CDS"
 #   '
 #
-# $CMD_W -D platynereis_dumerilii_gca026936325v1cm_core_61_114_1 -e '
+# $CMD_W -D premz_platynereis_dumerilii_gca026936325v1cm_core_61_113_1 -e '
 #   delete ta from translation_attrib ta
 #     left join translation tn using (translation_id)
 #     where ta.translation_id is not NULL
 #      and tn.translation_id is NULL;
 #   '
 #
-# $CMD_W -D platynereis_dumerilii_gca026936325v1cm_core_61_114_1 -e '
+# $CMD_W -D premz_platynereis_dumerilii_gca026936325v1cm_core_61_113_1 -e '
 #   update transcript
 #     set canonical_translation_id = NULL
 #     where biotype = "nontranslating_CDS";
