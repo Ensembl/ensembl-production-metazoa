@@ -77,10 +77,10 @@ while (<INFILE>){
 #Close input and remove the temporary license file
 close INFILE;
 
-#system("rm ${CWD}/temp_output_license.tsv");
+system("rm ${CWD}/temp_output_license.tsv");
 print "Looking for old MD files\n";
 system("find ${CWD}/${release_dir}/ -type f -name \"*_about.md.old\" | xargs -n 1 -I XXX rm XXX");
 
 print BRIGHT_GREEN "* Finished updating species *_about.md files <--> On Wiki Image licenses.\n\n";
 
-exit 0
+exit 0;

@@ -51,34 +51,32 @@ if ($safe_division =~ m/[Pp]lants/){
 	print "Division is $ens_division\n";
 	print "Setting url to plants.ensembl.org\n";
 	$division_url = "https://plants.ensembl.org/info/genome/annotation/index.html"
-   }
+	}
 elsif ($safe_division =~ m/[Ff]ungi/){
 	print "Division is $ens_division\n";
 	print "Setting url to fungi.ensembl.org\n";
-        $division_url =	"https://fungi.ensembl.org/info/genome/annotation/index.html"
+    $division_url =	"https://fungi.ensembl.org/info/genome/annotation/index.html"
    }
 elsif ($safe_division =~ m/[Bb]ateria/){
-        print "Division is $ens_division\n";
-        print "Setting url to bacteria.ensembl.org\n";
-        $division_url = "https://bacteria.ensembl.org/info/genome/annotation/index.html"
-   }
+	print "Division is $ens_division\n";
+	print "Setting url to bacteria.ensembl.org\n";
+	$division_url = "https://bacteria.ensembl.org/info/genome/annotation/index.html"
+	}
 elsif ($safe_division =~ m/[Pp]rotists/){
-        print "Division is $ens_division\n";
-        print "Setting url to protists.ensembl.org\n";
-        $division_url = "https://protists.ensembl.org/info/genome/annotation/index.html"
-   }
+	print "Division is $ens_division\n";
+	print "Setting url to protists.ensembl.org\n";
+	$division_url = "https://protists.ensembl.org/info/genome/annotation/index.html"
+	}
 elsif ($safe_division =~ m/[Mm]etazoa/){
-        print "Division is $ens_division\n";
-        print "Setting url to metazoa.ensembl.org\n";
-        $division_url = "https://metazoa.ensembl.org/info/genome/annotation/index.html"
-   }
+	print "Division is $ens_division\n";
+	print "Setting url to metazoa.ensembl.org\n";
+	$division_url = "https://metazoa.ensembl.org/info/genome/annotation/index.html"
+	}
 else{
 	print "Division default to ensembl\n";
-        print "Setting url to ensembl.org\n";
+	print "Setting url to ensembl.org\n";
 	$division_url = "https://www.ensembl.org/info/genome/genebuild/index.html"
 }
-
-
 
 ## For each genome report file, locate and combine its assoicated Wilipedia JSON summary file on GCF/GCA accession
 system ("mkdir -p ./StaticContent_MD_Output-${release}");
@@ -120,21 +118,21 @@ foreach my $genome_sum_file (@input_genome_reports){
 
 	if (($count_sp_name > 3 )){
 		print YELLOW "!!! Genome JSON contains atypical/long 'organism_name' [$count_sp_name sub names] !!! --> Utilizing just the bionomial: ";
-               $species_name = "$temp_split_sp_name[0]_$temp_split_sp_name[1]";
-               print "\"Species name set as: $species_name\"\n";
+		$species_name = "$temp_split_sp_name[0]_$temp_split_sp_name[1]";
+		$species_name =~ s/\.$//; #Remove trailing dot on names such as Genus sp.
+		print "\"Species name set as: $species_name\"\n";
 	}
 	elsif (($count_sp_name == 3 )){
-               print YELLOW "!!! Organismal species name is trinomial --> Utilizing just the bionomial: ";
-               $species_name = "$temp_split_sp_name[0]_$temp_split_sp_name[1]";
-
-               print "\"Species name set as: $species_name\"\n";
+		print YELLOW "!!! Organismal species name is trinomial --> Utilizing just the bionomial: ";
+		$species_name = "$temp_split_sp_name[0]_$temp_split_sp_name[1]";
+		print "\"Species name set as: $species_name\"\n";
 	}
 	else{
 		print "Organismal species name is binomial....";
 		print "Species name set as: \"$scientific_name\".\n";
 	}
 
-        $static_output_folder = $static_output_folder."/".$species_name;
+	$static_output_folder = $static_output_folder."/".$species_name;
 	$species_name = lc$species_name;
 	system ("mkdir -p ./$static_output_folder");
 
@@ -184,46 +182,53 @@ foreach my $genome_sum_file (@input_genome_reports){
 			$annotation_source = "community_annotation";
 		}
 	}
-	
+
 	$asseb_accession = `jq '.accession' $genome_sum_file | sed 's/"//g'`;
 	chomp $asseb_accession;
-    	$gca_accession = $asseb_accession;
-    	$gca_accession =~ s/GCF_/GCA_/;
-    	$gca_accession_escape = $gca_accession;
-    	$gca_accession_escape =~ s/GCA_/GCA\\_/;
+	$gca_accession = $asseb_accession;
+	$gca_accession =~ s/GCF_/GCA_/;
+	$gca_accession_escape = $gca_accession;
+	$gca_accession_escape =~ s/GCA_/GCA\\_/;
 	chomp $gca_accession_escape;
 
-    	$core_prodname_gca = $gca_accession;
-    	$core_prodname_gca =~ s/GCA_/gca/;
-    	$core_prodname_gca =~ s/\.[0-9]$//;
-    	chomp $core_prodname_gca;
-    	$core_prodname_gca = "${species_name}_${core_prodname_gca}";
+	$core_prodname_gca = $gca_accession;
+	$core_prodname_gca =~ s/GCA_/gca/;
+	$core_prodname_gca =~ s/\.[0-9]$//;
+	chomp $core_prodname_gca;
+	$core_prodname_gca = "${species_name}_${core_prodname_gca}";
 
 	#Attempt to locate the correct core DB which corresponds to the appropriate genome JSON.
 
 	my $species_core;
-	my $species_core_count = `grep -c -E "^${species_name}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed\n`;
-	my $species_gca_core_count = `grep -c -E "^${core_prodname_gca}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed\n`;
-	my $species_trinomial_core_count = `grep -c -E "^${species_name}_[A-Za-z0-9]+_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed\n`;
+	my $species_binomial_core_count = `grep -c -E "^${species_name}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
+	my $species_trinomial_core_count = `grep -c -E "^${core_prodname_gca}v[0-9]{1|2}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
+	my $species_trinomial_withsuffix_core_count = `grep -c -E "^${core_prodname_gca}v[0-9]+[a-z]{2}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
+	my $atypical_core_count = `grep -c -E "^${core_prodname_gca}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
+	# my $species_trinomial_core_count = `grep -c -E "^${species_name}_[A-Za-z0-9]+_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
 
-	if ($species_core_count == 1){
-		print GREEN "Core database located solely on binomial style db name.\n";
-		$species_core = `grep -e "^${species_name}" < $species_cores_listed\n`;
-                $core_located =	1;
-	} 
-	elsif($species_gca_core_count == 1){
-		print GREEN "Core database located on binomial + gca suffic style db name.\n";
-		$species_core = `grep -e "^${core_prodname_gca}" < $species_cores_listed\n`;
-                $core_located =	1;
-	}
-	elsif($species_trinomial_core_count == 1){
-             	print GREEN "Core database located on trinaomal style db name.\n";
-		$species_core = `grep -E "^${species_name}_[A-Za-z0-9]+_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed\n`;
+	if($species_trinomial_withsuffix_core_count == 1){
+		print GREEN "Core database located on trinaomal (binomial sp + gca + source suffix) database name.\n";
+		$species_core = `grep -m 1 -E "^${core_prodname_gca}v[0-9]+[a-z]{2}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
 		$core_located = 1;
 	}
-        else{
-		print RED "Unable to match core database nam in provided list to NCBI genome JSON (organism_name) for species $species_name. Exiting....";
-		exit;
+	elsif($species_trinomial_core_count == 1){
+		print GREEN "Core database located on trinaomal (binomial sp + gca) database name.\n";
+		$species_core = `grep -m 1 -E "^${core_prodname_gca}v[0-9]{1|2}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
+		$core_located = 1;
+	}
+	elsif ($species_binomial_core_count == 1){
+		print GREEN "Core database located solely on binomial sp database name.\n";
+		$species_core = `grep -m 1 -e "^${species_name}" < $species_cores_listed`;
+		$core_located =	1;
+	}
+	elsif($atypical_core_count == 1){
+		print YELLOW "Core database located on abnormal name (binomial sp + gca but NO version) database name.\n";
+		$species_core = `grep -m 1 -E "^${core_prodname_gca}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
+		$core_located = 1;
+	}
+	else{
+		print RED "Unable to match core database nam in provided list to NCBI genome JSON (organism_name) for species $species_name.\n";
+		die;
 	}
 
 	#Find the coreDB from the input core list file. Then locate the appropriate JSON file to parse. 
@@ -234,16 +239,16 @@ foreach my $genome_sum_file (@input_genome_reports){
 		chomp $species_core;
 		print "Core database located: $species_core\n";
 		$json_file_name = "${species_core}.wiki.json";
-		print "CHECKING -> ${wiki_input_dir}/${json_file_name}";
+		print "CHECKING -> ${wiki_input_dir}/${json_file_name}\n";
 		$json_file_path = `ls -1 ${wiki_input_dir}/${json_file_name}`;
-		print "FULL JSON PATH ->> $json_file_path";
+		print "FULL JSON PATH ->> $json_file_path\n";
 		chomp $json_file_path;
 	}
 
 	#Perform query to obtain production name from to ensure static md will match with ensembl core DB
 	my $prod_name=`$core_host -D $species_core -Ne \"SELECT meta_value FROM meta WHERE meta_key = 'species.production_name';"`;
 	chomp $prod_name;
-        print "Linked with Ensembl CORE_DB [$species_core] & species.production_name [$prod_name]\n";
+	print "Linked with Ensembl CORE_DB [$species_core] & species.production_name [$prod_name]\n";
 	$prod_name = ucfirst($prod_name);
 
 	##Open file handles using species.productioin_name to write markdown .md files.
@@ -282,7 +287,6 @@ foreach my $genome_sum_file (@input_genome_reports){
 		}
 	}
 	else{
-		
 		$scaf_N50 = `jq '.assembly_stats.scaffold_n50' $genome_sum_file`;
 		$scaf_L50 = `jq '.assembly_stats.scaffold_l50' $genome_sum_file`;
 		$gc_perc = `jq '.assembly_stats.gc_percent' $genome_sum_file`;
@@ -453,5 +457,5 @@ print BRIGHT_GREEN "\t** Finished processing **\n\n";
 
 system("rm ${wiki_input_dir}/*.fixed.json");
 
-exit;
+exit 0;
 

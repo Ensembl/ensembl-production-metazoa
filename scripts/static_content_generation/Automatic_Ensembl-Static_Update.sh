@@ -43,7 +43,7 @@ if [[ -z $STATIC_MD_DIR ]] || [[ -z $RELEASE ]] || [[ -z $FORK_REPO_URL ]]; then
 	echo "Usage: sh Automatic_Ensembl-Static_Update.sh < Path to new static content dirs> <RELEASE> <FOR_REPO_URL> <Division> Optional param: '--images' + Path to static content image dir>"
 	echo "e.g. Automatic_Ensembl-Static_Update.sh StaticContent_MD/ release/eg/60 git@github.com:GIT-USER-NAME/ensembl-static.git metazoa "
 	echo "e.g. Automatic_Ensembl-Static_Update.sh StaticContent_MD/ release/eg/60 git@github.com:GIT-USER-NAME/ensembl-static.git metazoa --images SourceImages/"
-	exit 0
+	exit 1
 else
 	TEMP_STATIC_IN=`readlink -f $STATIC_MD_DIR`
 	NEW_STATIC_CONTENT="${TEMP_STATIC_IN}/"
@@ -58,7 +58,7 @@ fi
 # Ensembl Division set ?
 if [[ -z $TMP_DIVISION ]]; then
 	echo "Ensembl divsion is not set. Please set from: 'bacteria', 'fungi', 'metazoa', 'plants', 'protists')"
-	exit 0
+	exit 1
 else
 	DIVISION=$TMP_DIVISION
 fi

@@ -22,10 +22,12 @@ CWD=`readlink -f $PWD`
 if [ -z $INPUT_SP ]; then
 
 	echo "usage: sh Generate_WIKI_Sp_ImagesFromText.sh <Species_names_infile>"
-	exit 0;
+	exit 1;
 fi
 
 INPUT_FILE=`readlink -f $INPUT_SP`
+ENS_PRODUCTION_METAZOA="${CWD}/ensembl-production-metazoa/scripts/static_content_generation"
+
 
 function gen_wiki_url (){
 
@@ -41,8 +43,8 @@ function gen_wiki_url (){
 }
 
 # Generate the WIikipedia JSON download script and download JSON file per species.
-mkdir -p WIKI_JSON
-export WIKI_DIR=`readlink -f WIKI_JSON`
+mkdir -p $CWD/WIKI_JSON_OUT
+export WIKI_DIR=`readlink -f $CWD/WIKI_JSON_OUT`
 cd $WIKI_DIR
 rm -f ./download_Wiki_JSON_Summary.sh
 
@@ -58,7 +60,7 @@ echo "....done"
 
 # Process images using input JSON folder
 echo "Downloading species source image(s)"
-`sh Image_resource_gather.sh $WIKI_DIR $CWD 2>&1 | tee image_download.log`
+sh ${ENS_PRODUCTION_METAZOA}/Image_resource_gather.sh $WIKI_DIR 2>&1 > image_download.log
 echo "....done"
 
 echo -e -n "\n\n### Log from image downloading:\n"

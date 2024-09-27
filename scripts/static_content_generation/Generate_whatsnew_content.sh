@@ -21,7 +21,7 @@ PIPE_OR_NO=$3
 if [[ -z $HOST ]] || [[ -z $CORE_FILE ]]; then
 
 	echo "usage: sh Generate_whatsnew_content.sh <HOST> <CORE LIST FILE>"
-	exit 0
+	exit 1
 else
 	echo -e -n "- **Assembly and gene set data updated**\n- **Updated gene sets**\n- **New assembly for existing species**\n- **New species**\n- **Updated BioMarts for all gene and variation data**\n- **Updated pan-taxonomic gene trees and homologies**\n- **Planned updates**\n\n" > ./WhatsNewContent.md
 	while read CORE; do 
@@ -39,5 +39,4 @@ if [[ $PIPE_OR_NO != 'pipe' ]]; then
 	readlink -f ./WhatsNewContent.md
 fi
 
-
-exit 1
+exit 0

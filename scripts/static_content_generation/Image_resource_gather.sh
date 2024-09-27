@@ -52,7 +52,7 @@ function get_wiki_altImages (){
 if [[ -z $JSON_WIKI_DIR_USER ]]; then
 
 	echo "Usage: sh Image_resource_gather.sh <INPUT WIKI JSON(s) DIR>"
-	exit 0
+	exit 1
 fi
 
 JSON_WIKI_DIR_FULL=`readlink -f $JSON_WIKI_DIR_USER`
@@ -78,7 +78,7 @@ do
 	BINOMIAL_SP=${LC_BINOMIAL_SP^}
 	
 	#Obtain the source url from Wiki Json (wiki species landing page)
-	SOURCE_URL=`jq '.' $JSON | grep -A 1 -e "originalimage" | grep -e ".jpg" -e ".JPG" -e ".png" -e ".PNG" | tail -n 1 | awk -F": " {'print $2'} | sed 's/[",]//g'`
+	SOURCE_URL=`jq -r '. | .originalimage | .source' $JSON`
 	#Replace all instances of encoded "(,) - %28/ %29 which I found interfered with obtaining image licensing information"
 	MEDIA_VIEW_BASE_URL="https://en.wikipedia.org/wiki/File"
 	IMAGE_NAME=`echo $SOURCE_URL | awk -F"/" '{print $NF}' | sed -E 's/[",]//g' | sed 's/%28/(/' | sed 's/%29/)/' | sed -E 's/[0-9]+px-//'`  
@@ -186,7 +186,7 @@ if [[ -e ${CWD}/Download_species_image_from_url.sh ]]; then
 	grep -e 'wget' Download_species_image_from_url.sh | awk -F" " '{print $NF}' | xargs -n 1 -I XXX mv XXX $CWD/Source_Images_wikipedia
  
 else
-	echo -e -n "${RED}WARNING: No source images were located !! Noting to do...Exiting !!${NC}"
+	echo -e -n "${RED}WARNING: No source images were located !! Noting to do...Exiting !!${NC}\n"
 	exit 1
 fi
 

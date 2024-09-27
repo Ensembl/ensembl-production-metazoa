@@ -29,6 +29,13 @@ WIKI_OUTPUT_JSONS="$CWD/WIKI_JSON_OUT"
 ENS_PRODUCTION_METAZOA="$CWD/ensembl-production-metazoa"
 DS_SOFTWARE_URL="https://api.github.com/repos/ncbi/datasets/releases/latest"
 
+##Vars for STDOUT colour formatting
+GREEN='\033[0;32m'
+PURPLE='\033[0;35m'
+RED='\033[0;31m'
+ORANGE='\033[0;33m'
+NC='\033[0m' # No Color
+
 if [[ -d ${ENS_PRODUCTION_METAZOA} ]]; then
 	STATIC_BASE_DIR="${ENS_PRODUCTION_METAZOA}/scripts/static_content_generation"
 else
@@ -41,35 +48,52 @@ fi
 
 if [[ $RUN_STAGE == TEMPLATE ]]; then
 
-       	# ### Generate blank files for species not linked with GCF_
-        read -p "Generating blank MD files. Enter species.production_name : " PROD_NAME
-	read -p "Generating blank MD files. Enter the appropriate Division (e.g. metazoa, plants, protists etc) : " ENS_DIVISION
-	     if [[ -d $ENS_PRODUCTION_METAZOA ]]; then
+		# ### Generate blank files for species not linked with GCF_
+		read -p "Generating blank MD files. Enter species.production_name : " PROD_NAME
+		read -p "Generating blank MD files. Enter the appropriate Division (e.g. metazoa, plants, protists etc) : " ENS_DIVISION
+		if [[ -d $ENS_PRODUCTION_METAZOA ]]; then
 
-		    for EXTENSION in _about.md _annotation.md _assembly.md
-            do
-            cat $ENS_PRODUCTION_METAZOA/scripts/static_content_generation/template${EXTENSION} | sed s/TEMP_DIVISION/$ENS_DIVISION/g > /$CWD/${PROD_NAME}${EXTENSION};
-            done
-        	echo -e -n "Generated generic template Markdown files:\n[${PROD_NAME}_about.md, ${PROD_NAME}_annotation.md, ${PROD_NAME}_assembly.md]\n!!! Please amend these files to fill in the missing values !\n"
-        	exit 0
+			for EXTENSION in _about.md _annotation.md _assembly.md _references.md
+			do
+			cat $ENS_PRODUCTION_METAZOA/scripts/static_content_generation/template${EXTENSION} | sed s/TEMP_DIVISION/$ENS_DIVISION/g > /$CWD/${PROD_NAME}${EXTENSION};
+			done
+			echo -e -n "Generated generic template Markdown files:\n[${PROD_NAME}_about.md, ${PROD_NAME}_annotation.md, ${PROD_NAME}_assembly.md]\n!!! Please amend these files to fill in the missing values !\n"
+			exit 0
 		fi
 
 fi
 
 if [[ -z $INPUT_DB_LIST ]] || [[ -z $HOST ]] || [[ -z $RELEASE ]] || [[ -z $STATIC_BASE_DIR ]] || [[ -z $ENS_DIVISION ]]; then
- 	echo "Usage: sh CoreList_To_StaticContent.sh Template"
- 	echo -e -n "\tOR\n"
- 	echo "Usage: sh CoreList_To_StaticContent.sh <RunStage: All, Wiki, NCBI, Static, Image, LicenseUsage, WhatsNew, Tidy> <INPUT_DB_LIST> <MYSQL_HOST_SERVER> <Unique_Run_Identifier> <Ensembl divsision>"
- 	exit 0
+	echo "Usage: sh CoreList_To_StaticContent.sh Template"
+	echo -e -n "\tOR\n"
+	echo "Usage: sh CoreList_To_StaticContent.sh <RunStage: All, Wiki, NCBI, Static, Image, LicenseUsage, WhatsNew, Tidy> <INPUT_DB_LIST> <MYSQL_HOST_SERVER> <Unique_Run_Identifier> <Ensembl divsision>"
+	exit 1
 fi
+
+# Repeat check of stage specific processing and exit or continue pipeline accordingly
+function check_exit_status(){
+	local EXIT_STATUS=$1
+	local CUR_STAGE=$2
+	local NEXT_STAGE=$3
+
+	if [[ $EXIT_STATUS == 0 ]]; then
+		echo -e -n "${GREEN}Stage: '${CUR_STAGE^}' has finished fully, moving on to $NEXT_STAGE...${NC}\n\n"
+		echo "$CUR_STAGE" >> $CWD/$STAGE_LOG
+		RUN_STAGE=$NEXT_STAGE
+	else
+		echo -e -n "${RED}Stage: $CUR_STAGE failed on exit status == '$EXIT_STATUS'. Exiting main processing wrapper.${NC}\n\n"
+		exit 1
+	fi
+}
 
 ## Check if SINGULARITY cache dir ENV variable is defined
 if [[ ! $NXF_SINGULARITY_CACHEDIR ]]; then
 	echo "Required singularity ENV variable 'NXF_SINGULARITY_CACHEDIR' is not defined."
 	echo "Please set this variable to a path you wish to store singularity SIF image files.!"
-	exit 0
+	exit 1
 else
-	DATASETS_RELEASE=`curl -s $DS_SOFTWARE_URL | grep browser_download_url | cut -d \" -f4 | grep linux-amd64.cli.package.zip | cut -d "/" -f 8`
+	#DATASETS_RELEASE=`curl -s $DS_SOFTWARE_URL | grep browser_download_url | cut -d \" -f4 | grep linux-amd64.cli.package.zip | cut -d "/" -f 8`
+	DATASETS_RELEASE="latest"
 	DATASETS_DOCKER_BASE_URL="docker://ensemblorg/datasets-cli"
 
 	SIF_IMAGE_W_VERSION="datasets-cli.${DATASETS_RELEASE}.sif"
@@ -102,26 +126,81 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "WIKI" ]]; then
 		rm ./generate_Wiki_JSON_Summary.sh
 	fi
 
+	check_wikipedia_content () {
+
+		local CORE=$1
+		local LOCAL_DIR=$2
+		local WIKI_DIR=$3
+		local LINNEAN_NAME=$4
+		local FALL_BACK_NAME=$5
+
+		if [[ -s ${CORE}.spname.wiki.json ]] && [[ -s ${CORE}.commonname.wiki.json ]]; then
+			mv $LOCAL_DIR/${CORE}.spname.wiki.json $WIKI_DIR/${CORE}.wiki.json
+			rm $LOCAL_DIR/${CORE}.commonname.wiki.json
+			echo -e -n  "Wikipedia webpage located on Linnean & Common name.\n${ORANGE}However using linnean $LINNEAN_NAME wikipage as preferred source.${NC}\n\n"
+			return
+		elif [[ -s ${CORE}.spname.wiki.json ]] && [[ ! -s ${CORE}.commonname.wiki.json ]]; then
+			mv $LOCAL_DIR/${CORE}.spname.wiki.json $WIKI_DIR/${CORE}.wiki.json
+			rm $LOCAL_DIR/${CORE}.commonname.wiki.json
+			echo -e -n "Wikipedia webpage exists based on Linnean name: $LINNEAN_NAME. Now set for $CORE !\n\n"
+			return
+		elif [[ ! -s ${CORE}.spname.wiki.json ]] && [[ -s ${CORE}.commonname.wiki.json ]]; then
+			mv $LOCAL_DIR/${CORE}.commonname.wiki.json $WIKI_DIR/${CORE}.wiki.json
+			rm $LOCAL_DIR/${CORE}.spname.wiki.json
+			echo -e -n "Wikipedia webpage exists based soley on species common name.\n${ORANGE}Must now use common name $FALL_BACK_NAME wikipage for static.${NC}\n\n"
+			echo ${CORE}.spname.wiki.json >> Without_Wikipedia_Summary_Content.txt
+			return
+		else
+			echo -e -n  "${RED}Unable to find wikipedia webpage for the Linnean OR Common name -> $CORE${NC}\n\n"
+			echo ${CORE}.spname.wiki.json >> Without_Wikipedia_Summary_Content.txt
+			echo ${CORE}.commonname.wiki.json >> Without_Wikipedia_Summary_Content.txt
+			rm $LOCAL_DIR/${CORE}.{commonname,spname}.wiki.json
+			return
+		fi
+	}
+
 	## Generate the list of wikipedia_urls and generate wget cmds for JSON summary retrival
 	while read CORE
 	do
+		NAME_COUNT=0
 		echo -e -ne "Downloading Wikipedia information (JSON) on species linked to core_db: $CORE\n";
 		SCI_NAME=`$HOST_NAME -D $CORE -e "select meta_value from meta where meta_key = \"species.scientific_name\";" \
 			| tail -n 1 | tr " " "_"`
-		echo "Scientific name: $SCI_NAME"
-		FORMAT_SCI_NAME=`echo $SCI_NAME | sed 's/_/%20/'`;
-		echo $SCI_NAME | xargs -n 1 -I XXX echo "https://en.wikipedia.org/wiki/XXX" >> Wikipedia_URL_listed.check.txt
-		echo "wget -qq --header='accept: application/json; charset=utf-8' --header 'Accept-Language: en-en' \
-			'https://en.wikipedia.org/api/rest_v1/page/summary/$FORMAT_SCI_NAME?redirect=true' -O ${CORE}.wiki.json" >> generate_Wiki_JSON_Summary.sh
+		SP_COMMON_NAME=`$HOST_NAME -D $CORE -e "select meta_value from meta where meta_key = \"species.common_name\";" \
+			| tail -n 1 | tr " " "_"`
+		echo -e -n "${PURPLE}Scientific name: $SCI_NAME | "
+		echo -e -n "Common name: $SP_COMMON_NAME${NC}\n"
+
+		# Create both linnean and common name wiki urls and check for content
+		if [ ! -z $SCI_NAME ]; then
+			NAME_COUNT=$((NAME_COUNT+1))
+			FORMAT_NAME=`echo $SCI_NAME | sed 's/_/%20/'`;
+			echo $SCI_NAME | xargs -n 1 -I XXX echo "https://en.wikipedia.org/wiki/XXX" >> Wikipedia_URL_listed.check.txt
+			echo "wget -qq --header='accept: application/json; charset=utf-8' --header 'Accept-Language: en-en' \
+				'https://en.wikipedia.org/api/rest_v1/page/summary/$FORMAT_NAME?redirect=true' -O ${CORE}.spname.wiki.json" >> generate_Wiki_JSON_Summary.sh
+		fi
+
+		if [ ! -z $SP_COMMON_NAME ]; then
+			NAME_COUNT=$((NAME_COUNT+1))
+			FORMAT_NAME=`echo $SP_COMMON_NAME | sed s/\'//g | sed 's/_/%20/'`;
+			echo $SP_COMMON_NAME | sed s/\'//g | xargs -n 1 -I XXX echo "https://en.wikipedia.org/wiki/XXX" >> Wikipedia_URL_listed.check.txt
+			echo "wget -qq --header='accept: application/json; charset=utf-8' --header 'Accept-Language: en-en' \
+				'https://en.wikipedia.org/api/rest_v1/page/summary/$FORMAT_NAME?redirect=true' -O ${CORE}.commonname.wiki.json" >> generate_Wiki_JSON_Summary.sh
+		fi
+
+		# Now pull wiki entries if they exist:
+		tail -n $NAME_COUNT generate_Wiki_JSON_Summary.sh > $CWD/temp_gen_wiki.sh
+		sh $CWD/temp_gen_wiki.sh;
+		if [[ $? == 0 ]]; then rm $CWD/temp_gen_wiki.sh; fi
+		unset NAME_COUNT
+
+		# Choose from available wikipedia species webpages
+		check_wikipedia_content $CORE $CWD $WIKI_OUTPUT_JSONS $SCI_NAME $SP_COMMON_NAME
+
 	done < $INPUT_DB_LIST
 
-	## Run the JSON REST wgets and place inside a folder:
-	`sh generate_Wiki_JSON_Summary.sh; mv *.json $WIKI_OUTPUT_JSONS`
-
-	##Find out which species have not got any wikipedia information
-	find $WIKI_OUTPUT_JSONS -empty | awk 'BEGIN{FS="/";}{print $NF}' >> Without_Wikipedia_Summary_Content.txt
-	echo "wikipedia" > $CWD/$STAGE_LOG
-	RUN_STAGE="NCBI"
+	## Check stage exited successfully, and Update stage log if confirmed. Set next stage var 'RUN_STAGE' to continue
+	check_exit_status 0 "wikipedia" "NCBI"
 
 fi
 
@@ -169,7 +248,7 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 			fi
 		else
 			echo -e -n "\n\nSingularity doens't appear to be installed. Please verify installation...Exiting\n"
-			exit 0
+			exit 1
 		fi
 	else
 		echo -e -n "INFO: Detected NCBI-datasets singularity image --> $DATASETS_SINGULARITY.\nProceeding with static content generation !...\n\n"
@@ -234,9 +313,9 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 
     done < $INPUT_DB_LIST
 
-	# Update stage log
-	echo "ncbi_datasets" >> $CWD/$STAGE_LOG
-	RUN_STAGE="STATIC"
+	## Check stage exited successfully, and Update stage log if confirmed. Set next stage var 'RUN_STAGE' to continue
+	check_exit_status $? "ncbi_datasets" "STATIC"
+
 fi
 
 ### Run the main parser to generate static content and create ensembl-static dirs/*.md files.
@@ -257,9 +336,9 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "STATIC" ]]; then
 	# echo "perl $STATIC_BASE_DIR/Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE"
 	perl $STATIC_BASE_DIR/Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE $SAFE_DIVISION 2>&1 | tee StaticContent_Gen_${RELEASE}_${HOST}.log
 
-	# Update stage log
-	echo "static_generation" >> $CWD/$STAGE_LOG
-	RUN_STAGE="IMAGE"
+	## Check stage exited successfully, and Update stage log if confirmed. Set next stage var 'RUN_STAGE' to continue
+	check_exit_status $? "static_generation" "IMAGE"
+
 fi
 
 ### Run the Wiki image resource gathering. Locate species images for each JSON dump file from earlier.
@@ -277,9 +356,9 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "IMAGE" ]]; then
 	\"sh Image_resource_gather.sh $WIKI_OUTPUT_JSONS\"\n\n"
 	sh $STATIC_BASE_DIR/Image_resource_gather.sh $WIKI_OUTPUT_JSONS
 
-	# Update stage log
-	echo "image_resources" >> $CWD/$STAGE_LOG
-	RUN_STAGE="LICENSEUSAGE"
+	## Check stage exited successfully, and Update stage log if confirmed. Set next stage var 'RUN_STAGE' to continue
+	check_exit_status $? "image_resources" "LICENSEUSAGE"
+
 fi
 
 ### Run the Wiki image usage license update.
@@ -301,9 +380,9 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "LICENSEUSAGE" ]]; then
 
 	perl $STATIC_BASE_DIR/Update_image_licenses.pl $RELEASE $CWD
 
-	# Update stage log 
-	echo "usage_lisence" >> $CWD/$STAGE_LOG
-	RUN_STAGE="WHATSNEW"
+	## Check stage exited successfully, and Update stage log if confirmed. Set next stage var 'RUN_STAGE' to continue
+	check_exit_status $? "usage_lisence" "WHATSNEW"
+
 fi
 
 ### Run generation of whats_new MD file
@@ -317,10 +396,12 @@ fi
 
 if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "WHATSNEW" ]]; then
 
-	echo -e -n "\n\n*** Generating static whats_new.md file to output MD formated species \
-		content...\n\n\"sh Generate_whatsnew_content.sh $INPUT_DB_LIST\"\n\n"
+	echo -e -n "\n\n*** Generating static whats_new.md file to output MD formated species content...\n\n\"sh Generate_whatsnew_content.sh $INPUT_DB_LIST\"\n\n"
 
 	sh $STATIC_BASE_DIR/Generate_whatsnew_content.sh $HOST $INPUT_DB_LIST 'pipe'
+
+	## Check stage exited successfully, and Update stage log if confirmed. Set next stage var 'RUN_STAGE' to continue
+	check_exit_status $? "whats_new_MD" "TIDY"
 
 	if [[ -e ./StaticContent_MD_Output-${RELEASE} ]]; then
 		mv ${CWD}/WhatsNewContent.md ${CWD}/StaticContent_MD_Output-${RELEASE}/
@@ -332,9 +413,6 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "WHATSNEW" ]]; then
 	echo -e -n "\n* Generated whatsnew.md (MD) content found here --> \t"
 	echo "StaticContent_MD_Output-${RELEASE}/WhatsNewContent.md"
 
-	# Update stage log
-	echo "whats_new_MD" >> $CWD/$STAGE_LOG
-	RUN_STAGE="TIDY"
 fi
 
 ## Tidy output / intermediate files
@@ -344,7 +422,7 @@ if [[ -f $CWD/$STAGE_LOG ]]; then
 		echo -e -n "\n*** Pipeline has already completed for run \"$RELEASE\".\n"
 		echo -e -n "To perform a full re-run, delete file or remove stages: -> $CWD/$STAGE_LOG\n"
 		echo -e -n "## Output gathered and stored here:\n${CWD}/$RELEASE/\n\n"
-		exit 1
+		exit 0
 	fi
 fi
 
@@ -395,12 +473,12 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "TIDY" ]]; then
 		fi
 	done
 
-		# Update stage log 
-		echo "tidy_output" >> $CWD/$STAGE_LOG
+	## Check stage exited successfully, and Update stage log if confirmed. Set next stage var 'RUN_STAGE' to continue
+	check_exit_status $? "tidy_output" "null"
 
 	fi
 
 echo -e -n "Log file tidy done! Logs stored here:\n${CWD}/$RELEASE/Log_Outputs_and_intermediates\n\n"
 echo -e -n "Output folder tidy done! Output folders all stored here:\n${CWD}/$RELEASE/\n\n"
 
-exit 1
+exit 0
