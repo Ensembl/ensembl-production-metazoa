@@ -40,7 +40,7 @@ STATIC_IMAGES_DIR=$6
 # #Check for user input of new static content folders/md files to be copied into ensembl-static repo
 if [[ -z $STATIC_MD_DIR ]] || [[ -z $RELEASE ]] || [[ -z $FORK_REPO_URL ]]; then
 
-	echo "Usage: sh Automatic_Ensembl-Static_Update.sh < Path to new static content dirs> <RELEASE> <FOR_REPO_URL> <Division> Optional param: '--images' + Path to static content image dir>"
+	echo "Usage: sh Automatic_Ensembl-Static_Update.sh < Path to new static content dirs> <RELEASE> <FOR_REPO_URL> <Division> Optional param: '--images' <i.e. full Path to static content images created by Core static pipeline>"
 	echo "e.g. Automatic_Ensembl-Static_Update.sh StaticContent_MD/ release/eg/60 git@github.com:GIT-USER-NAME/ensembl-static.git metazoa "
 	echo "e.g. Automatic_Ensembl-Static_Update.sh StaticContent_MD/ release/eg/60 git@github.com:GIT-USER-NAME/ensembl-static.git metazoa --images SourceImages/"
 	exit 1

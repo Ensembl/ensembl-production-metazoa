@@ -57,7 +57,7 @@ if [[ $RUN_STAGE == TEMPLATE ]]; then
 			do
 			cat $ENS_PRODUCTION_METAZOA/scripts/static_content_generation/template${EXTENSION} | sed s/TEMP_DIVISION/$ENS_DIVISION/g > /$CWD/${PROD_NAME}${EXTENSION};
 			done
-			echo -e -n "Generated generic template Markdown files:\n[${PROD_NAME}_about.md, ${PROD_NAME}_annotation.md, ${PROD_NAME}_assembly.md]\n!!! Please amend these files to fill in the missing values !\n"
+			echo -e -n "Generated generic template Markdown files:\n[${PROD_NAME}_about.md, ${PROD_NAME}_annotation.md, ${PROD_NAME}_assembly.md], ${PROD_NAME}_references.md\n!!! Please amend these files to fill in the missing values !\n"
 			exit 0
 		fi
 
