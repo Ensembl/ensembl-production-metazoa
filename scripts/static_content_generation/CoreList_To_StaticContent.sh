@@ -77,7 +77,7 @@ function check_exit_status(){
 	local NEXT_STAGE=$3
 
 	if [[ $EXIT_STATUS == 0 ]]; then
-		echo -e -n "${GREEN}Stage: '${CUR_STAGE^}' has finished fully, moving on to $NEXT_STAGE...${NC}\n\n"
+		echo -e -n "${GREEN}Stage: '${CUR_STAGE^}' has finished fully [exit code=$EXIT_STATUS], moving on to $NEXT_STAGE...${NC}\n\n"
 		echo "$CUR_STAGE" >> $CWD/$STAGE_LOG
 		RUN_STAGE=$NEXT_STAGE
 	else
@@ -328,18 +328,35 @@ if [[ -f $CWD/$STAGE_LOG ]]; then
 fi
 
 if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "STATIC" ]]; then
-	echo -e -n "\n\n *** Now running JSON to Static Parser\n\t---> \
-	\"perl Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE $ENS_DIVISION\"\n"
 
 	SAFE_DIVISION=`echo "$ENS_DIVISION" | tr " " "_"`
 
-	# echo "perl $STATIC_BASE_DIR/Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE"
-	perl $STATIC_BASE_DIR/Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $INPUT_DB_LIST $HOST $RELEASE $SAFE_DIVISION 2>&1 | tee StaticContent_Gen_${RELEASE}_${HOST}.log
+	#Make sure to remove any old/failed partial run of StaticContent_Gen_${RELEASE}_${HOST}.log
+	if [[ -e ./StaticContent_Gen_${RELEASE}_${HOST}.log ]]; then
+		echo "Deleting old StaticContent_Gen_${RELEASE}_${HOST}.log"
+		rm ./StaticContent_Gen_${RELEASE}_${HOST}.log
+	fi
 
-	## Check stage exited successfully, and Update stage log if confirmed. Set next stage var 'RUN_STAGE' to continue
-	check_exit_status $? "static_generation" "IMAGE"
+	echo -e -n "\n\n *** Now running JSON to Static Parser\n\t---> \
+	\"perl Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI 'CORE' $HOST $RELEASE $ENS_DIVISION\"\n"
+	
+	while read CORE_DB_STATIC;
+	do
+		# echo "perl $STATIC_BASE_DIR/Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $CORE_DB_STATIC $HOST $RELEASE"
+		perl $STATIC_BASE_DIR/Generate_StaticContent_MD.pl $WIKI_OUTPUT_JSONS $OUTPUT_NCBI $CORE_DB_STATIC $HOST $RELEASE $SAFE_DIVISION 2>&1 | tee -a StaticContent_Gen_${RELEASE}_${HOST}.log
+		
+		## Check stage exited successfully, and Update stage log if confirmed. Set next stage var 'RUN_STAGE' to continue
+		PER_DB_STATIC_EXIT=$?
+		if [[ $PER_DB_STATIC_EXIT != 0 ]]; then
+			echo -e -n "${RED} Oh no the static MD file generation on $CORE_DB_STATIC has failed${NC}\n"
+			exit 1
+		fi
+	done < $INPUT_DB_LIST
+
+	check_exit_status $PER_DB_STATIC_EXIT "static_generation" "IMAGE"
 
 fi
+
 
 ### Run the Wiki image resource gathering. Locate species images for each JSON dump file from earlier.
 if [[ -f $CWD/$STAGE_LOG ]]; then

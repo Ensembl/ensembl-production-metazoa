@@ -33,16 +33,27 @@ $Term::ANSIColor::AUTORESET = 1;
 ## Get dir inforatmion
 my $wiki_input_dir = $ARGV[0];
 my $genome_report_dir = $ARGV[1];
-my $species_cores_listed = $ARGV[2];
+my $species_core = $ARGV[2];
 my $core_host = $ARGV[3];
 my $release = $ARGV[4];
 my $safe_division = $ARGV[5];
 
-die "USAGE: Generate_StaticConten_MD.pl <WIKI_JSON_DIR> <NCBI_GENOME_REPORT_DIR> <List_Ensembl_CORE_FILE> <Core(s) Host> <Run_Identifier> <Ensembl Division>\n" unless (@ARGV==6);
+die "USAGE: Generate_StaticConten_MD.pl <dir: WIKI_JSON_OUT> <dir: NCBI_DATASETS> <Core Database> <Core Host> <Run Identifier> <Ensembl Division>\n" unless (@ARGV==6);
 
-my @input_genome_reports = <${genome_report_dir}/*.genomereport.json>;
+## Variable cleanup and initiate:
+chomp $species_core;
+my $genome_accession = `$core_host -D $species_core -Ne \"SELECT meta_value FROM meta WHERE meta_key = 'assembly.accession';"`; 
+chomp $genome_accession;
+# Set the appropriate NCBI genome annotation summary JSON based on GCA:
+my $genome_sum_file = "${genome_report_dir}/${genome_accession}.genomereport.json";
+# Set the appropriate WIKI species page summary JSON based on CoreDB:
+my $json_file_path = `ls -1 ${wiki_input_dir}/${species_core}.wiki.json`;
+chomp $json_file_path;
+#Find the coreDB from the input core list file. Then locate the appropriate JSON file to parse. 
+print "Core database: $species_core\n";
+print "NCBI Assembly report: $genome_sum_file\n";
 
-# Convert machine to lit form of division name
+## Convert machine to lit form of division name
 $safe_division =~ tr/_/ /;
 my $ens_division = $safe_division;
 my $division_url;
@@ -80,238 +91,147 @@ else{
 
 ## For each genome report file, locate and combine its assoicated Wilipedia JSON summary file on GCF/GCA accession
 system ("mkdir -p ./StaticContent_MD_Output-${release}");
-
 print BLUE "\nParsing JSON/Refseq files\n\n";
+print DARK GREEN "Beginning processing RefSeq annotation:\n[$genome_sum_file] genome JSON\n";
 
-foreach my $genome_sum_file (@input_genome_reports){
-
-	print DARK GREEN "Beginning processing RefSeq annotation:\n[$genome_sum_file] genome JSON\n";
-
-	#Species specific static content folder
-	my $static_output_folder = "StaticContent_MD_Output-${release}";	
+#Species specific static content folder
+my $static_output_folder = "StaticContent_MD_Output-${release}";	
 	
-	## Control flow and other control variables
-	my $has_wiki_json_data=0;
-	my $wrap_at = 70; #Length of each paragraph line printed.
-	my $wiki_about;
+## Control flow and other control variables
+my $has_wiki_json_data=0;
+my $wrap_at = 70; #Length of each paragraph line printed to MD.
+my $wiki_about;
 
-	#per core global vars
-	my ($scientific_name, $extract, $jpg_source, $wiki_url, $about_content, $refseq_annotation_content, $community_anno_content, $dtol_community_anno_content, $assembly_content);
-	
-	# Genome annotation report variables
-	my ($species_name, $common_name, $taxa_id, $anno_report_url, $asseb_accession, $release_version, @ncbi_rel, $annotation_source, $assembly_submitter);
+#per core global vars
+my ($scientific_name, $extract, $jpg_source, $wiki_url, $about_content, $refseq_annotation_content, $community_anno_content, $dtol_community_anno_content, $assembly_content);
 
-	# Convert GCF to GCA and locate its wiki JSON file
-	my ($refseq_file, $gca_accession, $core_prodname_gca, $gca_accession_escape, $core_located);
+# Genome annotation report variables
+my ($species_name, $common_name, $taxa_id, $anno_report_url, $release_version, @ncbi_rel, $annotation_source, $assembly_submitter);
 
-	## Parse species name from ref_seq annotion
-	$species_name = `jq '.organism.organism_name' $genome_sum_file | sed 's/"//g'`;
-	chomp $species_name;
-        print "Retrived organismal name from genome JSON file: $species_name\n";
+# Convert GCF to GCA and locate its wiki JSON file
+my ($refseq_file, $gca_accession, $gca_accession_escape);
 
-	$scientific_name = $species_name;
-	$species_name =~ tr/ /_/;
-	my @temp_split_sp_name = split ("_", $species_name);
-	my $count_sp_name = scalar @temp_split_sp_name;
+## Parse species name from ref_seq annotion
+$species_name = `$core_host -D $species_core -Ne \"SELECT meta_value FROM meta WHERE meta_key = 'species.scientific_name';"`;
+chomp $species_name;
+print "Retrived organismal name from genome JSON file: $species_name\n";
+$scientific_name = $species_name;
+$species_name =~ tr/ /_/;
+$static_output_folder = $static_output_folder."/".$species_name;
+$species_name = lc$species_name;
+system ("mkdir -p ./$static_output_folder");
 
-	#Check whether or not the species name is bionomial or trinomial
+# Obtained common name and taxon_id information from genome report file
+$common_name = `jq '.organism.common_name' $genome_sum_file | sed 's/"//g'`;
+chomp $common_name;
+$taxa_id = `jq '.organism.tax_id' $genome_sum_file`;
+chomp $taxa_id;
 
-	if (($count_sp_name > 3 )){
-		print YELLOW "!!! Genome JSON contains atypical/long 'organism_name' [$count_sp_name sub names] !!! --> Utilizing just the bionomial: ";
-		$species_name = "$temp_split_sp_name[0]_$temp_split_sp_name[1]";
-		$species_name =~ s/\.$//; #Remove trailing dot on names such as Genus sp.
-		print "\"Species name set as: $species_name\"\n";
-	}
-	elsif (($count_sp_name == 3 )){
-		print YELLOW "!!! Organismal species name is trinomial --> Utilizing just the bionomial: ";
-		$species_name = "$temp_split_sp_name[0]_$temp_split_sp_name[1]";
-		print "\"Species name set as: $species_name\"\n";
-	}
-	else{
-		print "Organismal species name is binomial....";
-		print "Species name set as: \"$scientific_name\".\n";
-	}
+# Try to obtain NCBI refseq release URL, this will only be populated if there is an associated RefSeq annotation
+# If not, likely the genome is community annotated instead i.e. GFF3 submitted with assembly to Genbank.
+$anno_report_url = `jq '.annotation_info.report_url' $genome_sum_file | sed 's/"//g'`;
+chomp $anno_report_url;
 
-	$static_output_folder = $static_output_folder."/".$species_name;
-	$species_name = lc$species_name;
-	system ("mkdir -p ./$static_output_folder");
+# Import check whether or not the assembly is linked to DToL:
+my $dtol_linked = 0;
+my $sanger_assembly = 0;
+my $dtol_project_acc = "PRJEB40665"; # https://www.ncbi.nlm.nih.gov/bioproject/PRJEB40665/
+$assembly_submitter = `jq '.assembly_info.submitter' $genome_sum_file`;
+chomp $assembly_submitter;
+my $bioproject=`cat $genome_sum_file | jq '.assembly_info.bioproject_lineage' | jq '.[]' | jq '.bioprojects' | jq '.[] | select(.accession=="$dtol_project_acc")' | jq '.title' | sed 's/"//g'`;
 
-	# Obtained common name and taxon_id information from genome report file
-	$common_name = `jq '.organism.common_name' $genome_sum_file | sed 's/"//g'`;
-	chomp $common_name;
-	$taxa_id = `jq '.organism.tax_id' $genome_sum_file`;
-	chomp $taxa_id;
+## Checking source of assembly for regular projects related to DToL and Sanger which tend to be linked to Ensembl
+if (( $assembly_submitter =~ "WELLCOME SANGER INSTITUTE") && ( $bioproject =~ "Darwin Tree of Life Project" ) ) {
+	$dtol_linked=1;
+	$annotation_source = "DToL";
+	# cat $genome_sum_file | jq '.assembly_info.bioproject_lineage' | jq '.[]' | jq '.bioprojects' | jq '.[] | select(.accession=="PRJEB40665")' | jq '.title' | sed 's/"//g'
+	# Darwin Tree of Life Project: Genome Data and Assemblies
+	# jq '.assembly_info.submitter' => "WELLCOME SANGER INSTITUTE"
+}
+elsif (( $assembly_submitter =~ "WELLCOME SANGER INSTITUTE") && ( $bioproject !~ "Darwin Tree of Life Project" ) ) {
+	$sanger_assembly=1;
+}
 
-	# Try to obtain NCBI refseq release URL, this will only be populated if there is an associated RefSeq annotation
-	# If not, likely the genome is community annotated instead i.e. GFF3 submitted with assembly to Genbank.
-	$anno_report_url = `jq '.annotation_info.report_url' $genome_sum_file | sed 's/"//g'`;
-	chomp $anno_report_url;
-
-	# Import check whether or not the assembly is linked to DToL:
-	my $dtol_linked = 0;
-	my $sanger_assembly = 0;
-	my $dtol_project_acc = "PRJEB40665"; # https://www.ncbi.nlm.nih.gov/bioproject/PRJEB40665/
-	$assembly_submitter = `jq '.assembly_info.submitter' $genome_sum_file`;
-	chomp $assembly_submitter;
-	my $bioproject=`cat $genome_sum_file | jq '.assembly_info.bioproject_lineage' | jq '.[]' | jq '.bioprojects' | jq '.[] | select(.accession=="$dtol_project_acc")' | jq '.title' | sed 's/"//g'`;
-
-	if (( $assembly_submitter =~ "WELLCOME SANGER INSTITUTE") && ( $bioproject =~ "Darwin Tree of Life Project" ) ) {
-
-		$dtol_linked=1;
-		$annotation_source = "DToL";
-		# cat $genome_sum_file | jq '.assembly_info.bioproject_lineage' | jq '.[]' | jq '.bioprojects' | jq '.[] | select(.accession=="PRJEB40665")' | jq '.title' | sed 's/"//g'
-		# Darwin Tree of Life Project: Genome Data and Assemblies
-		# jq '.assembly_info.submitter' => "WELLCOME SANGER INSTITUTE"
-	}
-	elsif (( $assembly_submitter =~ "WELLCOME SANGER INSTITUTE") && ( $bioproject !~ "Darwin Tree of Life Project" ) ) {
-		$sanger_assembly=1;
-	}
-
-	# Assess if we are dealing with normal refseq, or community annotated genome
-	if ( ( $anno_report_url !~ "null") && ( $dtol_linked eq 0 ) ){
-		@ncbi_rel = split ("/",$anno_report_url);
-		$release_version = $ncbi_rel[-1];
-		$annotation_source = "refseq";
-	}
-	elsif( ( $anno_report_url =~ "null") && ( $dtol_linked eq 0 ) ){
-
-		if( $sanger_assembly eq 1 ){
-			$annotation_source = "community_sanger";	
-		}
-		else{
-			$annotation_source = "community_annotation";
-		}
-	}
-
-	$asseb_accession = `jq '.accession' $genome_sum_file | sed 's/"//g'`;
-	chomp $asseb_accession;
-	$gca_accession = $asseb_accession;
-	$gca_accession =~ s/GCF_/GCA_/;
-	$gca_accession_escape = $gca_accession;
-	$gca_accession_escape =~ s/GCA_/GCA\\_/;
-	chomp $gca_accession_escape;
-
-	$core_prodname_gca = $gca_accession;
-	$core_prodname_gca =~ s/GCA_/gca/;
-	$core_prodname_gca =~ s/\.[0-9]$//;
-	chomp $core_prodname_gca;
-	$core_prodname_gca = "${species_name}_${core_prodname_gca}";
-
-	#Attempt to locate the correct core DB which corresponds to the appropriate genome JSON.
-
-	my $species_core;
-	my $species_binomial_core_count = `grep -c -E "^${species_name}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
-	my $species_trinomial_core_count = `grep -c -E "^${core_prodname_gca}v[0-9]{1|2}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
-	my $species_trinomial_withsuffix_core_count = `grep -c -E "^${core_prodname_gca}v[0-9]+[a-z]{2}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
-	my $atypical_core_count = `grep -c -E "^${core_prodname_gca}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
-	# my $species_trinomial_core_count = `grep -c -E "^${species_name}_[A-Za-z0-9]+_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
-
-	if($species_trinomial_withsuffix_core_count == 1){
-		print GREEN "Core database located on trinaomal (binomial sp + gca + source suffix) database name.\n";
-		$species_core = `grep -m 1 -E "^${core_prodname_gca}v[0-9]+[a-z]{2}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
-		$core_located = 1;
-	}
-	elsif($species_trinomial_core_count == 1){
-		print GREEN "Core database located on trinaomal (binomial sp + gca) database name.\n";
-		$species_core = `grep -m 1 -E "^${core_prodname_gca}v[0-9]{1|2}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
-		$core_located = 1;
-	}
-	elsif ($species_binomial_core_count == 1){
-		print GREEN "Core database located solely on binomial sp database name.\n";
-		$species_core = `grep -m 1 -e "^${species_name}" < $species_cores_listed`;
-		$core_located =	1;
-	}
-	elsif($atypical_core_count == 1){
-		print YELLOW "Core database located on abnormal name (binomial sp + gca but NO version) database name.\n";
-		$species_core = `grep -m 1 -E "^${core_prodname_gca}_core_[0-9]{2}_[0-9]{3}_[0-9]{1}" < $species_cores_listed`;
-		$core_located = 1;
+# Assess if we are dealing with normal refseq, or community annotated genome
+if ( ( $anno_report_url !~ "null") && ( $dtol_linked eq 0 ) ){
+	@ncbi_rel = split ("/",$anno_report_url);
+	$release_version = $ncbi_rel[-1];
+	$annotation_source = "refseq";
+}
+elsif( ( $anno_report_url =~ "null") && ( $dtol_linked eq 0 ) ){
+	if( $sanger_assembly eq 1 ){
+		$annotation_source = "community_sanger";	
 	}
 	else{
-		print RED "Unable to match core database nam in provided list to NCBI genome JSON (organism_name) for species $species_name.\n";
-		die;
+		$annotation_source = "community_annotation";
 	}
+}
 
-	#Find the coreDB from the input core list file. Then locate the appropriate JSON file to parse. 
-	my ($json_file_name, $json_file_path);
+$gca_accession = $genome_accession;
+$gca_accession =~ s/GCF_/GCA_/;
+$gca_accession_escape = $gca_accession;
+$gca_accession_escape =~ s/GCA_/GCA\\_/;
+chomp $gca_accession_escape;
 
-	#Test if core was found based on inclusion of GCA_ in the database name
-	if ($core_located == 1){
-		chomp $species_core;
-		print "Core database located: $species_core\n";
-		$json_file_name = "${species_core}.wiki.json";
-		print "CHECKING -> ${wiki_input_dir}/${json_file_name}\n";
-		$json_file_path = `ls -1 ${wiki_input_dir}/${json_file_name}`;
-		print "FULL JSON PATH ->> $json_file_path\n";
-		chomp $json_file_path;
-	}
+#Perform query to obtain production name from to ensure static md will match with ensembl core DB
+my $prod_name=`$core_host -D $species_core -Ne \"SELECT meta_value FROM meta WHERE meta_key = 'species.production_name';"`;
+chomp $prod_name;
+print "Ensembl CORE_DB [$species_core], species.production_name [$prod_name]\n";
+$prod_name = ucfirst($prod_name);
 
-	#Perform query to obtain production name from to ensure static md will match with ensembl core DB
-	my $prod_name=`$core_host -D $species_core -Ne \"SELECT meta_value FROM meta WHERE meta_key = 'species.production_name';"`;
-	chomp $prod_name;
-	print "Linked with Ensembl CORE_DB [$species_core] & species.production_name [$prod_name]\n";
-	$prod_name = ucfirst($prod_name);
+##Open file handles using species.productioin_name to write markdown .md files.
+open (OUT_ABOUT, ">${prod_name}_about.md") || die "Can\'t open ${prod_name}_about.md\n";
+open (OUT_ANNO, ">${prod_name}_annotation.md") || die "Can\'t open ${prod_name}_annotation.md\n";
+open (OUT_ASM, ">${prod_name}_assembly.md") || die "Can\'t open ${prod_name}_assembly.md\n";
 
-	##Open file handles using species.productioin_name to write markdown .md files.
-	open (OUT_ABOUT, ">${prod_name}_about.md") || die "Can\'t open ${prod_name}_about.md\n";
-	open (OUT_ANNO, ">${prod_name}_annotation.md") || die "Can\'t open ${prod_name}_annotation.md\n";
-	open (OUT_ASM, ">${prod_name}_assembly.md") || die "Can\'t open ${prod_name}_assembly.md\n";
- 
-	# printf "The species %s, otherwise known as the %s.\nTaxon_id=%d\nWas obtained with annotation from %s\nWhich is associated with acc:%s\n", $species_name, $common_name, $taxa_id, $anno_report_url, $asseb_accession;
+# printf "The species %s, otherwise known as the %s.\nTaxon_id=%d\nWas obtained with annotation from %s\nWhich is associated with acc:%s\n", $species_name, $common_name, $taxa_id, $anno_report_url, $asseb_accession;
+## Parse specifc assembly statistics from asm file
+my ($total_asm_len, $scaffold_count, $scaf_N50, $scaf_L50, $contig_count, $cont_N50, $cont_L50, $gc_perc);
+$total_asm_len = `jq '.assembly_stats.total_sequence_length' $genome_sum_file | sed 's/"//g'`;
+$scaffold_count = `jq '.assembly_stats.number_of_scaffolds' $genome_sum_file`;
+chomp ($scaffold_count, $total_asm_len);
 
-	## Parse specifc assembly statistics from asm file
-	my ($total_asm_len, $scaffold_count, $scaf_N50, $scaf_L50, $contig_count, $cont_N50, $cont_L50, $gc_perc);
-	$total_asm_len = `jq '.assembly_stats.total_sequence_length' $genome_sum_file | sed 's/"//g'`;
-	$scaffold_count = `jq '.assembly_stats.number_of_scaffolds' $genome_sum_file`;
-	chomp ($scaffold_count, $total_asm_len);
-
-	#Check if scaffolds are accounted for or contigs
-	if ($scaffold_count eq "null"){
-
-		# print "!!!!!!!!!Entered Contig section !!!!!!!!!!!!!!\n";
-		$contig_count = `jq '.assembly_stats.number_of_component_sequences' $genome_sum_file`;
-		$cont_N50 = `jq '.assembly_stats.contig_n50' $genome_sum_file`;
-		$cont_L50 = `jq '.assembly_stats.contig_l50' $genome_sum_file`;
-		$gc_perc = `jq '.assembly_stats.gc_percent' < $genome_sum_file`;
-
-		chomp ($contig_count, $cont_N50, $cont_L50, $gc_perc);
-
-		if (!$gc_perc){
-			# $gc_perc="0.0";
-			## Print out the assembly summary infortmation without mentioning the absent asm GC%
-			printf OUT_ASM "**Assembly**\n--------\n\nThe assembly presented here has been imported from [INSDC](http:\/\/www.insdc.org) and is linked to the assembly accession \[[%s](http:\/\/www.ebi.ac.uk\/ena\/data\/view\/%s)].\n\nThe total length of the assembly is %d bp contained withinin %d contigs.\nThe contig N50 value is %d, the contig L50 value is %d.\n",$gca_accession_escape, $gca_accession, $total_asm_len, $contig_count, $cont_N50, $cont_L50;
-
-		}
-		else{
-			## Print out the assembly summary infortmation without mentioning the absent asm GC%
-			printf OUT_ASM "**Assembly**\n--------\n\nThe assembly presented here has been imported from [INSDC](http:\/\/www.insdc.org) and is linked to the assembly accession [[%s](http:\/\/www.ebi.ac.uk\/ena\/data\/view\/%s)].\n\nThe total length of the assembly is %d bp contained withinin %d contigs.\nThe contig N50 value is %d, the contig L50 value is %d.\nThe GC%% content of the assembly is %.1f%%.\n",$gca_accession_escape, $gca_accession, $total_asm_len, $contig_count, $cont_N50, $cont_L50, $gc_perc;
-		}
+#Check if scaffolds are accounted for or contigs
+if ($scaffold_count eq "null"){
+	# print "!!!!!!!!!Entered Contig section !!!!!!!!!!!!!!\n";
+	$contig_count = `jq '.assembly_stats.number_of_component_sequences' $genome_sum_file`;
+	$cont_N50 = `jq '.assembly_stats.contig_n50' $genome_sum_file`;
+	$cont_L50 = `jq '.assembly_stats.contig_l50' $genome_sum_file`;
+	$gc_perc = `jq '.assembly_stats.gc_percent' < $genome_sum_file`;
+	chomp ($contig_count, $cont_N50, $cont_L50, $gc_perc);
+	if (!$gc_perc){
+		# $gc_perc="0.0";
+		## Print out the assembly summary infortmation without mentioning the absent asm GC%
+		printf OUT_ASM "**Assembly**\n--------\n\nThe assembly presented here has been imported from [INSDC](http:\/\/www.insdc.org) and is linked to the assembly accession \[[%s](http:\/\/www.ebi.ac.uk\/ena\/data\/view\/%s)].\n\nThe total length of the assembly is %d bp contained withinin %d contigs.\nThe contig N50 value is %d, the contig L50 value is %d.\n",$gca_accession_escape, $gca_accession, $total_asm_len, $contig_count, $cont_N50, $cont_L50;
 	}
 	else{
-		$scaf_N50 = `jq '.assembly_stats.scaffold_n50' $genome_sum_file`;
-		$scaf_L50 = `jq '.assembly_stats.scaffold_l50' $genome_sum_file`;
-		$gc_perc = `jq '.assembly_stats.gc_percent' $genome_sum_file`;
-
-		chomp ($scaf_N50, $scaf_L50, $gc_perc);
-
-		if (!$gc_perc){
-			# $gc_perc="0.0";
-			printf OUT_ASM "**Assembly**\n--------\n\nThe assembly presented here has been imported from [INSDC](http:\/\/www.insdc.org) and is linked to the assembly accession [[%s](http:\/\/www.ebi.ac.uk\/ena\/data\/view\/%s)].\n\nThe total length of the assembly is %d bp contained within %d scaffolds.\nThe scaffold N50 value is %d, the scaffold L50 value is %d.\n",$gca_accession_escape, $gca_accession, $total_asm_len, $scaffold_count, $scaf_N50, $scaf_L50;
-		}
-		else{
-			## Print out the assembly summary infortmation
-			printf OUT_ASM "**Assembly**\n--------\n\nThe assembly presented here has been imported from [INSDC](http:\/\/www.insdc.org) and is linked to the assembly accession [[%s](http:\/\/www.ebi.ac.uk\/ena\/data\/view\/%s)].\n\nThe total length of the assembly is %d bp contained within %d scaffolds.\nThe scaffold N50 value is %d, the scaffold L50 value is %d.\nThe GC%% content of the assembly is %.1f%%.\n",$gca_accession_escape, $gca_accession, $total_asm_len, $scaffold_count, $scaf_N50, $scaf_L50, $gc_perc;
-		}
+		## Print out the assembly summary infortmation without mentioning the absent asm GC%
+		printf OUT_ASM "**Assembly**\n--------\n\nThe assembly presented here has been imported from [INSDC](http:\/\/www.insdc.org) and is linked to the assembly accession [[%s](http:\/\/www.ebi.ac.uk\/ena\/data\/view\/%s)].\n\nThe total length of the assembly is %d bp contained withinin %d contigs.\nThe contig N50 value is %d, the contig L50 value is %d.\nThe GC%% content of the assembly is %.1f%%.\n",$gca_accession_escape, $gca_accession, $total_asm_len, $contig_count, $cont_N50, $cont_L50, $gc_perc;
 	}
-
-
-	## Test if the JSON file is empty, if yes raise a warning and produce a placeholder summary in about.md static file to be filled in manually later. 
-	unless (-z $json_file_path){
-		$has_wiki_json_data = 1;
+}
+else{
+	$scaf_N50 = `jq '.assembly_stats.scaffold_n50' $genome_sum_file`;
+	$scaf_L50 = `jq '.assembly_stats.scaffold_l50' $genome_sum_file`;
+	$gc_perc = `jq '.assembly_stats.gc_percent' $genome_sum_file`;
+	chomp ($scaf_N50, $scaf_L50, $gc_perc);
+	if (!$gc_perc){
+		# $gc_perc="0.0";
+		printf OUT_ASM "**Assembly**\n--------\n\nThe assembly presented here has been imported from [INSDC](http:\/\/www.insdc.org) and is linked to the assembly accession [[%s](http:\/\/www.ebi.ac.uk\/ena\/data\/view\/%s)].\n\nThe total length of the assembly is %d bp contained within %d scaffolds.\nThe scaffold N50 value is %d, the scaffold L50 value is %d.\n",$gca_accession_escape, $gca_accession, $total_asm_len, $scaffold_count, $scaf_N50, $scaf_L50;
 	}
 	else{
-		print BOLD RED "Wikipedia summary information NOT FOUND in JSON file: $json_file_path\t<----Skipping parse. Manual editing required for this species !!\n";
+		## Print out the assembly summary infortmation
+		printf OUT_ASM "**Assembly**\n--------\n\nThe assembly presented here has been imported from [INSDC](http:\/\/www.insdc.org) and is linked to the assembly accession [[%s](http:\/\/www.ebi.ac.uk\/ena\/data\/view\/%s)].\n\nThe total length of the assembly is %d bp contained within %d scaffolds.\nThe scaffold N50 value is %d, the scaffold L50 value is %d.\nThe GC%% content of the assembly is %.1f%%.\n",$gca_accession_escape, $gca_accession, $total_asm_len, $scaffold_count, $scaf_N50, $scaf_L50, $gc_perc;
+	}
+}
 
-		$about_content = "**About *$scientific_name***
+## Test if the JSON file is empty, if yes raise a warning and produce a placeholder summary in about.md static file to be filled in manually later. 
+unless (-z $json_file_path){
+	$has_wiki_json_data = 1;
+}
+else{
+	print BOLD RED "Wikipedia summary information NOT FOUND in JSON file: $genome_sum_file\t<----Skipping parse. Manual editing required for this species !!\n";
+
+$about_content = "**About *$scientific_name***
 -------------------------
 !!!!!! PLACEHOLDER SUMMARY. MANUAL EDIT REQUIRED HERE !!!!!!
 
@@ -324,8 +244,8 @@ Taxonomy ID [$taxa_id](https://www.uniprot.org/taxonomy/${taxa_id})
 **More information**
 General information about this species can be found in [Wikipedia](https://en.wikipedia.org/wiki/${species_name})\n";
 	
-	print OUT_ABOUT $about_content;
-	}
+print OUT_ABOUT $about_content;
+}
 
 #check if a file has JSON before attempting to parse it
 if ($has_wiki_json_data == 1){
@@ -348,6 +268,7 @@ if ($has_wiki_json_data == 1){
 		my $json_ob = JSON->new;
 		my $jsondata = $json_ob->decode($json_text);
 		# print Dumper(\$jsondata);
+		# exit;
 	
 		# Extract data from json.
 		foreach (@$jsondata){
@@ -448,12 +369,8 @@ system ("mv ./*.md ./$static_output_folder");
 close OUT_ANNO;
 close OUT_ABOUT;
 close OUT_ASM;
-
 print YELLOW "\n\n--> Be sure to double check all MD files. Particularly _annotation.md for assembly submitter URL <--\n";
-
 print BRIGHT_GREEN "\t** Finished processing **\n\n";
-
-}
 
 system("rm ${wiki_input_dir}/*.fixed.json");
 
