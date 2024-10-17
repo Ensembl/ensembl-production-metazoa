@@ -14,8 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-## Created 23-08-23 [Lahcen Campbell - lcampbell@ebi.ac.uk].
-## Version 1.0
+## Author: [Lahcen Campbell - lcampbell@ebi.ac.uk].
 ## A script to automatically updated the ensembl-static repo for metazoan species (or other if needed)
 ## Input to script is a directory containing one or more directories (one per species+gca). The script checks if this species is already
 ## present in the ens-static repo, and then copies or creates directories as neeeded. 
@@ -28,25 +27,25 @@ ORANGE='\033[0;33m'
 NC='\033[0m' # No Color
 
 # Run vars
-REPO="ensembl-static"
-# Input variables
 STATIC_MD_DIR=$1
 RELEASE=$2
-FORK_REPO_URL=$3
-TMP_DIVISION=$4
-STATIC_FLAG=$5
-STATIC_IMAGES_DIR=$6
+DIVISION=$3
+STATIC_FLAG=$4
+STATIC_IMAGES_DIR=$5
+CWD=`readlink -f $PWD`
+BASE_REPO="${CWD}/ensembl-static"
 
 # #Check for user input of new static content folders/md files to be copied into ensembl-static repo
-if [[ -z $STATIC_MD_DIR ]] || [[ -z $RELEASE ]] || [[ -z $FORK_REPO_URL ]]; then
-
-	echo "Usage: sh Automatic_Ensembl-Static_Update.sh < Path to new static content dirs> <RELEASE> <FOR_REPO_URL> <Division> Optional param: '--images' <i.e. full Path to static content images created by Core static pipeline>"
-	echo "e.g. Automatic_Ensembl-Static_Update.sh StaticContent_MD/ release/eg/60 git@github.com:GIT-USER-NAME/ensembl-static.git metazoa "
-	echo "e.g. Automatic_Ensembl-Static_Update.sh StaticContent_MD/ release/eg/60 git@github.com:GIT-USER-NAME/ensembl-static.git metazoa --images SourceImages/"
+if [[ -z $STATIC_MD_DIR ]] || [[ -z $RELEASE ]]; then
+	echo "Usage: sh Automatic_Ensembl-Static_Update.sh < Path to new static content dirs> <RELEASE BRANCH> <Division> Optional param: '--images' < + Path to static content images created by Core static pipeline>"
+	echo "e.g. Automatic_Ensembl-Static_Update.sh StaticContent_MD/ release/eg/60 metazoa "
+	echo "e.g. Automatic_Ensembl-Static_Update.sh StaticContent_MD/ release/eg/60 metazoa --images SourceImages/"
 	exit 1
 else
 	TEMP_STATIC_IN=`readlink -f $STATIC_MD_DIR`
 	NEW_STATIC_CONTENT="${TEMP_STATIC_IN}/"
+	echo -e -n "${ORANGE} WARNING !!! You must first create a fork of ensembl-staic repo before running this script. Direct commits to Ensembl/ensembl-static are not permotted! ${NC}"
+	sleep 2
 	echo -e -n "\n--------------Starting static MD file move-------------\n\n"
 fi
 
@@ -55,12 +54,54 @@ if [[ -e $STATIC_IMAGES_DIR ]]; then
 	NEW_STATIC_IMAGES=`readlink -f $STATIC_IMAGES_DIR` 
 fi
 
-# Ensembl Division set ?
-if [[ -z $TMP_DIVISION ]]; then
-	echo "Ensembl divsion is not set. Please set from: 'bacteria', 'fungi', 'metazoa', 'plants', 'protists')"
+# Check an appropriate division was supplied by user
+if [[ "$DIVISION" != "metazoa" ]] \
+	&& [[ "$DIVISION" != "plants" ]] \
+	&& [[ "$DIVISION" != "fungi" ]] \
+	&& [[ "$DIVISION" != "bacteria" ]] \
+	&& [[ "$DIVISION" != "protists" ]]; then
+	echo -e -n "${RED}Division supplied ($DIVISION) not recognised. Must define as: [ metazoa | plants | fungi | bacteria | protists ]${NC}\n\n"
 	exit 1
+fi
+
+# Check for fork user URL
+AUTO_GIT_USER=`git config --global user.name`
+if [[ ! $AUTO_GIT_USER ]]; then
+	echo "Appears github user not set in '~/.gitconfig'"
+	read -p "Please enter github user name for forked ensembl-static repo:" AUTO_GIT_USER
+	echo "Git user set as: $AUTO_GIT_USER"
+fi
+FORK_REPO_URL="git@github.com:$AUTO_GIT_USER/ensembl-static.git"
+echo "Detected Github user from ~/.gitconfig. Set ensembl-static SSH fork URL: $FORK_REPO_URL"
+
+if [[ -d $BASE_REPO ]]; then
+    echo "ensembl-static repo present already. Skipping cloning"
+    cd $BASE_REPO
+
+	BRANCH=`git branch | grep -e "*" | cut -d ' ' -f2`
+	if [[ "$BRANCH" != "$RELEASE" ]]; then
+		echo "Precloned ensembl-static is not on the specified branch: '$RELEASE'"
+		git branch
+		git checkout -b $RELEASE
+	else
+		echo "Precloned ensembl-static on correct branch: '$RELEASE'"
+	fi
+    cd ../
 else
-	DIVISION=$TMP_DIVISION
+	echo "cloning ensembl-static now..."
+	echo "git clone -b $RELEASE --depth 1 $FORK_REPO_URL"
+	sleep 2
+	git clone -b $RELEASE --depth 1 $FORK_REPO_URL $BASE_REPO
+
+	if [[ -d $BASE_REPO ]]; then
+		cd $BASE_REPO
+		echo "Cloning finished ! Local clone found: '$BASE_REPO'"
+		git branch
+		cd ../
+	else
+		echo "Clone of ensembl-static appears to have failed. Can't find dir -> $CWD/ensembl-static ! Exiting."
+		exit 1
+	fi
 fi
 
 # Check on static image param
@@ -70,24 +111,8 @@ else
 	unset $STATIC_ONLY
 fi
 
-CWD=`readlink -f $PWD`
-
-if [[ -e $CWD/ensembl-static ]]; then
-    echo "ensembl-static repo present already. Skipping cloning"
-    cd $CWD/ensembl-static
-    git branch
-    cd ../
-else
-	echo "cloning ensembl-static now..."
-	git clone -b $RELEASE --depth 1 $FORK_REPO_URL
-	cd $CWD/ensembl-static
-    git branch
-    cd ../
-fi
-
-
-STATIC_REPO="${CWD}/$REPO/$DIVISION/species"
-IMAGE_REPO="${CWD}/$REPO/$DIVISION/images/species"
+STATIC_REPO="${BASE_REPO}/$DIVISION/species"
+IMAGE_REPO="${BASE_REPO}/$DIVISION/images/species"
 
 PREXISTING_GENUS_COUNTER=0
 PREXISTING_GENUS_FILE=Preexisting.genus.tmp
@@ -230,14 +255,18 @@ if [[ $STATIC_ONLY == "--images" ]] && [[ $NEW_STATIC_IMAGES ]]; then
 fi
 
 ## Block printing on various assignments/copies/creates made on input species dirs
-echo -e -n "In total: $PREXISTING_GENUS_COUNTER pre-existing genus\n"
+echo -e -n "In total: $PREXISTING_GENUS_COUNTER pre-existing genus encountered\n"
 print_species_bin $NEW_STATIC_CONTENT $PREXISTING_GENUS_FILE
 echo ""
 
-if [[ -e ${NEW_STATIC_CONTENT}/NewGenus.tmp ]]; then NEW_GENUS_COUNTER=`cat ${NEW_STATIC_CONTENT}/$NEW_GENUS_FILE | sort | uniq | wc -l`; fi
-echo -e -n "In total: $NEW_GENUS_COUNTER new genus encountered (Changes made to repo!)\n"
-print_species_bin $NEW_STATIC_CONTENT $NEW_GENUS_FILE
-echo ""
+if [[ -e ${NEW_STATIC_CONTENT}/NewGenus.tmp ]]; then
+	NEW_GENUS_COUNTER=`cat ${NEW_STATIC_CONTENT}/$NEW_GENUS_FILE | sort | uniq | wc -l`;
+	else
+		NEW_GENUS_COUNTER=0
+	fi
+	echo -e -n "In total: $NEW_GENUS_COUNTER new genus encountered (Changes made to repo!)\n"
+	print_species_bin $NEW_STATIC_CONTENT $NEW_GENUS_FILE
+	echo ""
 
 echo -e -n "In total: $NEW_SP_COUNTER new species encountered (Changes made to repo!)\n"
 print_species_bin $NEW_STATIC_CONTENT $NEW_SP_FILE
@@ -252,7 +281,7 @@ print_species_bin $NEW_STATIC_CONTENT $PREXISTING_SP_FILE
 echo ""
 
 echo "Changes to repo:"
-cd ${STATIC_REPO}
+cd ${BASE_REPO}
 git status
 cd $CWD
 
