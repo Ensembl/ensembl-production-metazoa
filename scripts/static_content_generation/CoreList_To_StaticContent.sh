@@ -26,7 +26,7 @@ CWD=`readlink -f $PWD`
 STAGE_LOG="_static_stages_done_${RELEASE}"
 OUTPUT_NCBI="$CWD/NCBI_DATASETS"
 WIKI_OUTPUT_JSONS="$CWD/WIKI_JSON_OUT"
-ENS_PRODUCTION_METAZOA="$CWD/ensembl-production-metazoa"
+ENS_PRODUCTION_METAZOA="$ENSEMBL_ROOT_DIR/ensembl-production-metazoa"
 DS_SOFTWARE_URL="https://api.github.com/repos/ncbi/datasets/releases/latest"
 
 ##Vars for STDOUT colour formatting
@@ -38,26 +38,35 @@ NC='\033[0m' # No Color
 
 if [[ -d ${ENS_PRODUCTION_METAZOA} ]]; then
 	STATIC_BASE_DIR="${ENS_PRODUCTION_METAZOA}/scripts/static_content_generation"
+elif [[ -d ${CWD}/ensembl-production-metazoa ]]; then
+	STATIC_BASE_DIR="${CWD}/scripts/static_content_generation"
+	ENS_PRODUCTION_METAZOA="${CWD}/ensembl-production-metazoa"
 else
-	cd $CWD
 	echo "Can not detect required repository 'ensembl-production-metazoa' in CWD. Attemtping to download now..."
 	sleep 3
-	git clone -b main --depth 1 git@github.com:Ensembl/ensembl-production-metazoa.git
-	STATIC_BASE_DIR="${ENS_PRODUCTION_METAZOA}/scripts/static_content_generation"
+	git clone -b main --depth 1 git@github.com:Ensembl/ensembl-production-metazoa.git ${CWD}/ensembl-production-metazoa
+	STATIC_BASE_DIR="${CWD}/ensembl-production-metazoa/scripts/static_content_generation"
+	ENS_PRODUCTION_METAZOA="${CWD}/ensembl-production-metazoa"
 fi
 
 if [[ $RUN_STAGE == TEMPLATE ]]; then
 
 		# ### Generate blank files for species not linked with GCF_
-		read -p "Generating blank MD files. Enter species.production_name : " PROD_NAME
+		read -p "Generating blank MD files. Enter species.production_name : " PROD_NAME_USER
 		read -p "Generating blank MD files. Enter the appropriate Division (e.g. metazoa, plants, protists etc) : " ENS_DIVISION
+		PROD_NAME=`echo $PROD_NAME_USER | sed 's/ /_/g'`
+		TEMPLATE_OUTDIR="${CWD}/${PROD_NAME^}"
+		mkdir -p $TEMPLATE_OUTDIR
+
 		if [[ -d $ENS_PRODUCTION_METAZOA ]]; then
 
 			for EXTENSION in _about.md _annotation.md _assembly.md _references.md
 			do
-			cat $ENS_PRODUCTION_METAZOA/scripts/static_content_generation/template${EXTENSION} | sed s/TEMP_DIVISION/$ENS_DIVISION/g > /$CWD/${PROD_NAME}${EXTENSION};
+			cat $ENS_PRODUCTION_METAZOA/scripts/static_content_generation/template${EXTENSION} | sed s/TEMP_DIVISION/$ENS_DIVISION/g > $CWD/${PROD_NAME^}${EXTENSION};
 			done
-			echo -e -n "Generated generic template Markdown files:\n[${PROD_NAME}_about.md, ${PROD_NAME}_annotation.md, ${PROD_NAME}_assembly.md], ${PROD_NAME}_references.md\n!!! Please amend these files to fill in the missing values !\n"
+			mv $CWD/${PROD_NAME^}*.md $TEMPLATE_OUTDIR
+			echo -e -n "Generated generic template Markdown files -> $TEMPLATE_OUTDIR.\nContents:\t[${PROD_NAME^}_about.md, ${PROD_NAME^}_annotation.md, ${PROD_NAME^}_assembly.md, ${PROD_NAME^}_references.md]\n"
+			echo -e -n "${ORANGE}!!! Please amend these files to fill in the missing values !${NC}\n"
 			exit 0
 		fi
 
