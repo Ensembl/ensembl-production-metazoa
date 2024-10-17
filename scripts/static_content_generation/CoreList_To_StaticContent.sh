@@ -39,14 +39,14 @@ NC='\033[0m' # No Color
 if [[ -d ${ENS_PRODUCTION_METAZOA} ]]; then
 	STATIC_BASE_DIR="${ENS_PRODUCTION_METAZOA}/scripts/static_content_generation"
 elif [[ -d ${CWD}/ensembl-production-metazoa ]]; then
-	STATIC_BASE_DIR="${CWD}/ensembl-production-metazoa/scripts/static_content_generation"
 	ENS_PRODUCTION_METAZOA="${CWD}/ensembl-production-metazoa"
+	STATIC_BASE_DIR="${ENS_PRODUCTION_METAZOA}/scripts/static_content_generation"
 else
 	echo "Can not detect required repository 'ensembl-production-metazoa' in CWD. Attemtping to download now..."
 	sleep 3
 	git clone -b main --depth 1 git@github.com:Ensembl/ensembl-production-metazoa.git ${CWD}/ensembl-production-metazoa
-	STATIC_BASE_DIR="${CWD}/ensembl-production-metazoa/scripts/static_content_generation"
 	ENS_PRODUCTION_METAZOA="${CWD}/ensembl-production-metazoa"
+	STATIC_BASE_DIR="${ENS_PRODUCTION_METAZOA}/scripts/static_content_generation"
 fi
 
 if [[ $RUN_STAGE == TEMPLATE ]]; then
