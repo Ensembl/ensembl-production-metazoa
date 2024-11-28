@@ -37,7 +37,7 @@ from spython.main import Client
 from sqlalchemy.engine import URL
 
 from ensembl.io.genomio.assembly.status import singularity_image_setter
-from ensembl.io.genomio.assembly.status import datasets_asm_reports
+from ensembl.io.genomio.assembly.status import fetch_datasets_reports
 from ensembl.io.genomio.assembly.status import UnsupportedFormatError
 from ensembl.io.genomio.database.dbconnection_lite import DBConnectionLite as dbc
 from ensembl.io.genomio.utils.json_utils import get_json
@@ -348,7 +348,7 @@ def main() -> None:
     datasets_image = singularity_image_setter(args.cache_dir, args.datasets_version_url)
 
     # Datasets query implementation for one or more batched accessions
-    assembly_reports = datasets_asm_reports(
+    assembly_reports = fetch_datasets_reports(
         datasets_image, query_accessions, args.download_dir, args.datasets_batch_size
     )
 
