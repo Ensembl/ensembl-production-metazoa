@@ -1,4 +1,4 @@
-# Ensembl Metazoa scripts for loading ad-hoc annotations 
+# Ensembl Metazoa scripts for loading ad-hoc annotations
 
 ## Prerequisites
 The whole thing is intended to be run inside the Ensembl production environment. It tries to get local copies of all the Ensembl repos it needs. Please, make sure you have all the proper credential, keys, etc. set up.
@@ -12,7 +12,7 @@ Simple actions:
 
 2. Creating (or copying and modifyingi example) meta configuration file (see below).
 ```
-  ENS_VERSION=105
+  ENS_VERSION=114
   mkdir -p ensembl-production-metazoa/meta/$ENS_VERSION
   cp ensembl-production-metazoa/meta/109_for_110/dmel ensembl-production-metazoa/meta/$ENS_VERSION
   # edit ensembl-production-metazoa/meta/$ENS_VERSION/dmel if needed
@@ -24,7 +24,7 @@ Simple actions:
 
 4. Run either locally (under either `tmux` or `screen`)
 ```
-    ENS_VERSION=105 MZ_RELEASE=52 \
+    ENS_VERSION=114 MZ_RELEASE=62 \
     CMD=<DB server alias to build at> \
     PROD_SERVER=<DB server alias to production server> \
       ./ensembl-production-metazoa/scripts/mz_generic.sh ensembl-production-metazoa/meta/105/dmel
@@ -38,8 +38,8 @@ export PROD_SERVER=<DB server alias to production server>
 export CMD=<DB server alias to build at>
 # or source proper ensembl-production-metazoa/conf/_mz.conf file
 
-export ENS_VERSION=105
-export MZ_RELEASE=52
+export ENS_VERSION=114
+export MZ_RELEASE=62
 export LSF_QUEUE=<lsf_queue_name>
 ```
 ```
@@ -103,13 +103,18 @@ cat sptags | grep -vF '#' | head -n 3 |
    (see ["Parameters for mz_genenic runner"](docs/mz_generic_params.md) for more details).
 
 ## While running
-5. The first time the process runs it tries to get all the needed Ensembl repos into
+5.  If there is a pre-existing and loaded
+  [Ensembl modular environmnent](https://github.com/Ensembl/ensembl-mod-env), `mz_generic.sh` will try to use that one (checking for existence of `MODENV_ROOT` env variable).
+
+  If there's no modular environment loaded,
+  the first time the process runs it tries to get all the needed Ensembl repos into
   `${SCRIPTS_DIR}/ensembl.prod.${ENS_VERSION}` directory (`SCRIPTS_DIR` is `pwd` by default).
 
   If you need to load environment used for building you can
   ```
   source ${SCRIPTS_DIR}/ensembl.prod.${ENS_VERSION}/setup.sh
   ```
+
 
 6. When script runs it creates
   * `${DATA_DIR}/<meta_name>/bup` -- to store most recent core backup (usually, created after each stage by `backup_relink` wrapper)

@@ -14,8 +14,8 @@ There are few ways to specify these parameters.
 | Parameter | Example | Description | Comment |
 | - | - | - | - |
 `MZ_CONFIG` | /path/to/_mz.conf | Paths to the config files with the listed below options, sourced by `mz_generic.sh`
-`MZ_RELEASE` | 51 | EnsemblGenomes release version
-`ENS_VERSION` | 104 | Ensembl (core db schema) release version
+`MZ_RELEASE` | 62 | EnsemblGenomes release version
+`ENS_VERSION` | 114 | Ensembl (core db schema) release version
 `CMD` | cmd_server_alias | SQL DB server alias, to create *core DB* at and put *e-hive* DBs for running pipelines
 `PROD_SERVER` | prod_server_alias | Production SQL DB server alias to get `ensembl_production` and `ncbi_taxonomy` databases from | Should be exported within config file (`export PROD_SERVER`)
 

@@ -63,10 +63,10 @@ fi
 
 # ENS_VERSION and MZ_RELEASE number
 if [ -z "$MZ_RELEASE" ]; then
-  MZ_RELEASE=51
+  MZ_RELEASE=62
 fi
 if [ -z "$ENS_VERSION" ]; then
-  ENS_VERSION=104
+  ENS_VERSION=114
 fi
 
 # TODO: create a param or a config to load user scpecific options from
@@ -118,23 +118,29 @@ else
 fi # ! env_setup_only
 
 
-# prepare / source ensembl.prod.${ENS_VERSION}
-#   ${SCRIPTS}/ensembl.prod.${ENS_VERSION}
+# use an existing modenv or create a new local environment
+if [ -z "$MODENV_ROOT" ]; then
+  echo 'no MODENV_ROOT defined. building environment...' >> /dev/stderr
+  # prepare / source ensembl.prod.${ENS_VERSION}
+  #   ${SCRIPTS}/ensembl.prod.${ENS_VERSION}
 
-flock ${SCRIPTS}/ensembl.prod.${ENS_VERSION}.lock -c "
-  source ${MZ_SCRIPTS}/lib.sh;
-  get_ensembl_prod ${SCRIPTS}/ensembl.prod.${ENS_VERSION} $ENS_VERSION \
-    $MZ_SCRIPTS/checkout_ensembl.20210208.sh $MZ_SCRIPTS/legacy/create_setup_script.sh
-  "
+  flock ${SCRIPTS}/ensembl.prod.${ENS_VERSION}.lock -c "
+    source ${MZ_SCRIPTS}/lib.sh;
+    get_ensembl_prod ${SCRIPTS}/ensembl.prod.${ENS_VERSION} $ENS_VERSION \
+      $MZ_SCRIPTS/checkout_ensembl.20210208.sh $MZ_SCRIPTS/legacy/create_setup_script.sh
+    "
 
-[ -f "${SCRIPTS}/ensembl.prod.${ENS_VERSION}/_FAILED" ] && echo "setting up env failed... exiting" >> /dev/stderr && exit 2
+  [ -f "${SCRIPTS}/ensembl.prod.${ENS_VERSION}/_FAILED" ] && echo "setting up env failed... exiting" >> /dev/stderr && exit 2
 
-# or copy
+  source ${SCRIPTS}/ensembl.prod.${ENS_VERSION}/setup.sh
+  export PROD_DB_SCRIPTS=${ENSEMBL_ROOT_DIR}/ensembl.prod.${ENS_VERSION}uction/scripts/production_database
+  echo 'ENSEMBL_ROOT_DIR='"${ENSEMBL_ROOT_DIR}" >> /dev/stderr
+else # ! -z "$MODENV_ROOT"
+  echo "MODENV_ROOT defined, using $MODENV_ROOT ..." >> /dev/stderr
+  echo "modules loaded: ${LOADEDMODULES}"  >> /dev/stderr
+  echo 'ENSEMBL_ROOT_DIR='"${ENSEMBL_ROOT_DIR}" >> /dev/stderr
+fi # -z "$MODENV_ROOT"
 
-
-source ${SCRIPTS}/ensembl.prod.${ENS_VERSION}/setup.sh
-export PROD_DB_SCRIPTS=${ENSEMBL_ROOT_DIR}/ensembl.prod.${ENS_VERSION}uction/scripts/production_database
-echo 'ENSEMBL_ROOT_DIR='"${ENSEMBL_ROOT_DIR}" >> /dev/stderr
 
 # exit after env setup, if you wish to
 if [ z"${SPECIAL_ACTION}" = z"env_setup_only" ]; then
