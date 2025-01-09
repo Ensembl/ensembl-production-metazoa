@@ -196,6 +196,7 @@ cpanm --local-lib=${dir}/perl5 DateTime::Format::ISO8601
 nf_dir=${dir_full_path}/nextflow
 mkdir -p $nf_dir
 export NXF_HOME=${nf_dir}/dot.nextflow
+export NXF_SINGULARITY_NEW_PID_NAMESPACE=false
 #   get nextflow and install almost like here: https://www.nextflow.io/index.html#GetStarted
 wget -O - https://get.nextflow.io > ${nf_dir}/nextflow.install.bash
 pushd $nf_dir
@@ -241,6 +242,7 @@ echo 'export PYTHONPATH='${dir_full_path}'/ensembl-production-imported-private/l
 
 echo '# nextflow bit' >> $dir/setup.sh
 echo 'export NXF_HOME='${nf_dir}'/dot.nextflow' >> $dir/setup.sh
+echo 'export NXF_SINGULARITY_NEW_PID_NAMESPACE=false' >> $dir/setup.sh
 echo 'PATH='${nf_dir}':$PATH' >> $dir/setup.sh
 
 echo '# gene annotation related bit' >>  $dir/setup.sh
