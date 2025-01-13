@@ -96,25 +96,12 @@ done
 
 
 ## Now checkout Hive
-#branch="main"
-branch="version/2.6"
-for module in \
-    ensembl-hive
-do
-    echo "Checking out $module ($branch)" >> /dev/stderr
-    git clone -b $branch --depth 1 --no-single-branch ${URL_PFX}Ensembl/${module} || {
-        echo "Could not check out $module ($branch)" >> /dev/stderr
-        touch _FAILED
-        exit 2
-    }
-    [ -f _FAILED ] && exit 2
-    echo done >> /dev/stderr
-    echo
-done
 
 # slurm related bit
-mv ensembl-hive ensembl-hive.lsf
-git clone -b  feature/slurm_meadow --depth 1 --no-single-branch ${URL_PFX}Ensembl/ensembl-hive ensembl-hive.slurm 
+git clone -b  version/2.6 --depth 1 --no-single-branch ${URL_PFX}Ensembl/ensembl-hive ensembl-hive.lsf
+
+git clone -b  version/2.7 --depth 1 --no-single-branch ${URL_PFX}Ensembl/ensembl-hive ensembl-hive.slurm
+
 ln -s ensembl-hive.slurm ensembl-hive
 echo "Point symlink ${dir_full_path}/`ensembl-hive` to ${dir_full_path}/`ensembl-hive.lsf` if you're on LSF" >> /dev/stderr
 
