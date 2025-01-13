@@ -59,6 +59,9 @@ elif [ -f "$(pwd)/_mz.conf" ]; then
 elif [ -f "$(pwd)/ensembl-production-metazoa-private/conf/_mz.conf" ]; then
   MZ_CONFIG="$(pwd)/ensembl-production-metazoa-private/conf/_mz.conf"
   source $MZ_CONFIG
+elif [ -f "${ENSEMBL_ROOT_DIR}/ensembl-production-metazoa-private/conf/_mz.conf" ]; then
+  MZ_CONFIG="${ENSEMBL_ROOT_DIR}/ensembl-production-metazoa-private/conf/_mz.conf"
+  source $MZ_CONFIG
 fi
 
 # ENS_VERSION and MZ_RELEASE number
