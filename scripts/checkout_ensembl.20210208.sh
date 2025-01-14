@@ -98,12 +98,13 @@ done
 ## Now checkout Hive
 
 # slurm related bit
-git clone -b  version/2.6 --depth 1 --no-single-branch ${URL_PFX}Ensembl/ensembl-hive ensembl-hive.lsf
+git clone -b version/2.6 --depth 1 --no-single-branch ${URL_PFX}Ensembl/ensembl-hive ensembl-hive.lsf
 
-git clone -b  version/2.7 --depth 1 --no-single-branch ${URL_PFX}Ensembl/ensembl-hive ensembl-hive.slurm
+git clone -b version/2.8 --depth 1 --no-single-branch ${URL_PFX}Ensembl/ensembl-hive ensembl-hive.slurm
 
 ln -s ensembl-hive.slurm ensembl-hive
-echo "Point symlink ${dir_full_path}/`ensembl-hive` to ${dir_full_path}/`ensembl-hive.lsf` if you're on LSF" >> /dev/stderr
+
+echo "Point symlink '${dir_full_path}/ensembl-hive' to '${dir_full_path}/ensembl-hive.lsf' if you're on LSF" >> /dev/stderr
 
 
 
