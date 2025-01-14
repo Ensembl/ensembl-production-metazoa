@@ -96,25 +96,12 @@ done
 
 
 ## Now checkout Hive
-#branch="main"
-branch="version/2.6"
-for module in \
-    ensembl-hive
-do
-    echo "Checking out $module ($branch)" >> /dev/stderr
-    git clone -b $branch --depth 1 --no-single-branch ${URL_PFX}Ensembl/${module} || {
-        echo "Could not check out $module ($branch)" >> /dev/stderr
-        touch _FAILED
-        exit 2
-    }
-    [ -f _FAILED ] && exit 2
-    echo done >> /dev/stderr
-    echo
-done
 
 # slurm related bit
-mv ensembl-hive ensembl-hive.lsf
-git clone -b  feature/slurm_meadow --depth 1 --no-single-branch ${URL_PFX}Ensembl/ensembl-hive ensembl-hive.slurm 
+git clone -b  version/2.6 --depth 1 --no-single-branch ${URL_PFX}Ensembl/ensembl-hive ensembl-hive.lsf
+
+git clone -b  version/2.7 --depth 1 --no-single-branch ${URL_PFX}Ensembl/ensembl-hive ensembl-hive.slurm
+
 ln -s ensembl-hive.slurm ensembl-hive
 echo "Point symlink ${dir_full_path}/`ensembl-hive` to ${dir_full_path}/`ensembl-hive.lsf` if you're on LSF" >> /dev/stderr
 
@@ -196,6 +183,7 @@ cpanm --local-lib=${dir}/perl5 DateTime::Format::ISO8601
 nf_dir=${dir_full_path}/nextflow
 mkdir -p $nf_dir
 export NXF_HOME=${nf_dir}/dot.nextflow
+export NXF_SINGULARITY_NEW_PID_NAMESPACE=false
 #   get nextflow and install almost like here: https://www.nextflow.io/index.html#GetStarted
 wget -O - https://get.nextflow.io > ${nf_dir}/nextflow.install.bash
 pushd $nf_dir
@@ -241,6 +229,7 @@ echo 'export PYTHONPATH='${dir_full_path}'/ensembl-production-imported-private/l
 
 echo '# nextflow bit' >> $dir/setup.sh
 echo 'export NXF_HOME='${nf_dir}'/dot.nextflow' >> $dir/setup.sh
+echo 'export NXF_SINGULARITY_NEW_PID_NAMESPACE=false' >> $dir/setup.sh
 echo 'PATH='${nf_dir}':$PATH' >> $dir/setup.sh
 
 echo '# gene annotation related bit' >>  $dir/setup.sh
