@@ -16,6 +16,7 @@ species.common_name	Itch mite
 # Annotation provider: College of Veterinary Medicine, Sichuan Agricultural University
 # RefSeq Annotation Name: 
 # RefSeq Annotation URL: 
+# NOTE: Itch mite add mtDNA NC_031334.1, see meta/106/cgig
 
 #CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/020/844/145/GCA_020844145.1_ASM2084414v1
 
