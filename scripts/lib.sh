@@ -115,6 +115,9 @@ function get_ensembl_prod () {
     perl -i -pe "s/100M/2GB/ if m/\\\$memory\{'100M'\}/" \
         "$BASE"/ensembl-production/modules/Bio/EnsEMBL/Production/Pipeline/PipeConfig/Base_conf.pm
 
+    # patching datachecks ehive version dependency
+    perl -i -pe  's/(::Version)/; #$1/ if m/use Bio::EnsEMBL::Hive::Version /' "$BASE"/ensembl-datacheck/lib/Bio/EnsEMBL/DataCheck/Pipeline/DbDataChecks_conf.pm
+
     touch "$BASE"/_CAN_USE
   fi
 
