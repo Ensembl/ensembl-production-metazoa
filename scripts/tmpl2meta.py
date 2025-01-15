@@ -15,15 +15,18 @@ def get_args():
                       type=argparse.FileType('rt', encoding='UTF-8'),
                       help="species data as a tsv file with header")
   parser.add_argument("--output_dir", metavar="_species.lst", required=False,
-                      type=str, default='.', 
+                      type=str, default='.',
                       help="directory to write results to")
   parser.add_argument("--out_file_pfx", metavar="rs_", required=False,
-                      type=str, default='', 
+                      type=str, default='',
                       help="directory to write results to")
+  parser.add_argument("--keep_empty_values", required=False,
+                      action="store_true", default=False,
+                      help="keep rows with empty cells")
   args = parser.parse_args()
   return args
 
-def load_species_data(infile):
+def load_species_data(infile, keep_empty_values = False):
   out = []
   header = None
   for line in infile:
@@ -36,19 +39,21 @@ def load_species_data(infile):
     conf_raw = list(map(lambda s: s.strip(), line.strip().split("\t"))) + [""] * len(header)
     conf = dict(zip(header, conf_raw[:len(header)]))
     if "" in conf.values():
-      print(f"# warning: ignoring incomplete configuration: {conf}" , file = sys.stderr)
-      continue
+      print(f"# warning: incomplete configuration: {conf}" , file = sys.stderr)
+      if not keep_empty_values:
+        continue
     # print(f"configuration: {conf}" , file = sys.stderr)
     out.append(conf)
   return out
-  
+
 def fill_template(template : str, conf : dict, name_field : str, dir_path : str, file_pfx : str = ""):
   name = conf.get(name_field, name_field)
   filename = pj(dir_path, file_pfx + name)
   with open(filename, "w") as outfile:
     print(f"# creating '{name}' meta file", file = sys.stderr)
     template = str(template)
-    for expr, subst in conf.items():
+    # sort keys first by length, then alphabetically to fix "_A_" and "_A_SFX_" case
+    for expr, subst in sorted(conf.items(), key = lambda p: (-len(p[0]), p[0])):
       template = template.replace(expr, subst)
     outfile.write(template)
   return
@@ -58,7 +63,7 @@ def main():
   template = "".join(args.template.readlines())
 
   os.makedirs(args.output_dir, exist_ok = True)
-  for conf in load_species_data(args.param_table):
+  for conf in load_species_data(args.param_table, args.keep_empty_values):
      fill_template(template, conf, "_ABBREV_", args.output_dir, args.out_file_pfx)
 
 # main
