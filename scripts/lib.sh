@@ -116,7 +116,9 @@ function get_ensembl_prod () {
         "$BASE"/ensembl-production/modules/Bio/EnsEMBL/Production/Pipeline/PipeConfig/Base_conf.pm
 
     # patching datachecks ehive version dependency
-    perl -i -pe  's/(::Version)/; #$1/ if m/use Bio::EnsEMBL::Hive::Version /' "$BASE"/ensembl-datacheck/lib/Bio/EnsEMBL/DataCheck/Pipeline/DbDataChecks_conf.pm
+    perl -i -pe  's/(::Version)/; #$1/ if m/use Bio::EnsEMBL::Hive::Version /' \
+        "$BASE"/ensembl-datacheck/lib/Bio/EnsEMBL/DataCheck/Pipeline/DbDataChecks_conf.pm \
+        "$BASE"/ensembl-production/modules/Bio/EnsEMBL/Production/Pipeline/PipeConfig/ProductionDBSync_conf.pm
 
     touch "$BASE"/_CAN_USE
   fi
