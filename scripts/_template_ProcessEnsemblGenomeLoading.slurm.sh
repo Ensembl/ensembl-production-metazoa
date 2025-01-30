@@ -32,7 +32,7 @@ if [[ $ENSEMBL_VERSION ]]; then
   echo "ENSEMBL VERSION detected: '$ENS_VERSION'"
 else
   # e.g 111 i.e. the ensembl schema version to use for loading
-  ENS_VERSION=""
+  ENS_VERSION=
   if [[ -z $ENS_VERSION ]]; then
     echo "Please define the ENSEMBL VERSION: ENS_VERSION, See $0 (line: 35)"
     exit 0
@@ -44,7 +44,9 @@ fi
 # If using mod-env you must ensure the environment variable MODENV_ROOT is defined !
 if [[ $MODENV_ROOT ]] && [[ $MODENV_HOME ]]; then
   echo "Detecting 'ensembl-mod-env' production environment setup...."
+  
   PRODUCTION_MODENV_NAME="" #< E.G. NOTE: Ensure MODENV_DIR DOESN'T END WITH: "/"
+
   if [[ $PRODUCTION_MODENV_NAME ]]; then
     MODENV_DIR="${MODENV_HOME}/${PRODUCTION_MODENV_NAME}" ## MODENV_ROOT must be defined and should be if ensembl-mod-env is correctly setup for $USER
     echo "Using modenv setup ?.... if so its configured to this path: '$MODENV_DIR'"
@@ -56,7 +58,8 @@ if [[ $MODENV_ROOT ]] && [[ $MODENV_HOME ]]; then
   else
     echo "Named ensembl-mod-env module not defined 'PRODUCTION_MODENV_NAME' ! See $0 (line: 47)"
     exit 0
-  fi
+  fi # < PRODUCTION_MODENV_NAME
+
 # METHOD B: Setup when using 'mz_generic.sh env_setup_only'
 elif [[ -d "${PWD}/ensembl.prod.${ENS_VERSION}" ]]; then
   echo "Attempting to detect standard 'ensembl.prod.${ENS_VERSION}' non-module-env production environment setup"
@@ -70,7 +73,7 @@ else
   echo "git clone --depth 1 -b main git@github.com:Ensembl/ensembl-production-metazoa.git"
   echo "ensembl-production-metazoa/scripts/mz_generic.sh env_setup_only"
   exit 1
-fi
+fi # <[[ $MODENV_ROOT ]] && [[ $MODENV_HOME ]]
 
 ## set basic requirement env setup vars
 PROD_CYCLE_ENS_VERSION=$(( ${ENS_VERSION} + 1 )) # The production release version for which we are running genome loading.
@@ -113,15 +116,15 @@ fi
 cd $WORK_DIR; mkdir -p workdir tmp logs data locks
 
 # Requires https://github.com/Ensembl/ensembl-production-metazoa
-CONF_DIR_NAME=`date -I`
+CONF_DIR_DATE=`date -I`
 # If specific loading meta configuration folder already exists with config files generated...define it on next line:
 # METACONF_DIR=""
 # Or we attempt to build it from other configs defined:
-METACONF_DIR=$ENS_MAIN_METAZOA_PROD/meta/${CONF_DIR_NAME}.${ENS_VERSION}_for_${PROD_CYCLE_ENS_VERSION}  #Space in which meta files are stored for a given release.
+METACONF_DIR=$ENS_MAIN_METAZOA_PROD/meta/${CONF_DIR_DATE}.${ENS_VERSION}_for_${PROD_CYCLE_ENS_VERSION}  #Space in which meta files are stored for a given release.
 # Create METACONF_DIR if it doesn't already exist
 if [[ ! -d "$METACONF_DIR" ]]; then
     # mkdir -p $METACONF_DIR
-    echo "Could not set METACONF_DIR. Path doesn't exist -> '$ENS_MAIN_METAZOA_PROD/meta/${CONF_DIR_NAME}.${ENS_VERSION}_for_${PROD_CYCLE_ENS_VERSION}'"
+    echo "Could not set METACONF_DIR. Path doesn't exist -> '$ENS_MAIN_METAZOA_PROD/meta/${CONF_DIR_DATE}.${ENS_VERSION}_for_${PROD_CYCLE_ENS_VERSION}'"
     echo "You will need to manually create this conf dir and loading meta config files, see $0 (line: 128)"
 
     # ## If no config files exist for your release loading, create them:
