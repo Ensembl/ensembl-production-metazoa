@@ -198,8 +198,6 @@ fi
 ## Species batch number 2:
 if [ "$BATCH_NO" == "BATCH_2_ROUND1" ]; then
 
-cat sptags_batch_02 |
-
 BATCH_FILE=sptags_batch_02
 MODE=$MZGEN_MODE
 SLEEP=7200
