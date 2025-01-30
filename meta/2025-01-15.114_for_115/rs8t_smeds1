@@ -14,14 +14,28 @@ species.common_name	Freshwater planarian
 # https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/045/838/265/GCA_045838265.1_schMedS3h1
 # Assembly provider: Max Planck Institute for Multidisciplinary Sciences
 # Annotation provider: Max Planck Institute for Multidisciplinary Sciences
-# RefSeq Annotation Name: 
-# RefSeq Annotation URL: 
+# RefSeq Annotation Name:
+# RefSeq Annotation URL:
 
 #CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/045/838/265/GCA_045838265.1_schMedS3h1
 
 # Community GFF3 loading
-#no CONF	DATA_INIT	zcat $METAZOA_NFS/warehouse/e115/schMedS3h1_GCA_045838265.1_JBJCJH01_ivankovic2024.gff3 | cat > fixed.gff3
-#no CONF	GFF_FILE	fixed.gff3
+#CONF	DATA_INIT	cat $METAZOA_NFS/warehouse/e115/schMedS3h1_GCA_045838265.1_JBJCJH01_ivankovic2024.gff3 | perl -pe 's/gene_id=/Parent=/ if m/\ttranscript\t/; s/\ttranscript\t/\tmRNA\t/; s/ORF_Len=/orf_len=/; s/ORF_Type=/orf_type=/' > fixed.gff3
+
+## WE HAVE ASSUMED THAT THE FIRST FOUR CONTIGS CORRESPOND TO THE FOLLOWING SEQREGION NAMES ABSENT FROM THE ASSEMBLY REPORT:
+#CONF	DATA_INIT	echo -n > cm_to_gbc.sr_syns
+#CONF	DATA_INIT	echo -e 'CM099442.1\tJBJCJH010000001.1' >> cm_to_gbc.sr_syns
+#CONF	DATA_INIT	echo -e 'CM099443.1\tJBJCJH010000002.1' >> cm_to_gbc.sr_syns
+#CONF	DATA_INIT	echo -e 'CM099444.1\tJBJCJH010000003.1' >> cm_to_gbc.sr_syns
+#CONF	DATA_INIT	echo -e 'CM099445.1\tJBJCJH010000004.1' >> cm_to_gbc.sr_syns
+
+#CONF	SR_SYNS_FILE	cm_to_gbc.sr_syns
+
+#CONF	GBFF_FILE	GCA_045838265.1_schMedS3h1_genomic.gbff.gz
+#CONF	FNA_FILE	GCA_045838265.1_schMedS3h1_genomic.fna.gz
+#CONF	ASM_REP_FILE	GCA_045838265.1_schMedS3h1_fcs_report.txt
+
+#CONF	GFF_FILE	fixed.gff3
 #no CONF	PEP_FILE	pep.faa
 
 # RefSeq related defaults
@@ -61,7 +75,7 @@ species.annotation_source	Community
 
 
 # update stable ids based on RefSeq gene-id
-#CONF	UPDATE_STABLE_IDS	YES
+#no CONF	UPDATE_STABLE_IDS	YES
 # it's better not to split version ('-fix_version 0' by default)
 #no CONF	UPDATE_STABLE_IDS_OPTIONS	-fix_version 1
 
@@ -76,7 +90,7 @@ assembly.provider_name	Max Planck Institute for Multidisciplinary Sciences
 assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_045838265.1
 
 annotation.provider_name	Max Planck Institute for Multidisciplinary Sciences
-annotation.provider_url	
+annotation.provider_url
 
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
 #  to change the lower allowed length [default 5000]: -min_slice_length 1000
