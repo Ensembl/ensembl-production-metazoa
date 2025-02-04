@@ -44,7 +44,7 @@ species.common_name	Freshwater planarian
 species.annotation_source	Community
 
 # fix missing CDS IDs in the gff3 before filtration and post-filtration check
-#CONF	FIX_MISSING_CDS_ID	NO
+#CONF	FIX_MISSING_CDS_ID	YES
 #CONF	IGNORE_LOST_FILTERED_CDS	NO
 
 
