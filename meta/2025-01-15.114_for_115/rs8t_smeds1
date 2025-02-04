@@ -33,7 +33,7 @@ species.common_name	Freshwater planarian
 
 #CONF	GBFF_FILE	GCA_045838265.1_schMedS3h1_genomic.gbff.gz
 #CONF	FNA_FILE	GCA_045838265.1_schMedS3h1_genomic.fna.gz
-#CONF	ASM_REP_FILE	GCA_045838265.1_schMedS3h1_fcs_report.txt
+#CONF	ASM_REP_FILE	GCA_045838265.1_schMedS3h1_assembly_report.txt
 
 #CONF	GFF_FILE	fixed.gff3
 #no CONF	PEP_FILE	pep.faa
