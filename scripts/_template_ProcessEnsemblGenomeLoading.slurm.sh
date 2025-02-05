@@ -24,6 +24,8 @@
   # - E.g. modenv_create -b 114 ensembl/load_genome e114_genomeload
 ## Load module env, you will need to do this manually outside of this wrapper
   # -E.g.  module load ensembl/e114_genomeload
+## Load module env for hive, you will need to do this manually outside of this wrapper
+  # -E.g.  module load hive/2.7.0
 ####################
 
 ## set and ENS_VERSION
