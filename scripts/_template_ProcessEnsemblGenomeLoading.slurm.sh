@@ -28,7 +28,7 @@
   # -E.g.  module load hive/2.7.0
 ####################
 
-## set and ENS_VERSION
+## set ENS_VERSION
 if [[ $ENSEMBL_VERSION ]]; then
   ENS_VERSION=$ENSEMBL_VERSION
   echo "ENSEMBL VERSION detected: '$ENS_VERSION'"
@@ -158,7 +158,7 @@ fi
 
 ### Genome Loading and Processing starts from here:
 
-## Uncomment lines as needed
+## Uncomment lines as needed to run different sptags batches. Only one BATCH_NO should be uncommented at a time
 BATCH_NO="BATCH_1_ROUND1"
 # BATCH_NO="BATCH_2_ROUND1"
 # BATCH_NO="BATCH_3_ROUND1"
@@ -169,7 +169,7 @@ BATCH_NO="BATCH_1_ROUND1"
 # BATCH_NO=......."
 # BATCH_NO="CUSTOM"
 
-### mz_generic params:
+### mz_generic params, this will set the level of throughput in genome loading and production pipeline processing:
 ## SEE (https://github.com/Ensembl/ensembl-production-metazoa/blob/main/docs/mz_generic_params.md)
 MZGEN_MODE="stop_after_conf"
 # MZGEN_MODE="stop_after_load"
