@@ -2000,6 +2000,16 @@ function set_core_random_samples () {
       $($CMD details script) \
       -dbname "$DBNAME"
 
+    # adding "genebuild.sample_gene", "genebuild.sample_location" metakeys
+    ${CMD} -D "${DBNAME}" -e '
+      insert ignore into meta (species_id, meta_key, meta_value)
+        select species_id,
+               replace( replace(meta_key, "sample.", "genebuild.sample_"), "_param", ""),
+               meta_value
+          from meta
+          where meta_key in ("sample.location_param", "sample.gene_param");
+    '
+
     touch_done "$DONE_TAG"
   fi
 
