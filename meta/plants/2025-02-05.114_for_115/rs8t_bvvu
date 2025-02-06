@@ -26,6 +26,9 @@ species.common_name	Sugar beet
 #no CONF	GFF_FILE	fixed.gff3
 #no CONF	PEP_FILE	pep.faa
 
+#NC_002511.2     RefSeq  mRNA    471065  152684  .       ?       .       ID=rna-LK397_mgp104;Parent=gene-LK397_mgp104;Dbxref=GeneID:809450;exception=RNA editing%2C trans-splicing;gbkey=mRNA;gene=nad1;locus_tag=LK397_mgp104
+
+
 # RefSeq related defaults
 #no CONF	GCF_TO_GCA	1
 #CONF	ANNOTATION_SOURCE_SFX	rs
