@@ -173,7 +173,14 @@ function get_meta_conf () {
     perl -pe 's/^\s*//'
 }
 
-
+function get_meta_conf_interp () {
+    local META_FILE="$1"
+    local CONF_KEY="$2"
+    get_meta_conf "$META_FILE" "$CONF_KEY" |
+    perl -pe 's,\$([A-Za-z0-9_]+),\$\{$1\},g' |
+    perl -pe 's,\$\{([A-Za-z0-9_]+)\},$ENV{$1} // "\$\{$1\}",eg' |
+    perl -pe 's/^\s*//'
+}
 
 function gen_db_name () {
   local META_FILE=$1
@@ -1831,7 +1838,7 @@ function run_repeat_masking () {
       REP_LIB_OPT=
     fi
 
-    DNA_FEATURES_OPTIONS="$(get_meta_conf $META_RAW 'DNA_FEATURES_OPTIONS')"
+    DNA_FEATURES_OPTIONS="$(get_meta_conf_interp $META_RAW 'DNA_FEATURES_OPTIONS')"
 
     local SPECIES_TAG=$(echo $SPECIES | perl -pe 's/^([^_]{3})[^_]+(?:_([^_]{3}))?.*(_[^_]+)$/$1_$2$3/')
 
@@ -3404,7 +3411,10 @@ function prepare_metada () {
       #   filter
       cat $OUT_DIR/pre_models.gff3 |
         python3 $SCRIPTS/ensembl-production-metazoa/scripts/cds_sr_filter.py \
-        > $OUT_DIR/pre_models.cds_sr_filtered.gff3
+        > $OUT_DIR/pre_models.cds_sr_filtered.gff3 \
+        2> $OUT_DIR/pre_models.cds_sr_filtered.log
+
+      head $OUT_DIR/pre_models.cds_sr_filtered.log
 
       #   check that there are any CDS left and the drop is not critical
       local cds_after_filter=$(cat $OUT_DIR/pre_models.cds_sr_filtered.gff3 | awk -F "\t" '$3 == "CDS"' | wc -l)

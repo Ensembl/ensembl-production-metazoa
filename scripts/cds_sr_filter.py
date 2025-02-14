@@ -39,7 +39,7 @@ for line_raw in sys.stdin:
     seq4cds[cds_id] = seq_id
 
   if seq_id != seq4cds[cds_id]:
-    print(cds_id, seq_id, file=sys.stderr)
+    print("\t".join(["DUPLICATED_REGION", cds_id, seq_id, seq4cds[cds_id]]), file=sys.stderr)
     continue
 
   sys.stdout.write(line_raw)
