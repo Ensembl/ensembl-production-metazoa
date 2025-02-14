@@ -3404,7 +3404,10 @@ function prepare_metada () {
       #   filter
       cat $OUT_DIR/pre_models.gff3 |
         python3 $SCRIPTS/ensembl-production-metazoa/scripts/cds_sr_filter.py \
-        > $OUT_DIR/pre_models.cds_sr_filtered.gff3
+        > $OUT_DIR/pre_models.cds_sr_filtered.gff3 \
+        2> $OUT_DIR/pre_models.cds_sr_filtered.log
+
+      head $OUT_DIR/pre_models.cds_sr_filtered.log
 
       #   check that there are any CDS left and the drop is not critical
       local cds_after_filter=$(cat $OUT_DIR/pre_models.cds_sr_filtered.gff3 | awk -F "\t" '$3 == "CDS"' | wc -l)
