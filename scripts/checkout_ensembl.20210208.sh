@@ -191,6 +191,29 @@ pushd $nf_dir
   cat ${nf_dir}/nextflow.install.bash |  bash 2>&1 | tee ${nf_dir}/nextflow.install.log
 popd
 
+# installing tkrzw
+tkrzw_ver=1.0.32
+tkrzw_url="https://dbmx.net/tkrzw/pkg/tkrzw-${tkrzw_ver}.tar.gz"
+tkrzw_python_git_url="git+https://github.com/estraier/tkrzw-python"
+
+wget "$tkrzw_url"
+tar -zxf "tkrzw-${tkrzw_ver}.tar.gz"
+TKRZW_DIR="${dir_full_path}"/"tkrzw-${tkrzw_ver}"
+pushd "$TKRZW_DIR"
+  ./configure --enable-zlib --enable-lzma --enable-zstd
+  make
+popd
+
+export PATH="$PATH":"$TKRZW_DIR"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH":"$TKRZW_DIR"
+
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH":"$TKRZW_DIR" \
+  LIBRARY_PATH="$TKRZW_DIR" \
+  CPATH="$TKRZW_DIR" \
+  pip3 install "$tkrzw_python_git_url"
+
+python -c 'import tkrzw' || false
+
 ## Gasp!
 
 echo "Checkout complete" >> /dev/stderr
@@ -233,6 +256,11 @@ echo 'export NXF_HOME='${nf_dir}'/dot.nextflow' >> $dir/setup.sh
 echo 'export NXF_SINGULARITY_NEW_PID_NAMESPACE=false' >> $dir/setup.sh
 echo 'PATH='${nf_dir}':$PATH' >> $dir/setup.sh
 
+echo '# tkrzw bit' >> $dir/setup.sh
+echo 'export TKRZW_DIR='${TKRZW_DIR} >> $dir/setup.sh
+echo 'PATH=$PATH:'${TKRZW_DIR} >> $dir/setup.sh
+echo 'LD_LIBRARY_PATH=$LD_LIBRARY_PATH:'${TKRZW_DIR} >> $dir/setup.sh
+
 echo '# gene annotation related bit' >>  $dir/setup.sh
 echo 'PERL5LIB='${dir_full_path}'/ensembl-genes/lib:$PERL5LIB' >> $dir/setup.sh
 echo 'PATH='${dir_full_path}'/ensembl-genes/bin:$PATH' >> $dir/setup.sh
@@ -242,7 +270,7 @@ echo 'PERL5LIB='${dir_full_path}'/ensembl-orm/modules:$PERL5LIB' >> $dir/setup.s
 echo 'PATH='${dir_full_path}'/ensembl-orm/bin:$PATH' >> $dir/setup.sh
 echo 'export ENSCODE=$ENSEMBL_ROOT_DIR' >> $dir/setup.sh
 
-echo 'export PERL5LIB ENSEMBL_ROOT_DIR ENSEMBL_CVS_ROOT_DIR PYTHONPATH PATH' >> $dir/setup.sh
+echo 'export PERL5LIB ENSEMBL_ROOT_DIR ENSEMBL_CVS_ROOT_DIR PYTHONPATH LD_LIBRARY_PATH PATH' >> $dir/setup.sh
 
 
 echo
