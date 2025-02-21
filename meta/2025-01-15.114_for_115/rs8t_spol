@@ -20,7 +20,7 @@ species.common_name	Flatworm
 #CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/044/892/525/GCA_044892525.1_ASM4489252v1
 
 # Community GFF3 loading
-#CONF	DATA_INIT	cat $METAZOA_NFS/warehouse/e115/schPol2_GCA_044892525.1_JBJFYX01_ivankovic2024.gff3 | perl -pe 's/gene_id=/Parent=/ if m/\ttranscript\t/; s/\ttranscript\t/\tmRNA\t/; s/ORF_Len=/orf_len=/; s/ORF_Type=/orf_type=/' > fixed.gff3
+#CONF	DATA_INIT	cat $METAZOA_NFS/warehouse/e115/schPol2_GCA_044892525.1_JBJFYX01_ivankovic2024.gff3 | perl -pe 's/geneID=/Parent=/ if m/\ttranscript\t/; s/\ttranscript\t/\tmRNA\t/; s/ORF_Len=/orf_len=/; s/ORF_Type=/orf_type=/' > fixed.gff3
 
 ## WE HAVE ASSUMED THAT THE FIRST FOUR CONTIGS CORRESPOND TO THE FOLLOWING SEQREGION NAMES ABSENT FROM THE ASSEMBLY REPORT:
 #CONF	DATA_INIT	echo -n > cm_to_gbc.sr_syns
