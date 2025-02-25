@@ -56,3 +56,7 @@ Itch mite	ssca	GCA_020844145.1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/020/
 # cat  meta/2025-01-15.114_for_115/_refseq_e115.list | grep -vF '#' | grep -vP '^\s*$' | awk -F "\t" '{print NF}' | sort | uniq -c
 # python3 ./scripts/tmpl2meta.py --template meta/metazoa.tmpl --param_table meta/2025-01-15.114_for_115/_refseq_e115.list --output_dir meta/2025-01-15.114_for_115 --out_file_pfx rs8t_ --keep_empty_values
 # ls -1 meta/2025-01-15.114_for_115/rs8t_* | wc -l
+
+# Added during e115 HO period, not linked to e115 release or handover but added to production cycle:
+Owl limpet	lgig1	GCF_000327385.1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/327/385/GCF_000327385.1_Helro1	https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000327385.1/		DOE Joint Genome Institute	NCBI RefSeq	refseq_import_visible	RefSeq	rs	
+Owl limpet	lgig2	GCA_000327385.1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/327/385/GCA_000327385.1_Helro1	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000327385.1/		DOE Joint Genome Institute	DOE Joint Genome Institute	gff3_genes	Community	cm	
