@@ -16,14 +16,35 @@ species.common_name	Itch mite
 # Annotation provider: College of Veterinary Medicine, Sichuan Agricultural University
 # RefSeq Annotation Name: 
 # RefSeq Annotation URL: 
-# NOTE: Itch mite add mtDNA NC_031334.1, see meta/106/cgig
 
 #CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/020/844/145/GCA_020844145.1_ASM2084414v1
 
-# Community GFF3 loading
-#no CONF	DATA_INIT	zcat  | cat > fixed.gff3
-#no CONF	GFF_FILE	fixed.gff3
-#no CONF	PEP_FILE	pep.faa
+# NOTE: Itch mite add mtDNA NC_031334.1
+#   GenBank: LN874268.1 RefSeq:  NC_031334.1
+# MT data: https://www.ncbi.nlm.nih.gov/nuccore/NC_031334.1?report=gbwithparts&log$=seqview
+#CONF	DATA_INIT	wget 'https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=fasta&id=NC_031334.1' -O NC_031334.1.fna
+#CONF	DATA_INIT	wget 'https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=NC_031334.1' -O NC_031334.1.gff3
+#CONF	DATA_INIT	wget 'https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=fasta_cds_aa&save=file&id=NC_031334.1&withparts=on&conwithfeat=on&hide-cdd=on&tool=portal' -O NC_031334.1.faa
+
+# N.B. no CDSs on  NC_031334.1:
+#   manually map gene -> gene/cds, to enable further correction by gff_stats
+#   add transl_table=5, see https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=52283 
+#CONF	DATA_INIT	( zcat GCA_020844145.1_ASM2084414v1_genomic.gff.gz; grep -v '#' NC_031334.1.gff3 | perl -pe 'if (m/\tgene\t/ && m/gene_biotype=other;/) { s/gene_biotype=other;/gene_biotype=protein_coding;/; print; s/\tgene\t/\tCDS\t/; s/ID=gene-([^;]+).*/ID=cds-$1;Parent=gene-$1;transl_table=5/; }' ) > gff3.gff3
+
+#CONF	DATA_INIT	zcat GCA_020844145.1_ASM2084414v1_genomic.fna.gz | cat - NC_031334.1.fna  > fna.fna
+#CONF	DATA_INIT	(zcat GCA_020844145.1_ASM2084414v1_protein.faa.gz; cat NC_031334.1.faa | perl -pe 'if (m/\[protein_id=(\w+\.\d+)\]/) {my $a = $1; s/^>/>$a / }' ) > pep.faa
+
+# patch assembly report
+# MT assembled-molecule MT Mitochondrion LN874268.1 = NC_031334.1 non-nuclear 15881 na
+#CONF	DATA_INIT	echo -e 'MT\tassembled-molecule\tMT\tMitochondrion\tLN874268.1\t=\tNC_031334.1\tnon-nuclear\t15881\tna'| cat GCA_020844145.1_ASM2084414v1_assembly_report.txt - > patched_report.txt
+
+#CONF	GBFF_FILE	GCA_020844145.1_ASM2084414v1_genomic.gbff.gz
+#CONF	FNA_FILE	fna.fna
+#CONF	ASM_REP_FILE	patched_report.txt
+
+#CONF	GFF_FILE	gff3.gff3
+#CONF	PEP_FILE	pep.faa
+
 
 # RefSeq related defaults
 #no CONF	GCF_TO_GCA	1
@@ -49,7 +70,7 @@ species.annotation_source	GenBank
 
 #CONF	GFF3_LOAD_LOGIC_NAME	gff3_genes
 
-#CONF	GFF_LOADER_OPTIONS	--external_db_map_name default.txt --manifest_integrity_rc_name 32GB --load_sequence_data_rc_name 64GB
+#CONF	GFF_LOADER_OPTIONS	--external_db_map_name default.txt --manifest_integrity_rc_name 32GB --load_sequence_data_rc_name 64GB --check_manifest 0
 #  default: --external_db_map_name default.txt
 #  flybase: --external_db_map_name default.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
 #  minimal: --external_db_map_name minimal.txt --skip_unknown_xref_source 1
