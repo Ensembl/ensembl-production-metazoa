@@ -132,3 +132,16 @@ annotation.provider_url
 #
 # FINALIZE
 #
+# Adding proper attributions for NC_031334.1 (MT) seq_region
+# Papenfuss Lab, The Walter and Eliza Hall Institute of Medical Research
+# NCBI Genome Project, https://www.ncbi.nlm.nih.gov/nuccore/NC_031334.1
+##   adding "added_seq_accession", "added_seq_asm_pr_nam", "added_seq_asm_pr_url", "added_seq_ann_pr_nam", "added_seq_ann_pr_url" seq_region_attrib
+# DB=premz_sarcoptes_scabiei_gca020844145v1gb_core_62_114_1
+# ${CMD_W} -D ${DB} -e 'INSERT IGNORE INTO seq_region_attrib (seq_region_id, attrib_type_id, value) SELECT sr.seq_region_id, at.attrib_type_id, "NC_031334.1" FROM seq_region sr, attrib_type at WHERE sr.name = "NC_031334.1" AND at.code = "added_seq_accession";'
+# ${CMD_W} -D ${DB} -e 'INSERT IGNORE INTO seq_region_attrib (seq_region_id, attrib_type_id, value) SELECT sr.seq_region_id, at.attrib_type_id, "Papenfuss Lab, The Walter and Eliza Hall Institute of Medical Research" FROM seq_region sr, attrib_type at WHERE sr.name = "NC_031334.1" AND at.code = "added_seq_asm_pr_nam";'
+# ${CMD_W} -D ${DB} -e 'INSERT IGNORE INTO seq_region_attrib (seq_region_id, attrib_type_id, value) SELECT sr.seq_region_id, at.attrib_type_id, "" FROM seq_region sr, attrib_type at WHERE sr.name = "NC_031334.1" AND at.code = "added_seq_asm_pr_url";'
+# ${CMD_W} -D ${DB} -e 'INSERT IGNORE INTO seq_region_attrib (seq_region_id, attrib_type_id, value) SELECT sr.seq_region_id, at.attrib_type_id, "NCBI Genome Project" FROM seq_region sr, attrib_type at WHERE sr.name = "NC_031334.1" AND at.code = "added_seq_ann_pr_nam";'
+# ${CMD_W} -D ${DB} -e 'INSERT IGNORE INTO seq_region_attrib (seq_region_id, attrib_type_id, value) SELECT sr.seq_region_id, at.attrib_type_id, "https://www.ncbi.nlm.nih.gov/nuccore/NC_031334.1" FROM seq_region sr, attrib_type at WHERE sr.name = "NC_031334.1" AND at.code = "added_seq_ann_pr_url";'
+##    adding "added_seq.region_name" meta_key
+# ${CMD_W} -D ${DB} -e 'INSERT INTO meta (species_id, meta_key, meta_value) VALUES (1, "added_seq.region_name", "NC_031334.1");'
+#
