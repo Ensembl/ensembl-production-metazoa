@@ -184,10 +184,9 @@ if [[ -e ${CWD}/Download_species_image_from_url.sh ]]; then
 	sh ${CWD}/Download_species_image_from_url.sh
 	mkdir -p $CWD/Source_Images_wikipedia
 	grep -e 'wget' Download_species_image_from_url.sh | awk -F" " '{print $NF}' | xargs -n 1 -I XXX mv XXX $CWD/Source_Images_wikipedia
- 
+
 else
-	echo -e -n "${RED}WARNING: No source images were located !! Noting to do...Exiting !!${NC}\n"
-	exit 1
+	echo -e -n "${RED}WARNING: No source images were located !! Noting more to do!!${NC}\n"
 fi
 
 #Check we don't rewrite over a previous run in case of loss of data
