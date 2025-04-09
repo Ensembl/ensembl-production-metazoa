@@ -22,8 +22,8 @@ species.common_name	Artichoke
 #no CONF	FNA_FILE	_ASSEMBLY_FASTA_
 
 # Community GFF3 loading
-#CONF	DATA_INIT	zcat  | cat > fixed.gff3
-#CONF	GFF_FILE	fixed.gff3
+#no CONF	DATA_INIT	zcat  | cat > fixed.gff3
+#no CONF	GFF_FILE	fixed.gff3
 #no CONF	PEP_FILE	pep.faa
 
 # RefSeq related defaults
