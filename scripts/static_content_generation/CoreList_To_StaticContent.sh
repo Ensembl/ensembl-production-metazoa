@@ -164,6 +164,7 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "WIKI" ]]; then
 			echo ${CORE}.spname.wiki.json >> Without_Wikipedia_Summary_Content.txt
 			echo ${CORE}.commonname.wiki.json >> Without_Wikipedia_Summary_Content.txt
 			rm $LOCAL_DIR/${CORE}.{commonname,spname}.wiki.json
+			touch $WIKI_DIR/${CORE}.wiki.json
 			return
 		fi
 	}
@@ -279,7 +280,7 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 
 		if [[ $VERSION == 1 ]]; then 
 			echo "BaseCase: GCF $GCF."
-	     	singularity run $DATASETS_SINGULARITY \
+			singularity run $DATASETS_SINGULARITY \
 				datasets summary genome accession $GCF --assembly-source RefSeq --as-json-lines --report genome | \
 			jq '.' > ${GCA}.genomereport.json
 		else
@@ -293,7 +294,7 @@ if [[ $RUN_STAGE == "ALL" ]] || [[ $RUN_STAGE == "NCBI" ]]; then
 			while [[ $VERSION -ne 0 ]];
 			do
 				echo "Trying GCF $INSDC.$VERSION" 
-        		singularity run $DATASETS_SINGULARITY \
+				singularity run $DATASETS_SINGULARITY \
 					datasets summary genome accession $INSDC.$VERSION --assembly-source RefSeq --as-json-lines --report genome | \
 				jq '.' > ${GCA}.genomereport.json
 
