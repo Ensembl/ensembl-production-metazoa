@@ -15,7 +15,8 @@
 
 
 ## LOAD MODULES, INSERT CODE, AND RUN YOUR PROGRAMS HERE
-module load libffi-3.3-gcc-9.3.0-cgokng6
+# module load libffi-3.3-gcc-9.3.0-cgokng6 : deprecated as of April-2025
+module load libffi
 
 ## JOB CMD(S):
 

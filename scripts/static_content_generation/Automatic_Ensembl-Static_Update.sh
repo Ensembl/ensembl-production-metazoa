@@ -17,7 +17,7 @@
 ## Author: [Lahcen Campbell - lcampbell@ebi.ac.uk].
 ## A script to automatically updated the ensembl-static repo for metazoan species (or other if needed)
 ## Input to script is a directory containing one or more directories (one per species+gca). The script checks if this species is already
-## present in the ens-static repo, and then copies or creates directories as neeeded. 
+## present in the ens-static repo, and then copies or creates directories as needed.
 
 ##Vars for STDOUT colour formatting
 GREEN='\033[0;32m'
@@ -44,7 +44,9 @@ if [[ -z $STATIC_MD_DIR ]] || [[ -z $RELEASE ]]; then
 else
 	TEMP_STATIC_IN=`readlink -f $STATIC_MD_DIR`
 	NEW_STATIC_CONTENT="${TEMP_STATIC_IN}/"
-	echo -e -n "${ORANGE} WARNING !!! You must first create a fork of ensembl-staic repo before running this script. Direct commits to Ensembl/ensembl-static are not permotted! ${NC}"
+	echo -e -n "${ORANGE} WARNING !!! You must first create a fork of ensembl-static repo before running this script. Direct commits to Ensembl/ensembl-static are not permitted! ${NC}\n"
+	sleep 2
+	echo -e -n "${ORANGE} If you run this script in a directory with access to a pre-cloned ensembl-static on the right branch, updates will use this local cloned repo. If not, it will attempt to clone anew.${NC}"
 	sleep 2
 	echo -e -n "\n--------------Starting static MD file move-------------\n\n"
 fi
@@ -148,10 +150,10 @@ function print_species_bin () {
 while read GENUS
 do
 	#Does genus dir exist
-  	if [[ -d ${STATIC_REPO}/$GENUS ]]; then
+	if [[ -d ${STATIC_REPO}/$GENUS ]]; then
 
                 ## Genus is already present, next check for species and production name if needed
-				echo -e -n "${ORANGE}[1] - Found pre-exisiting genus dir for $GENUS${NC}\n"
+				echo -e -n "${ORANGE}[1] - Found pre-existing genus dir for $GENUS${NC}\n"
 
 				#Increment counter of new genus
 				((PREXISTING_GENUS_COUNTER=PREXISTING_GENUS_COUNTER+1))
@@ -163,7 +165,7 @@ do
 				do
 					if [[ -d ${STATIC_REPO}/${GENUS}/${SP} ]]; then
 						# Species directory also found so need to check if the production name is present
-						echo -e -n "\t${ORANGE}[2] - Found pre-exisiting species dir for $SP${NC}\n"
+						echo -e -n "\t${ORANGE}[2] - Found pre-existing species dir for $SP${NC}\n"
 
 						# Now check if the same production name is found:
 						BASE_PROD_NAME=`find ${NEW_STATIC_CONTENT}/${SP}/ -type f -name "*_about.md"`
@@ -179,7 +181,7 @@ do
 							echo -e -n "\t${RED}[3] MD files with same 'species.production_name' present:${NC} $PROD_NAME ${RED}! MD files = [MANUAL CHECK NEEDED]${NC}\n"
 						else
 
-							#Increment counter of new assembly version for pre exisiting species
+							#Increment counter of new assembly version for pre existing species
 							((NEW_SP_ASM_COUNTER=NEW_SP_ASM_COUNTER+1))
 							echo "$PROD_NAME" >> ${NEW_STATIC_CONTENT}/$NEW_SP_ASM_FILE
 							cp -r ${NEW_STATIC_CONTENT}/${SP}/${PROD_NAME}* ${STATIC_REPO}/${GENUS}/${SP}/
@@ -198,8 +200,8 @@ do
 					fi
 				done < ${NEW_STATIC_CONTENT}/${GENUS}.species.tmp
     else
-            # Genus directory is unique and not already presenet in repo:
-			echo -e -n "${GREEN}[1] No directory existis with name:${NC}\"$GENUS\"\n"
+            # Genus directory is unique and not already present in repo:
+			echo -e -n "${GREEN}[1] No directory exists with name:${NC}\"$GENUS\"\n"
 
 			#Increment counter of new genus
 			echo "$GENUS" >> ${NEW_STATIC_CONTENT}/$NEW_GENUS_FILE
