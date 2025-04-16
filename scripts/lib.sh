@@ -30,7 +30,7 @@ if [ -z "$TAXONOMY_DBNAME" ]; then
 fi
 
 if [ -n "${REPUTIL_EXE_PATH}" ]; then
-  echo Located repeatmasker. Using: "${REPUTIL_EXE}" >> /dev/stderr
+  echo Located repeatmasker. Using: "${REPUTIL_EXE_PATH}" >> /dev/stderr
   REPUTIL_PATH=$REPUTIL_EXE_PATH
 else
   REPUTIL_PATH="$(brew --prefix repeatmasker)"/libexec/util
