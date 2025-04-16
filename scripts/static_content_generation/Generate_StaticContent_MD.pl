@@ -55,7 +55,7 @@ print "NCBI Assembly report: $genome_sum_file\n";
 
 ## Convert machine to lit form of division name
 $safe_division =~ tr/_/ /;
-my $ens_division = $safe_division;
+my $ens_division = ucfirst($safe_division);
 my $division_url;
 
 if ($safe_division =~ m/[Pp]lants/){
@@ -67,7 +67,7 @@ elsif ($safe_division =~ m/[Ff]ungi/){
 	print "Division is $ens_division\n";
 	print "Setting url to fungi.ensembl.org\n";
     $division_url =	"https://fungi.ensembl.org/info/genome/annotation/index.html"
-   }
+	}
 elsif ($safe_division =~ m/[Bb]ateria/){
 	print "Division is $ens_division\n";
 	print "Setting url to bacteria.ensembl.org\n";
@@ -311,7 +311,7 @@ Genomic assembly deposited to the INSDC by [Wellcome Sanger Institute](https://w
 partnership with the [Darwin Tree of Life (DToL)](https://www.darwintreeoflife.org/) project.
 
 Genome annotation was obtained using re-engineered versions of our Gene Annotation System [Aken *et al.*](https://europepmc.org/article/MED/27337980) with
-refinements implemented for [non-vertebrate genomic annotation](https://rapid.ensembl.org/info/genome/genebuild/anno.html).
+refinements implemented for [non-vertebrate genomic annotation](https://beta.ensembl.org/help/articles/non-vertebrate-genome-annotation).
 
 Find more information regarding DToL and Ensembl partnership [here](https://projects.ensembl.org/darwin-tree-of-life/).
 ";
