@@ -82,6 +82,10 @@ fi
 mkdir -p "$WD"
 
 # db server alias
+if [ -n "${DB_SERVER_ALIAS}" ]; then
+  echo using "${DB_SERVER_ALIAS}" as a db server alias... >> /dev/stderr
+  export CMD="${DB_SERVER_ALIAS}"
+fi
 if [ -z "$CMD" ]; then
   echo 'no db server alias "$CMD" is provided' >> /dev/stderr
   exit 1
