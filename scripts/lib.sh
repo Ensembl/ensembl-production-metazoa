@@ -29,7 +29,12 @@ if [ -z "$TAXONOMY_DBNAME" ]; then
   TAXONOMY_DBNAME=ncbi_taxonomy
 fi
 
-REPUTIL_PATH="$(brew --prefix repeatmasker)"/libexec/util
+if [ -n "${REPUTIL_EXE}" ]; then
+  echo Located repeatmasker. Using: "${REPUTIL_EXE}" >> /dev/stderr
+  REPUTIL_PATH=$REPUTIL_EXE
+else
+  REPUTIL_PATH="$(brew --prefix repeatmasker)"/libexec/util
+fi
 
 # utils
 

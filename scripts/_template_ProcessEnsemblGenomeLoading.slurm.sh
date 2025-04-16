@@ -93,11 +93,11 @@ else
 fi
 
 ## Host setup, dbs and SLURM queue config
-CMD= #Mysql host in which new core DBs will be created and stored (e.g: me1, me2, pl1, pl2)
+DB_SERVER_ALIAS= #Mysql host in which new core DBs will be created and stored (e.g: me1, me2, pl1, pl2)
 PROD_SERVER= # Host containing production 'ensembl_production' db
 QUEUE=production # QUEUE/PARTITION FOR SLURM SCHEDULER:
-if [[ -z $CMD ]] || [[ -z $PROD_SERVER ]] || [[ -z $QUEUE ]]; then
-    echo "Ensure following environment vars are defined: CMD, PROD_SERVER, QUEUE"
+if [[ -z $DB_SERVER_ALIAS ]] || [[ -z $PROD_SERVER ]] || [[ -z $QUEUE ]]; then
+    echo "Ensure following environment vars are defined: DB_SERVER_ALIAS, PROD_SERVER, QUEUE"
     exit 0
 fi
 
@@ -189,8 +189,8 @@ while read TAG
 do
   echo "Preparing ${TAG}_slurm_batch.sh ..."
   cat $SLURM_BATCH_TEMPLATE > ${TAG}_slurm_batch.sh
-  echo -e -n "ENS_VERSION=$ENS_VERSION\nPROD_SERVER=$PROD_SERVER\nCMD=$CMD\nMZ_RELEASE=$MZ_RELEASE\n" >> ${TAG}_slurm_batch.sh
-  echo -e -n "\nexport ENS_VERSION\nexport PROD_SERVER\nexport CMD\nexport MZ_RELEASE\n\n" >> ${TAG}_slurm_batch.sh
+  echo -e -n "ENS_VERSION=$ENS_VERSION\nPROD_SERVER=$PROD_SERVER\nDB_SERVER_ALIAS=$DB_SERVER_ALIAS\nMZ_RELEASE=$MZ_RELEASE\n" >> ${TAG}_slurm_batch.sh
+  echo -e -n "\nexport ENS_VERSION\nexport PROD_SERVER\nexport DB_SERVER_ALIAS\nexport MZ_RELEASE\n\n" >> ${TAG}_slurm_batch.sh
   echo -e -n "flock -n locks/$TAG ${ENS_MAIN_METAZOA_PROD}/scripts/mz_generic.sh ${METACONF_DIR}/$TAG $MODE;\n" >> ${TAG}_slurm_batch.sh
   sed -i s/XXX/${TAG}/g ${TAG}_slurm_batch.sh
   sbatch ${TAG}_slurm_batch.sh | tee logs/${TAG}.sbatch_ID
@@ -211,8 +211,8 @@ while read TAG
 do
   echo "Preparing ${TAG}_slurm_batch.sh ..."
   cat $SLURM_BATCH_TEMPLATE > ${TAG}_slurm_batch.sh
-  echo -e -n "ENS_VERSION=$ENS_VERSION\nPROD_SERVER=$PROD_SERVER\nCMD=$CMD\nMZ_RELEASE=$MZ_RELEASE\n" >> ${TAG}_slurm_batch.sh
-  echo -e -n "\nexport ENS_VERSION\nexport PROD_SERVER\nexport CMD\nexport MZ_RELEASE\n\n" >> ${TAG}_slurm_batch.sh
+  echo -e -n "ENS_VERSION=$ENS_VERSION\nPROD_SERVER=$PROD_SERVER\nDB_SERVER_ALIAS=$DB_SERVER_ALIAS\nMZ_RELEASE=$MZ_RELEASE\n" >> ${TAG}_slurm_batch.sh
+  echo -e -n "\nexport ENS_VERSION\nexport PROD_SERVER\nexport DB_SERVER_ALIAS\nexport MZ_RELEASE\n\n" >> ${TAG}_slurm_batch.sh
   echo -e -n "flock -n locks/$TAG ${ENS_MAIN_METAZOA_PROD}/scripts/mz_generic.sh ${METACONF_DIR}/$TAG $MODE;\n" >> ${TAG}_slurm_batch.sh
   sed -i s/XXX/${TAG}/g ${TAG}_slurm_batch.sh
   sbatch ${TAG}_slurm_batch.sh | tee logs/${TAG}.sbatch_ID
@@ -233,8 +233,8 @@ while read TAG
 do
   echo "Preparing ${TAG}_slurm_batch.sh ..."
   cat $SLURM_BATCH_TEMPLATE > ${TAG}_slurm_batch.sh
-  echo -e -n "ENS_VERSION=$ENS_VERSION\nPROD_SERVER=$PROD_SERVER\nCMD=$CMD\nMZ_RELEASE=$MZ_RELEASE\n" >> ${TAG}_slurm_batch.sh
-  echo -e -n "\nexport ENS_VERSION\nexport PROD_SERVER\nexport CMD\nexport MZ_RELEASE\n\n" >> ${TAG}_slurm_batch.sh
+  echo -e -n "ENS_VERSION=$ENS_VERSION\nPROD_SERVER=$PROD_SERVER\nDB_SERVER_ALIAS=$DB_SERVER_ALIAS\nMZ_RELEASE=$MZ_RELEASE\n" >> ${TAG}_slurm_batch.sh
+  echo -e -n "\nexport ENS_VERSION\nexport PROD_SERVER\nexport DB_SERVER_ALIAS\nexport MZ_RELEASE\n\n" >> ${TAG}_slurm_batch.sh
   echo -e -n "flock -n locks/$TAG ${ENS_MAIN_METAZOA_PROD}/scripts/mz_generic.sh ${METACONF_DIR}/$TAG $MODE;\n" >> ${TAG}_slurm_batch.sh
   sed -i s/XXX/${TAG}/g ${TAG}_slurm_batch.sh
   sbatch ${TAG}_slurm_batch.sh | tee logs/${TAG}.sbatch_ID
@@ -255,8 +255,8 @@ while read TAG
 do
   echo "Preparing ${TAG}_slurm_batch.sh ..."
   cat $SLURM_BATCH_TEMPLATE > ${TAG}_slurm_batch.sh
-  echo -e -n "ENS_VERSION=$ENS_VERSION\nPROD_SERVER=$PROD_SERVER\nCMD=$CMD\nMZ_RELEASE=$MZ_RELEASE\n" >> ${TAG}_slurm_batch.sh
-  echo -e -n "\nexport ENS_VERSION\nexport PROD_SERVER\nexport CMD\nexport MZ_RELEASE\n\n" >> ${TAG}_slurm_batch.sh
+  echo -e -n "ENS_VERSION=$ENS_VERSION\nPROD_SERVER=$PROD_SERVER\nDB_SERVER_ALIAS=$DB_SERVER_ALIAS\nMZ_RELEASE=$MZ_RELEASE\n" >> ${TAG}_slurm_batch.sh
+  echo -e -n "\nexport ENS_VERSION\nexport PROD_SERVER\nexport DB_SERVER_ALIAS\nexport MZ_RELEASE\n\n" >> ${TAG}_slurm_batch.sh
   echo -e -n "flock -n locks/$TAG ${ENS_MAIN_METAZOA_PROD}/scripts/mz_generic.sh ${METACONF_DIR}/$TAG $MODE;\n" >> ${TAG}_slurm_batch.sh
   sed -i s/XXX/${TAG}/g ${TAG}_slurm_batch.sh
   sbatch ${TAG}_slurm_batch.sh | tee logs/${TAG}.sbatch_ID
@@ -277,8 +277,8 @@ while read TAG
 do
   echo "Preparing ${TAG}_slurm_batch.sh ..."
   cat $SLURM_BATCH_TEMPLATE > ${TAG}_slurm_batch.sh
-  echo -e -n "ENS_VERSION=$ENS_VERSION\nPROD_SERVER=$PROD_SERVER\nCMD=$CMD\nMZ_RELEASE=$MZ_RELEASE\n" >> ${TAG}_slurm_batch.sh
-  echo -e -n "\nexport ENS_VERSION\nexport PROD_SERVER\nexport CMD\nexport MZ_RELEASE\n\n" >> ${TAG}_slurm_batch.sh
+  echo -e -n "ENS_VERSION=$ENS_VERSION\nPROD_SERVER=$PROD_SERVER\nDB_SERVER_ALIAS=$DB_SERVER_ALIAS\nMZ_RELEASE=$MZ_RELEASE\n" >> ${TAG}_slurm_batch.sh
+  echo -e -n "\nexport ENS_VERSION\nexport PROD_SERVER\nexport DB_SERVER_ALIAS\nexport MZ_RELEASE\n\n" >> ${TAG}_slurm_batch.sh
   echo -e -n "flock -n locks/$TAG ${ENS_MAIN_METAZOA_PROD}/scripts/mz_generic.sh ${METACONF_DIR}/$TAG $MODE;\n" >> ${TAG}_slurm_batch.sh
   sed -i s/XXX/${TAG}/g ${TAG}_slurm_batch.sh
   sbatch ${TAG}_slurm_batch.sh | tee logs/${TAG}.sbatch_ID
@@ -299,8 +299,8 @@ while read TAG
 do
   echo "Preparing ${TAG}_slurm_batch.sh ..."
   cat $SLURM_BATCH_TEMPLATE > ${TAG}_slurm_batch.sh
-  echo -e -n "ENS_VERSION=$ENS_VERSION\nPROD_SERVER=$PROD_SERVER\nCMD=$CMD\nMZ_RELEASE=$MZ_RELEASE\n" >> ${TAG}_slurm_batch.sh
-  echo -e -n "\nexport ENS_VERSION\nexport PROD_SERVER\nexport CMD\nexport MZ_RELEASE\n\n" >> ${TAG}_slurm_batch.sh
+  echo -e -n "ENS_VERSION=$ENS_VERSION\nPROD_SERVER=$PROD_SERVER\nDB_SERVER_ALIAS=$DB_SERVER_ALIAS\nMZ_RELEASE=$MZ_RELEASE\n" >> ${TAG}_slurm_batch.sh
+  echo -e -n "\nexport ENS_VERSION\nexport PROD_SERVER\nexport DB_SERVER_ALIAS\nexport MZ_RELEASE\n\n" >> ${TAG}_slurm_batch.sh
   echo -e -n "flock -n locks/$TAG ${ENS_MAIN_METAZOA_PROD}/scripts/mz_generic.sh ${METACONF_DIR}/$TAG $MODE;\n" >> ${TAG}_slurm_batch.sh
   sed -i s/XXX/${TAG}/g ${TAG}_slurm_batch.sh
   sbatch ${TAG}_slurm_batch.sh | tee logs/${TAG}.sbatch_ID
