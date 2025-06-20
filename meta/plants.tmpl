@@ -22,8 +22,8 @@ species.common_name	_COMMON_NAME_
 #no CONF	FNA_FILE	_ASSEMBLY_FASTA_
 
 # Community GFF3 loading
-#CONF	DATA_INIT	zcat _ANNOTATION_GFF3_ | cat > fixed.gff3
-#CONF	GFF_FILE	fixed.gff3
+#CONF_IF_ANNOTATION_GFF3_	DATA_INIT	zcat _ANNOTATION_GFF3_ | cat > fixed.gff3
+#CONF_IF_ANNOTATION_GFF3_	GFF_FILE	fixed.gff3
 #no CONF	PEP_FILE	pep.faa
 
 # RefSeq related defaults
