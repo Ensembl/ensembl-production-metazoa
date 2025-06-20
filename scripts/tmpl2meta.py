@@ -55,6 +55,10 @@ def fill_template(template : str, conf : dict, name_field : str, dir_path : str,
     # sort keys first by length, then alphabetically to fix "_A_" and "_A_SFX_" case
     for expr, subst in sorted(conf.items(), key = lambda p: (-len(p[0]), p[0])):
       template = template.replace(expr, subst)
+    # process "#CONF_IF" entries
+    template = re.sub(r"^#CONF_IF +\t", "#CONF_IF\t", template, flags=re.MULTILINE)
+    template = re.sub(r"^#CONF_IF[^\t]+\t", "#CONF\t", template, flags=re.MULTILINE)
+    template = re.sub(r"^#CONF_IF\t", "#no CONF\t", template, flags=re.MULTILINE)
     outfile.write(template)
   return
 
