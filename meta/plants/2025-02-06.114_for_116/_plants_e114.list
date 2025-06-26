@@ -1,0 +1,3 @@
+_VARIETY_	_COMMON_NAME_	_PLOIDY_	_ABBREV_	_GENOME_ACCESSION_	_GENOME_FTP_URL_	_REFSEQ_ANN_REPORT_URL_	_REFSEQ_ANN_NAME_	_ASSEMBLY_PROVIDER_NAME_	_ANNOTATION_PROVIDER_NAME_	_ANNOTATION_SOURCE_	_ANNOTATION_SOURCE_SFX_	_LOAD_GFF3_ANALYSIS_NAME_	_ANNOTATION_GFF3_
+Darmor-bzh 	Rape	4	bnap	GCA_905183035.1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/905/183/035/GCA_905183035.1_bnapus_darmor_bzh_v10/			Genoscope CEA	Genoscope CEA	GenBank	gb	gff3_genes	
+K326	Common tobacco	4	ntab	GCA_000715075.2	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/715/075/GCA_000715075.2_ASM71507v2/			Philip Morris International R&D	Philip Morris International R&D	Community	cm	gff3_genes	https://zenodo.org/records/14816438/files/ntab.gff3.gz
