@@ -87,7 +87,7 @@ annotation.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_0036759
 #  add to use redat: -redatrepeatmasker 1
 
 # to ignore empty de novo repeat libraries
-#no CONF	IGNORE_EMPTY_REP_LIB	YES
+#CONF	IGNORE_EMPTY_REP_LIB	YES
 
 
 # rna features and genes
