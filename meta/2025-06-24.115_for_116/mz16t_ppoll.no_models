@@ -19,6 +19,9 @@ species.common_name	Crustaceans
 
 #CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/011/947/565/GCA_011947565.3_Ppol_2.1
 
+#activate the below option (remove 'no ') to allow loading core with no annotation / gff3
+#CONF	IGNORE_MISSING_GFF3	YES
+
 # Community GFF3 loading
 #no CONF	DATA_INIT	zcat  | cat > fixed.gff3
 #no CONF	GFF_FILE	fixed.gff3
