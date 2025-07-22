@@ -19,6 +19,9 @@ species.common_name	_COMMON_NAME_
 
 #CONF	ASM_URL	_GENOME_FTP_URL_
 
+#activate the below option (remove 'no ') to allow loading core with no annotation / gff3
+#no CONF	IGNORE_MISSING_GFF3	YES
+
 # Community GFF3 loading
 #CONF_IF_ANNOTATION_GFF3_	DATA_INIT	zcat _ANNOTATION_GFF3_ | cat > fixed.gff3
 #CONF_IF_ANNOTATION_GFF3_	GFF_FILE	fixed.gff3

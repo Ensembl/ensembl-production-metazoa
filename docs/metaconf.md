@@ -63,6 +63,8 @@ Data retrieved using `get_asm_ftp` and `get_individual_files_to_asm` wrappers ([
 `GBFF_FILE` | `GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gbff.gz` | `relative` (to `data/raw/asm` dir) or `abs path` | (optional) `GenBank` file to get assembly wide information from (taxon id, assembly name, etc.)| If path is relative, `data/raw/asm` fetched by `ASM_URL` is used as a root
 `ASM_REP_FILE` | `GCA_000001215.4_Release_6_plus_ISO1_MT_assembly_report.txt` | `relative` (to `data/raw/asm` dir) or `abs path`  | (optional) GenBank `assembly report` file to get seq region synonyms and cellular components/locations from | If  path is relative, `data/raw/asm` fetched by `ASM_URL` is used as a root
 `SR_GFF_FILE` | `GCA_000001215.4_Release_6_plus_ISO1_MT_genomic.gff.gz` | `relative` (to `data/raw/asm` dir) or `abs path`  | (optional) Additional GFF3 file with seq region information to be extracted from. I.e. used for D.melanogaster, as there are no region features with the information parsable in the FlyBase GFF3 | If path is relative, `data/raw/asm` fetched by `ASM_URL` is used as a root. Very specific usecase.
+`IGNORE_MISSING_GFF3` | `NO`,`YES` | (optional) string, with only one value ("YES") meaningful, rest is ignored | disable check for missing gff3 file, set to YES to allow loading cores with no models | not active by default, thus gff3 files are required
+
 
 ### Data preprocessing options
 Options related to data preprocessing affect
