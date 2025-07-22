@@ -3534,6 +3534,46 @@ function prepare_metada () {
 
     echo -e "#CONF\tMETA_FILE_RAW_ORIG\t${META_RAW_ORIG}" >> $OUT_DIR/meta
 
+    # checking for uknown xrefs
+    if [ -f "$OUT_DIR/functional_annotation.json" ]; then
+      echo "$OUT_DIR/functional_annotation.json" found. checking for uknown xrefs... >> /dev/stderr
+      # gather all used xrefs
+      cat "$OUT_DIR/functional_annotation.json" |
+        jq -r '.[]? | .xrefs // [] | map (.dbname) | join("\n")' |
+        grep -vP '^\s*$' |
+        sort | uniq > "$OUT_DIR"/xrefs.used
+      # gather all known xrefs
+      cat $SCRIPTS/ensembl-genomio/config/external_db_map/default.txt |
+        perl -pe 's/#.*$//' | grep -vP '^\s*$' |
+        cut -f 1 |
+        sort | uniq > "$OUT_DIR"/xrefs.from_map
+      $PROD_SERVER -D $PROD_DBNAME -Ne 'select db_name from external_db' |
+        sort | uniq > "$OUT_DIR"/xrefs.from_db
+      # merge known and prefix to avoid partial match (-w is not enough, we cah have '/')
+      cat "$OUT_DIR"/xrefs.from_db "$OUT_DIR"/xrefs.from_map |
+        perl -pe 's/^/\t/; s/$/\t/' |
+        sort | uniq > "$OUT_DIR"/xrefs.valid_pat
+      cat "$OUT_DIR"/xrefs.used |
+        perl -pe 's/^/\t/; s/$/\t/;' |
+        sort | uniq > "$OUT_DIR"/xrefs.used_pat
+      # check
+      cat "$OUT_DIR"/xrefs.used_pat |
+        grep -viFf "$OUT_DIR"/xrefs.valid_pat |
+        cut -f 2 |
+        sort | uniq > "$OUT_DIR"/xrefs.uknown
+      # count and report
+      local uknown_xrefs_cnt=$(wc -l "$OUT_DIR"/xrefs.uknown)
+      if [ "$uknown_xrefs_cnt" -gt "0" ]; then
+          echo "$OUT_DIR/functional_annotation.json" had ${uknown_xrefs_cnt} uknown xrefs. see "$OUT_DIR/xrefs.uknown" ... >> /dev/stderr
+          head "$OUT_DIR"/xrefs.uknown
+          false
+      else # $uknown_xrefs_cnt"
+          echo "$OUT_DIR/functional_annotation.json" xrefs are known. ok ... >> /dev/stderr
+      fi # $uknown_xrefs_cnt" -gt "0"
+    else # $OUT_DIR/functional_annotation.json
+       echo no functional_annotation.json found. unknow xrefs check skipped... >> /dev/stderr
+    fi # -f $OUT_DIR/functional_annotation.json
+
     touch_done "$DONE_TAG"
   fi
 }
