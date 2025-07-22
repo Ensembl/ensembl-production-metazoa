@@ -3562,7 +3562,7 @@ function prepare_metada () {
         cut -f 2 |
         sort | uniq > "$OUT_DIR"/xrefs.uknown
       # count and report
-      local uknown_xrefs_cnt=$(wc -l "$OUT_DIR"/xrefs.uknown)
+      local uknown_xrefs_cnt=$(cat "$OUT_DIR"/xrefs.uknown | wc -l)
       if [ "$uknown_xrefs_cnt" -gt "0" ]; then
         echo "$OUT_DIR/functional_annotation.json" had ${uknown_xrefs_cnt} uknown xrefs. see "$OUT_DIR/xrefs.uknown" ... >> /dev/stderr
         head "$OUT_DIR"/xrefs.uknown
@@ -3575,11 +3575,11 @@ function prepare_metada () {
     fi # -f $OUT_DIR/functional_annotation.json
 
     # check fo missing gff3
-    local gff3_file_from_manifest=$(jq -r '.gff3.file1 // ""' $OUT_DIR/manifest.json)
+    local gff3_file_from_manifest=$(jq -r '.gff3.file // ""' $OUT_DIR/manifest.json)
     if [ -f "${gff3_file_from_manifest}" ]; then
-      echo successfully located gff3 file (${gff3_file_from_manifest}) from $OUT_DIR/manifest.json... >> /dev/stderr
+      echo "successfully located gff3 file ( ${gff3_file_from_manifest} ) from $OUT_DIR/manifest.json..." >> /dev/stderr
     else # -f "${gff3_file_from_manifest}"
-      echo missing or not located gff3 file (${gff3_file_from_manifest}) from $OUT_DIR/manifest.json... >> /dev/stderr
+      echo "missing or not located gff3 file ( ${gff3_file_from_manifest} ) from $OUT_DIR/manifest.json..." >> /dev/stderr
       local ignore_missing_gff3=$(get_meta_conf $META_RAW IGNORE_MISSING_GFF3)
       if [ "${ignore_missing_gff3}" != "YES" ]; then
         echo no IGNORE_MISSING_GFF3 option in $META_RAW or value "${ignore_missing_gff3}" != "YES"... failing... >> /dev/stderr
