@@ -3564,15 +3564,30 @@ function prepare_metada () {
       # count and report
       local uknown_xrefs_cnt=$(wc -l "$OUT_DIR"/xrefs.uknown)
       if [ "$uknown_xrefs_cnt" -gt "0" ]; then
-          echo "$OUT_DIR/functional_annotation.json" had ${uknown_xrefs_cnt} uknown xrefs. see "$OUT_DIR/xrefs.uknown" ... >> /dev/stderr
-          head "$OUT_DIR"/xrefs.uknown
-          false
+        echo "$OUT_DIR/functional_annotation.json" had ${uknown_xrefs_cnt} uknown xrefs. see "$OUT_DIR/xrefs.uknown" ... >> /dev/stderr
+        head "$OUT_DIR"/xrefs.uknown
+        false
       else # $uknown_xrefs_cnt"
-          echo "$OUT_DIR/functional_annotation.json" xrefs are known. ok ... >> /dev/stderr
+        echo "$OUT_DIR/functional_annotation.json" xrefs are known. ok ... >> /dev/stderr
       fi # $uknown_xrefs_cnt" -gt "0"
     else # $OUT_DIR/functional_annotation.json
-       echo no functional_annotation.json found. unknow xrefs check skipped... >> /dev/stderr
+      echo no functional_annotation.json found. unknow xrefs check skipped... >> /dev/stderr
     fi # -f $OUT_DIR/functional_annotation.json
+
+    # check fo missing gff3
+    local gff3_file_from_manifest=$(jq -r '.gff3.file1 // ""' $OUT_DIR/manifest.json)
+    if [ -f "${gff3_file_from_manifest}" ]; then
+      echo successfully located gff3 file (${gff3_file_from_manifest}) from $OUT_DIR/manifest.json... >> /dev/stderr
+    else # -f "${gff3_file_from_manifest}"
+      echo missing or not located gff3 file (${gff3_file_from_manifest}) from $OUT_DIR/manifest.json... >> /dev/stderr
+      local ignore_missing_gff3=$(get_meta_conf $META_RAW IGNORE_MISSING_GFF3)
+      if [ "${ignore_missing_gff3}" != "YES" ]; then
+        echo no IGNORE_MISSING_GFF3 option in $META_RAW or value "${ignore_missing_gff3}" != "YES"... failing... >> /dev/stderr
+        false
+      else
+        echo IGNORE_MISSING_GFF3 option in $META_RAW set to "${ignore_missing_gff3}", ignoring... >> /dev/stderr
+      fi # "${ignore_missing_gff3}"
+    fi # -f  "${gff3_file_from_manifest}"
 
     touch_done "$DONE_TAG"
   fi
