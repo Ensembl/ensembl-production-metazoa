@@ -1,7 +1,29 @@
 NCBI_FTP_URL="https://ftp.ncbi.nlm.nih.gov/genomes/all/"
 
-DATASETS="./datasets"
 SCRIPTS="."
+
+# try to find "NCBI" datasets to use
+DATASETS_ON_PATH=$(command -v datasets 2>/dev/null)
+DATASETS_IMG="$NXF_SINGULARITY_CACHEDIR/datasets-cli.latest.sif"
+
+if [ -n "$DATASETS" ]; then
+  # user provided
+  echo using user provided path to datasets binary: $DATASETS >> /dev/stderr
+  DATASETS_BIN="$DATASETS"
+elif [ -f "$DATASETS_IMG" ]; then
+  # check if we have anything in the singularity hash
+  echo "using datasest from the singularity image: $DATASETS_IMG" >> /dev/stderr
+  DATASETS_BIN="singularity run $NXF_SINGULARITY_CACHEDIR/datasets-cli.latest.sif datasets" >> /dev/stderr
+elif [ -n "$DATASETS_ON_PATH" ]; then
+  # check if we have anything on PATH
+  echo "no singularity image found, using available binary..." >> /dev/stderr
+  DATASETS_BIN="datasets"
+else
+  # grumble
+  echo "please, ensure the 'datasests' binary is on PATH or provide 'DATASETS' variable with its path... exiting..." >> /dev/stderr
+  exit 1
+fi
+
 
 # working dir
 WD="."
@@ -11,7 +33,7 @@ cat > "$WD"/acc.lst
 # get data using NCBI datasets
 cat acc.lst |
   xargs -n 10 \
-    "$DATASETS" summary genome accession |
+    "$DATASETS_BIN" summary genome accession |
   cat > "$WD"/ds.raw
 
 # turn into jsonl
