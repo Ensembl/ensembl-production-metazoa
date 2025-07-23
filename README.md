@@ -170,6 +170,41 @@ assembly.provider_url   https://www.flybase.org
 
 Further description can be found in the [Metaconf options document](docs/metaconf.md)
 
+### Template based generation of meta configuration files
+You can provide a `\n` separated list of INSDC or REFSEQ accessions to generate a table with most of the metata you need.
+I.e.
+```
+echo GCF_023614345.1 GCA_023614345.1 |
+  xargs -n 1 |
+  ./ensembl-production-metazoa/scripts/template/gen_template.sh > ./ensembl-production-metazoa/meta/some_release/release.tsv
+```
+The generator script will use the data from the columns with undercored names (like `_NAME_`)
+to substitute corresponding occurences in the template file.
+Feel free to add any columns that you need.
+
+
+Now based on this table and template we can generate a list of configs. I.e.
+```
+# check the number of columns
+cat release.tsv | grep -vF '#' | grep -vP '^\s*$' | awk -F "\t" '{print NF}' | sort | uniq -c
+
+# generate meta configs using ./ensembl-production-metazoa/meta/metazoa.tmpl template
+python3 ./ensembl-production-metazoa/scripts/tmpl2meta.py \
+  --template ./ensembl-production-metazoa/meta/metazoa.tmpl \
+  --param_table ./ensembl-production-metazoa/meta/some_release/release.tsv \
+  --output_dir ./ensembl-production-metazoa/meta/some_release \
+  --out_file_pfx rel_ \
+  --keep_empty_values
+
+# check the number of generated files
+ls -1 ./ensembl-production-metazoa/meta/some_release/rel_* | wc -l
+```
+
+Now you can edit this meta configs manually if you need to.
+
+N.B. Please, feel free to commit the source table and resulting meta configs (as well as changes to then) to git/whatever
+for the reproducibilty.
+
 
 ##  General processing flow
 See related ["Metaconf"](docs/metaconf.md) documentation.
