@@ -2002,7 +2002,21 @@ function set_core_random_samples () {
     fi
 
     if [ -z "$SAMPLE_GENE" ]; then
-      local RAND_GENE=$($CMD -D "$DBNAME" -N -e "select g.stable_id FROM gene g INNER JOIN seq_region_attrib USING (seq_region_id) INNER JOIN attrib_type at USING (attrib_type_id) WHERE g.biotype='protein_coding' AND at.name = 'Top Level' ORDER BY RAND() LIMIT 1;")
+      local RAND_GENE=$($CMD -D "$DBNAME" -N -e '
+        select g.stable_id
+          from seq_region_attrib sra_tl
+          join attrib_type at_tl on (sra_tl.attrib_type_id = at_tl.attrib_type_id)
+          left join (
+            select sra_kr.* from seq_region_attrib sra_kr
+            join attrib_type at_kr on (sra_kr.attrib_type_id = at_kr.attrib_type_id)
+            where at_kr.code = "karyotype_rank"
+          ) as sr_kr on (sr_kr.seq_region_id = sra_tl.seq_region_id)
+          join gene g on (g.seq_region_id = sra_tl.seq_region_id)
+        where at_tl.code = "toplevel"
+          and g.biotype = "protein_coding"
+        order by -sr_kr.value desc, rand()
+        limit 1;
+        ')
       echo "using $RAND_GENE as sample" >> /dev/stderr
       SAMPLE_GENE="$RAND_GENE"
     fi
