@@ -1,6 +1,43 @@
+#!/usr/bin/env bash
+# See the NOTICE file distributed with this work for additional information
+# regarding copyright ownership.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 NCBI_FTP_URL="https://ftp.ncbi.nlm.nih.gov/genomes/all/"
 
-SCRIPTS="../"
+# get script location
+SCRIPT="$(which $0)"
+SCRIPTS_DIR="$(dirname $SCRIPT)"
+echo "script called as '$SCRIPT'. using '$SCRIPTS_DIR' to locate parts..." >> /dev/stderr
+
+# just in case
+SCRIPT_SHORT="./$(realpath -e --relative-to=. $SCRIPT)"
+echo "usage:" >> /dev/stderr
+echo "  cat accessions.lst | $SCRIPT_SHORT [workdir] > template.tsv" >> /dev/stderr
+echo "i.e.:" >> /dev/stderr
+echo "  echo GCF_023614345.1 GCA_023614345.1 | xargs -n 1 | $SCRIPT_SHORT" >> /dev/stderr
+
+# working dir
+WD_BASE="$1"
+if [ -n "$WD_BASE" ]; then
+  mkdir -p "$WD_BASE"
+  WD=$(mktemp -d -p $WD_BASE)
+else
+  WD=$(mktemp -d)
+fi
+echo "using $WD to store intermediate data to..." >> /dev/stderr
+
 
 # try to find "NCBI" datasets to use
 DATASETS_ON_PATH=$(command -v datasets 2>/dev/null)
@@ -42,10 +79,8 @@ fi
 echo "using '$DATASETS_BIN' as datasets binary" >> /dev/stderr
 echo "using '$JQ_BIN' as jq binary" >> /dev/stderr
 
-# working dir
-WD="tmp"
-mkdir -p $WD
 
+# store accession from stdin into the list
 cat > "$WD"/acc.lst
 
 # get data using NCBI datasets
@@ -56,11 +91,11 @@ cat "$WD"/acc.lst |
   cat > "$WD"/ds.raw
 
 # turn into jsonl
-cat "$WD"/ds.raw | $JQ_BIN -c -f $SCRIPTS/template/ds_raw2jsonl.jq > "$WD"/ds.jsonl.raw
+cat "$WD"/ds.raw | $JQ_BIN -c -f $SCRIPTS_DIR/ds_raw2jsonl.jq > "$WD"/ds.jsonl.raw
 
 
 # add ftp and assembly report urls
-cat "$WD"/ds.jsonl.raw | python3 $SCRIPTS/template/add_urls.py "$NCBI_FTP_URL" > "$WD"/ds.jsonl.urls
+cat "$WD"/ds.jsonl.raw | python3 $SCRIPTS_DIR/add_urls.py "$NCBI_FTP_URL" > "$WD"/ds.jsonl.urls
 
 # fetch assembly reports
 REPORTS_DIR="$WD"/reports
@@ -74,7 +109,7 @@ cat "$WD"/ds.jsonl.urls |
     echo XXX
     wget -O '"${REPORTS_DIR}"'/$(echo XXX | cut -f 1 -d :) $(echo XXX | cut -f 2- -d :)
     sleep 2
-  '
+  ' >> /dev/stderr 2>&1
 
 # add submitter and common name
 echo "adding bits from assembly reports..." >> /dev/stderr
@@ -84,15 +119,15 @@ touch "$REPORTS_DIR/"_tech_report_stub
 
 grep -e '^# Organism name:' -e '^# Submitter:' "$REPORTS_DIR"/* |
   perl -pe 's,.*/([^/]+:),$1,' |
-  python3 $SCRIPTS/template/add_submitter_and_common.py "$WD"/ds.jsonl.urls |
+  python3 $SCRIPTS_DIR/add_submitter_and_common.py "$WD"/ds.jsonl.urls |
   cat > "$WD"/ds.jsonl.urls_names
 
 # generate a tsv file
 echo "generating a tsv file..." >> /dev/stderr
-cat "$WD"/ds.jsonl.urls_names | $JQ_BIN -c -r -f $SCRIPTS/template/jsonl2tsv.jq  > "$WD"/ds.tsv.pre
+cat "$WD"/ds.jsonl.urls_names | $JQ_BIN -c -r -f $SCRIPTS_DIR/jsonl2tsv.jq  > "$WD"/ds.tsv.pre
 
 # form header
-grep -P '^\s*\.' $SCRIPTS/template/jsonl2tsv.jq |
+grep -P '^\s*\.' $SCRIPTS_DIR/jsonl2tsv.jq |
   perl -pe 's/^\s*\.//; s/,?\s*$/\t/' |
   perl -pe 's/\s*$/\n/' > "$WD"/ds.tsv
 
@@ -101,6 +136,7 @@ cat "$WD"/ds.tsv.pre "$WD"/acc.lst |
   awk -F "\t" '(NF > 1) {stash[$5] = $0} NF == 1 {print stash[$1]}' >> "$WD"/ds.tsv
 
 # print out
+echo "dumping '$WD/ds.tsv' to stdout..." >> /dev/stderr
 cat "$WD"/ds.tsv
 
-# usage: echo GCF_023614345.1 GCA_023614345.1 | xargs -n 1 | bash ./gen_template.sh
+exit 0
