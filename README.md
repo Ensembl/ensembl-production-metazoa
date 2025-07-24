@@ -189,7 +189,9 @@ Feel free to add any columns that you need.
 
 Now based on this table and template we can generate a list of configs. I.e.
 ```
-# check the number of columns
+# check the number of columns to make sure it's tabulated properly
+#   all lines should have the same number of fields
+#   you should get only one single line with something like "(number of lines) (number of columns)" 
 cat ./new_release.tsv | grep -vF '#' | grep -vP '^\s*$' | awk -F "\t" '{print NF}' | sort | uniq -c
 
 # generate meta configs using ./ensembl-production-metazoa/meta/metazoa.tmpl template
