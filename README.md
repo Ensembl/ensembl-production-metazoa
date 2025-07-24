@@ -204,9 +204,9 @@ python3 ./ensembl-production-metazoa/scripts/tmpl2meta.py \
 ls -1 ./ensembl-production-metazoa/meta/some_release/rel_* | wc -l
 ```
 
-Btw, templates support `#CONF_IF_CONDITION_` meta option prefixes.
+Btw, templates support `#CONF_IF_CONDITION_` meta option prefix.
 This renders to `#CONF` if `_CONDITIONS_` is successfully replaced with a non-empty value (at least one alnum, no tabs allowed).
-Or otherwise renders to `#no CONF` thus disabling this meta option.
+Or, otherwise, renders to `#no CONF`, thus disabling this meta option.
 
 And you can edit this meta configs manually if you need to.
 
