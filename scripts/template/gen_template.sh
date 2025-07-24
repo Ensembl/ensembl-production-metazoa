@@ -93,33 +93,12 @@ cat "$WD"/acc.lst |
 # turn into jsonl
 cat "$WD"/ds.raw | $JQ_BIN -c -f $SCRIPTS_DIR/ds_raw2jsonl.jq > "$WD"/ds.jsonl.raw
 
-
 # add ftp and assembly report urls
 cat "$WD"/ds.jsonl.raw | python3 $SCRIPTS_DIR/add_urls.py "$NCBI_FTP_URL" > "$WD"/ds.jsonl.urls
 
-# fetch assembly reports
-REPORTS_DIR="$WD"/reports
-mkdir -p "$REPORTS_DIR"
-
-echo "fetching assembly reports from NCBI into $REPORTS_DIR..." >> /dev/stderr
-cat "$WD"/ds.jsonl.urls |
-  $JQ_BIN -c '{ (._GENOME_ACCESSION_) : .assembly_report_url }' |
-  tr -d '{}' |
-  xargs -n 1 -I XXX sh -c '
-    echo XXX
-    wget -O '"${REPORTS_DIR}"'/$(echo XXX | cut -f 1 -d :) $(echo XXX | cut -f 2- -d :)
-    sleep 2
-  ' >> /dev/stderr 2>&1
-
-# add submitter and common name
-echo "adding bits from assembly reports..." >> /dev/stderr
-
-# add fake  report for grep to work properly
-touch "$REPORTS_DIR/"_tech_report_stub
-
-grep -e '^# Organism name:' -e '^# Submitter:' "$REPORTS_DIR"/* |
-  perl -pe 's,.*/([^/]+:),$1,' |
-  python3 $SCRIPTS_DIR/add_submitter_and_common.py "$WD"/ds.jsonl.urls |
+# fix submitter and add other bits
+echo "adding other bits from assembly reports..." >> /dev/stderr
+python3 $SCRIPTS_DIR/add_submitter_and_common.py "$WD"/ds.jsonl.urls |
   cat > "$WD"/ds.jsonl.urls_names
 
 # generate a tsv file

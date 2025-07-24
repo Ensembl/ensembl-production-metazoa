@@ -3,6 +3,7 @@
   current_accession: .current_accession,
   paired_accession: .paired_accession,
   assembly_name: .assembly_info.assembly_name,
+  _ASSEMBLY_PROVIDER_NAME_: .assembly_info.submitter,
 
   _REFSEQ_ANN_NAME_: .annotation_info.name,
   _REFSEQ_ANN_REPORT_URL_: .annotation_info.report_url,
@@ -10,4 +11,5 @@
 
   taxon_id: .organism.tax_id,
   scientific_name: .organism.organism_name,
+  _COMMON_NAME_: .organism.common_name,
 }
