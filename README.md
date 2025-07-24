@@ -180,6 +180,10 @@ echo GCF_023614345.1 GCA_023614345.1 |
 ```
 The generator script will use the data from the columns with undercored names (like `_NAME_`)
 to substitute corresponding occurences in the template file.
+
+Don't forget to fill placeholders like `COMMUNITY_PROVIDER_PLACEHOLDER` or `COMMUNITY_GFF3_PLACEHOLDER`
+in the corresponding columns if you have any.
+
 Feel free to add any columns that you need.
 
 
@@ -200,7 +204,11 @@ python3 ./ensembl-production-metazoa/scripts/tmpl2meta.py \
 ls -1 ./ensembl-production-metazoa/meta/some_release/rel_* | wc -l
 ```
 
-Now you can edit this meta configs manually if you need to.
+Btw, templates support `#CONF_IF_CONDITION_` meta option prefix.
+This renders to `#CONF` if `_CONDITIONS_` is successfully replaced with a non-empty value (at least one alnum, no tabs allowed).
+Or, otherwise, renders to `#no CONF`, thus disabling this meta option.
+
+And you can edit this meta configs manually if you need to.
 
 N.B. Please, feel free to commit the source table and resulting meta configs (as well as changes to then) to git/whatever
 for the reproducibilty.
