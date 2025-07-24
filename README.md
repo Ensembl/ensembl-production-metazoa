@@ -176,7 +176,7 @@ I.e.
 ```
 echo GCF_023614345.1 GCA_023614345.1 |
   xargs -n 1 |
-  ./ensembl-production-metazoa/scripts/template/gen_template.sh > ./ensembl-production-metazoa/meta/some_release/release.tsv
+  ./ensembl-production-metazoa/scripts/template/gen_template.sh > ./new_release.tsv
 ```
 The generator script will use the data from the columns with undercored names (like `_NAME_`)
 to substitute corresponding occurences in the template file.
@@ -190,18 +190,21 @@ Feel free to add any columns that you need.
 Now based on this table and template we can generate a list of configs. I.e.
 ```
 # check the number of columns
-cat release.tsv | grep -vF '#' | grep -vP '^\s*$' | awk -F "\t" '{print NF}' | sort | uniq -c
+cat ./new_release.tsv | grep -vF '#' | grep -vP '^\s*$' | awk -F "\t" '{print NF}' | sort | uniq -c
 
 # generate meta configs using ./ensembl-production-metazoa/meta/metazoa.tmpl template
+OUT_DIR=new_release_dir
+mkdir -p $OUT_DIR
+
 python3 ./ensembl-production-metazoa/scripts/tmpl2meta.py \
   --template ./ensembl-production-metazoa/meta/metazoa.tmpl \
-  --param_table ./ensembl-production-metazoa/meta/some_release/release.tsv \
-  --output_dir ./ensembl-production-metazoa/meta/some_release \
+  --param_table ./new_release.tsv \
+  --output_dir $OUT_DIR \
   --out_file_pfx rel_ \
   --keep_empty_values
 
 # check the number of generated files
-ls -1 ./ensembl-production-metazoa/meta/some_release/rel_* | wc -l
+ls -1 $OUT_DIR/rel_* | wc -l
 ```
 
 Btw, templates support `#CONF_IF_CONDITION_` meta option prefix.
