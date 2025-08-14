@@ -148,9 +148,9 @@ while(<STDIN>) {
     $sub4gene_id->{$gene_id} = $name_subst;
     if ($common_pfx) {
       $new_gene_name = $gene_name;
-      $new_gene_name =~ s/$common_pfx/$name_subst/;
+      $new_gene_name =~ s/\Q$common_pfx\E/$name_subst/;
       $new_tr_name = $tr_name;
-      $new_tr_name =~ s/$common_pfx/$name_subst/;
+      $new_tr_name =~ s/\Q$common_pfx\E/$name_subst/;
     } else {
       $new_gene_name = $name_subst;
     }
@@ -160,7 +160,7 @@ while(<STDIN>) {
     if ($common_pfx && exists $sub4gene_id->{$gene_id}) {
       $new_tr_name = $tr_name;
       my $name_subst = $sub4gene_id->{$gene_id};
-      $new_tr_name =~ s/$common_pfx/$name_subst/;
+      $new_tr_name =~ s/\Q$common_pfx\E/$name_subst/;
     } else {
       # process individually
       my $xref_id = $xreftr_id;
