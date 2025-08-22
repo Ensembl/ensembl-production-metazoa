@@ -3759,7 +3759,7 @@ function get_repbase_lib () {
   local OUT_DIR="$4"
   local TAG="$5"
 
-  local REPUTIL="$REPUTIL_PATH"/queryRepeatDatabase.pl
+  local REPUTIL="perl $REPUTIL_PATH/queryRepeatDatabase.pl"
 
   local DONE_TAG='_get_repbase'"$TAG"
   if ! check_done "$DONE_TAG"; then
