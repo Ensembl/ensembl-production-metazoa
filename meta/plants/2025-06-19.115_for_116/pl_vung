@@ -7,7 +7,7 @@
 # # updated, prev was _PREV_CORE_NAME_
 # species.production_name	_PROD_NAME_
 species.common_name	Cowpea
-species.strain_group	
+#species.strain_group	
 #no CONF	TAXON_ID	_TAXON_ID_
 
 # GCF_004118075.2
@@ -22,9 +22,10 @@ species.strain_group
 
 #no CONF	FNA_FILE	
 
-# Community GFF3 loading
-#no CONF	DATA_INIT	zcat  | cat > fixed.gff3
-#no CONF	GFF_FILE	fixed.gff3
+# Dealing with UNSEEN gene/exon structures
+#   NC_018051.1 RefSeq exon 815 823 . + . ID=id-A564_pgp002-1;Parent=gene-A564_pgp002.....
+#CONF	DATA_INIT	zcat GCF_004118075.2_ASM411807v2_genomic.gff.gz | awk -F "\t" '!($3 == "exon" && $9 ~ /;Parent=gene-/)' | gzip - > fixed.gff3.gz
+#CONF	GFF_FILE	fixed.gff3.gz
 #no CONF	PEP_FILE	pep.faa
 
 # RefSeq related defaults
@@ -64,7 +65,7 @@ species.annotation_source	RefSeq
 
 
 # update stable ids based on RefSeq gene-id
-#CONF	UPDATE_STABLE_IDS	NO
+#CONF	UPDATE_STABLE_IDS	YES
 # it's better not to split version ('-fix_version 0' by default)
 #no CONF	UPDATE_STABLE_IDS_OPTIONS	-fix_version 1
 
@@ -115,4 +116,7 @@ annotation.provider_url	https://www.ncbi.nlm.nih.gov/refseq/annotation_euk/Vigna
 
 #
 # FINALIZE
+#
+# transplicing mRNAs related effects
+# $CMD_W -D prepl_vigna_unguiculata_gcf004118075v2rs_core_63_116_1 -e 'update meta_coord set max_length = 104097 where table_name = "transcript"'
 #

@@ -1407,7 +1407,8 @@ function run_xref () {
   local SPECIES="$3"
   local EG_DIR="$4"
   local OUT_DIR="$5"
-  local PARAMS="$6"
+  local RUN_XREF="$6"
+  local PARAMS="$7"
 
   if ! check_done _run_xref; then
     [ -d ${OUT_DIR}.old ] && rm -rf ${OUT_DIR}.old
@@ -1420,49 +1421,52 @@ function run_xref () {
       -dbname "$DBNAME" > $OUT_DIR/prev_xrefs/"${DBNAME}.ids_xref.txt" \
       2> $OUT_DIR/prev_xrefs/prev_xrefs.stderr
 
-    echo "running xref pipelines on $DBNAME " >> /dev/stderr
-    mkdir -p $OUT_DIR/prereqs
-    local REG_FILE=$OUT_DIR/prereqs/reg.conf
-    gen_one_db_reg_conf $CMD $DBNAME $SPECIES $REG_FILE
+    if [ -z "$RUN_XREF" -o "x$RUN_XREF" != "xNO" ]; then
+      echo "running xref pipelines on $DBNAME " >> /dev/stderr
+      mkdir -p $OUT_DIR/prereqs
+      local REG_FILE=$OUT_DIR/prereqs/reg.conf
+      gen_one_db_reg_conf $CMD $DBNAME $SPECIES $REG_FILE
 
-    local SPECIES_TAG=$(echo $SPECIES | perl -pe 's/^([^_]{3})[^_]+(?:_([^_]{3}))?.*(_[^_]+)$/$1_$2$3/')
+      local SPECIES_TAG=$(echo $SPECIES | perl -pe 's/^([^_]{3})[^_]+(?:_([^_]{3}))?.*(_[^_]+)$/$1_$2$3/')
 
-    init_pipeline.pl Bio::EnsEMBL::EGPipeline::PipeConfig::AllXref_conf \
-      $($CMD details script) \
-      -pipeline_tag "_${SPECIES_TAG}" \
-      -registry $REG_FILE \
-      -production_db "$($PROD_SERVER details url)""$PROD_DBNAME" \
-      -hive_force_init 1 \
-      -pipeline_dir $OUT_DIR \
-      -species $SPECIES \
-      $PARAMS \
-      2> $OUT_DIR/init.stderr \
-      1> $OUT_DIR/init.stdout
-    tail $OUT_DIR/init.stderr $OUT_DIR/init.stdout
+      init_pipeline.pl Bio::EnsEMBL::EGPipeline::PipeConfig::AllXref_conf \
+        $($CMD details script) \
+        -pipeline_tag "_${SPECIES_TAG}" \
+        -registry $REG_FILE \
+        -production_db "$($PROD_SERVER details url)""$PROD_DBNAME" \
+        -hive_force_init 1 \
+        -pipeline_dir $OUT_DIR \
+        -species $SPECIES \
+        $PARAMS \
+        2> $OUT_DIR/init.stderr \
+        1> $OUT_DIR/init.stdout
+      tail $OUT_DIR/init.stderr $OUT_DIR/init.stdout
 
-    local SYNC_CMD=$(cat $OUT_DIR/init.stdout | grep -- -sync'$' | perl -pe 's/^\s*//; s/"//g')
-    local LOOP_CMD=$(cat $OUT_DIR/init.stdout | grep -- -loop | perl -pe 's/^\s*//; s/\s*#.*$//; s/"//g')
+      local SYNC_CMD=$(cat $OUT_DIR/init.stdout | grep -- -sync'$' | perl -pe 's/^\s*//; s/"//g')
+      local LOOP_CMD=$(cat $OUT_DIR/init.stdout | grep -- -loop | perl -pe 's/^\s*//; s/\s*#.*$//; s/"//g')
 
-    echo -n > $OUT_DIR/_continue_pipeline
-    echo "$SYNC_CMD" >> $OUT_DIR/_continue_pipeline
-    echo "$LOOP_CMD" >> $OUT_DIR/_continue_pipeline
-    echo "touch $DONE_TAGS_DIR/_run_xref" >> $OUT_DIR/_continue_pipeline
-    echo "rm -f ${OUT_DIR}/uniprot/uniprot_trembl.fasta*" >> $OUT_DIR/_continue_pipeline
-    echo "rm -f ${OUT_DIR}/uniprot/uniprot_sprot.fasta*" >> $OUT_DIR/_continue_pipeline
+      echo -n > $OUT_DIR/_continue_pipeline
+      echo "$SYNC_CMD" >> $OUT_DIR/_continue_pipeline
+      echo "$LOOP_CMD" >> $OUT_DIR/_continue_pipeline
+      echo "touch $DONE_TAGS_DIR/_run_xref" >> $OUT_DIR/_continue_pipeline
+      echo "rm -f ${OUT_DIR}/uniprot/uniprot_trembl.fasta*" >> $OUT_DIR/_continue_pipeline
+      echo "rm -f ${OUT_DIR}/uniprot/uniprot_sprot.fasta*" >> $OUT_DIR/_continue_pipeline
 
-    echo Running pipeline...  >> /dev/stderr
-    echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
-    cat $OUT_DIR/_continue_pipeline >> /dev/stderr
+      echo Running pipeline...  >> /dev/stderr
+      echo See $OUT_DIR/_continue_pipeline if failed...  >> /dev/stderr
+      cat $OUT_DIR/_continue_pipeline >> /dev/stderr
 
-    $SYNC_CMD \
-      2> $OUT_DIR/sync.stderr \
-      1> $OUT_DIR/sync.stdout
-    tail $OUT_DIR/sync.stderr $OUT_DIR/sync.stdout
+      $SYNC_CMD \
+        2> $OUT_DIR/sync.stderr \
+        1> $OUT_DIR/sync.stdout
+      tail $OUT_DIR/sync.stderr $OUT_DIR/sync.stdout
 
-    $LOOP_CMD \
-      2> $OUT_DIR/loop.stderr \
-      1> $OUT_DIR/loop.stdout
-    tail $OUT_DIR/loop.stderr $OUT_DIR/loop.stdout
+      $LOOP_CMD \
+        2> $OUT_DIR/loop.stderr \
+        1> $OUT_DIR/loop.stdout
+      tail $OUT_DIR/loop.stderr $OUT_DIR/loop.stdout
+
+    fi # RUN_XREF
 
     touch_done _run_xref
 
@@ -3059,6 +3063,20 @@ function mark_tr_trans_spliced () {
       xargs -n 1 -I XXX echo 'insert ignore into transcript_attrib select transcript_id, 503, 1 from transcript where stable_id in ("XXX");' |
       $CMD -D $DBNAME
 
+    local SEEN_PAT=$(
+      echo $ID_LIST |
+        perl -pe 's/[,\s+]/\n/g' |
+        xargs -n 1 -I XXX $CMD -D $DBNAME -Ne 'select stable_id from transcript where stable_id in ("XXX");'
+        xargs -n 1 -I XXX echo -- '-e XXX ' |
+        xargs echo
+    )
+
+    echo $ID_LIST |
+      perl -pe 's/[,\s+]/\n/g' |
+      grep -vFw -e hw_6f5902ac237024bdd0c176cb93063dc4 $SEEN_PAT |
+      xargs -n 1 -I XXX echo 'insert ignore into transcript_attrib select transcript_id, 503, 1 from transcript where stable_id in ("XXX_t1");' |
+      $CMD -D $DBNAME
+
     touch_done "$DONE_TAG"
   fi
 }
@@ -3351,8 +3369,19 @@ function prepare_metada () {
       || echo "unvalid source gff: $GFF_PATH. no IGNORE_UNVALID_SOURCE_GFF ($IGNORE_UNVALID_SOURCE_GFF) set. failing..." \
           >> /dev/stderr || return false || exit 0
 
-      # gen stats
+      # deal with trans-splicing
+      mkdir -p $OUT_DIR/trans_splicing_fix
       cat $OUT_DIR/no_fasta.gff3 |
+        $SCRIPTS/ensembl-production-metazoa/scripts/fix_trans_spliced.sh \
+            $OUT_DIR/trans_splicing_fix \
+            $SCRIPTS/ensembl-production-metazoa/scripts/fix_trans_spliced.py \
+            "$GFF_PARSER_PFX_TRIM" |
+        cat - > $OUT_DIR/no_fasta.splicing_fixed.gff3
+      # get list from $OUT_DIR/trans_splicing_fix/fixed_tr.stable_ids.meta
+      # append to #CONF TR_TRANS_SPLICED
+
+      # gen stats
+      cat $OUT_DIR/no_fasta.splicing_fixed.gff3 |
         python $SCRIPTS/ensembl-genomio/scripts/gff_metaparser/gff_stats.py \
           --dump_used_options \
           --fail_unknown \
@@ -3547,6 +3576,24 @@ function prepare_metada () {
       --meta_out $OUT_DIR/meta
 
     echo -e "#CONF\tMETA_FILE_RAW_ORIG\t${META_RAW_ORIG}" >> $OUT_DIR/meta
+
+    # fix TR_TRANS_SPLICED option
+    cp $OUT_DIR/meta $OUT_DIR/meta.before_tr_splicing_append
+    cat $OUT_DIR/meta.before_tr_splicing_append |
+        grep -vP '^#CONF\tTR_TRANS_SPLICED\t' > $OUT_DIR/meta
+
+    #   get list from $OUT_DIR/trans_splicing_fix/fixed_tr.stable_ids.meta
+    #   append to #CONF TR_TRANS_SPLICED
+    cat $OUT_DIR/meta.before_tr_splicing_append \
+        $OUT_DIR/trans_splicing_fix/fixed_tr.stable_ids.meta |
+      grep -P '^#CONF\tTR_TRANS_SPLICED\t' |
+      cut -f 3 |
+      perl -pe 's/,/\n/g' |
+      sort | uniq |
+      perl -pe 's/\n/,/g' |
+      perl -pe 's/,$//' |
+      awk -F "\t" '{OFS="\t"; print "#CONF", "TR_TRANS_SPLICED", $1}' |
+      cat >> $OUT_DIR/meta
 
     # checking for uknown xrefs
     if [ -f "$OUT_DIR/functional_annotation.json" ]; then

@@ -220,7 +220,15 @@ backup_relink $DBNAME $CMD with_meta $DATA_DIR/bup
 
 
 # mark trans_spliced transcripts
-TR_TRANS_SPLICED="$(get_meta_conf $META_FILE_RAW 'TR_TRANS_SPLICED')"
+#    manual
+TR_TRANS_SPLICED_RAW="$(get_meta_conf $META_FILE_RAW 'TR_TRANS_SPLICED')"
+if [ -n "$TR_TRANS_SPLICED_RAW" ]; then
+  mark_tr_trans_spliced $CMD_W $DBNAME "$TR_TRANS_SPLICED_RAW" raw
+  backup_relink $DBNAME $CMD tr_spliced_marks_raw $DATA_DIR/bup
+fi
+
+#    generated
+TR_TRANS_SPLICED="$(get_meta_conf $META_FILE 'TR_TRANS_SPLICED')"
 if [ -n "$TR_TRANS_SPLICED" ]; then
   mark_tr_trans_spliced $CMD_W $DBNAME "$TR_TRANS_SPLICED"
   backup_relink $DBNAME $CMD tr_spliced_marks $DATA_DIR/bup
@@ -364,12 +372,11 @@ if [ -n "$GFF_FILE" ]; then
   fi
 
   # run xref pipelines
-  RUN_XREF="$(get_meta_conf $META_FILE_RAW RUN_XREF)"
-  if [ -z "$RUN_XREF" -o "x$RUN_XREF" != "xNO" ]; then
-    run_xref $CMD_W $DBNAME $SPECIES $ENSEMBL_ROOT_DIR $DATA_DIR/data/pipeline_out/xrefs/all "$(get_meta_conf $META_FILE_RAW XREF_PARAMS)"
-    backup_relink $DBNAME $CMD run_xref $DATA_DIR/bup
-  fi
-
+  run_xref $CMD_W $DBNAME $SPECIES $ENSEMBL_ROOT_DIR \
+    $DATA_DIR/data/pipeline_out/xrefs/all \
+    "$(get_meta_conf $META_FILE_RAW RUN_XREF)" \
+    "$(get_meta_conf $META_FILE_RAW XREF_PARAMS)"
+  backup_relink $DBNAME $CMD run_xref $DATA_DIR/bup
 
   # fix gene and transcript stable ids, update xrefs name
   UPDATE_STABLE_IDS="$(get_meta_conf $META_FILE_RAW 'UPDATE_STABLE_IDS')"
