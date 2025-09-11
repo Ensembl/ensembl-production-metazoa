@@ -3351,8 +3351,19 @@ function prepare_metada () {
       || echo "unvalid source gff: $GFF_PATH. no IGNORE_UNVALID_SOURCE_GFF ($IGNORE_UNVALID_SOURCE_GFF) set. failing..." \
           >> /dev/stderr || return false || exit 0
 
-      # gen stats
+      # deal with trans-splicing
+      mkdir -p $OUT_DIR/trans_splicing_fix
       cat $OUT_DIR/no_fasta.gff3 |
+        $SCRIPTS/ensembl-production-metazoa/scripts/fix_trans_spliced.sh \
+            $OUT_DIR/trans_splicing_fix \
+            $SCRIPTS/ensembl-production-metazoa/scripts/fix_trans_spliced.py \
+            "$GFF_PARSER_PFX_TRIM" |
+        cat - > $OUT_DIR/no_fasta.splicing_fixed.gff3
+      # get list from $OUT_DIR/trans_splicing_fix/fixed_tr.stable_ids.meta
+      # append to #CONF TR_TRANS_SPLICED
+
+      # gen stats
+      cat $OUT_DIR/no_fasta.splicing_fixed.gff3 |
         python $SCRIPTS/ensembl-genomio/scripts/gff_metaparser/gff_stats.py \
           --dump_used_options \
           --fail_unknown \
@@ -3547,6 +3558,24 @@ function prepare_metada () {
       --meta_out $OUT_DIR/meta
 
     echo -e "#CONF\tMETA_FILE_RAW_ORIG\t${META_RAW_ORIG}" >> $OUT_DIR/meta
+
+    # fix TR_TRANS_SPLICED option
+    cp $OUT_DIR/meta $OUT_DIR/meta.before_tr_splicing_append
+    cat $OUT_DIR/meta.before_tr_splicing_append |
+        grep -vP '^#CONF\tTR_TRANS_SPLICED\t' > $OUT_DIR/meta
+
+    #   get list from $OUT_DIR/trans_splicing_fix/fixed_tr.stable_ids.meta
+    #   append to #CONF TR_TRANS_SPLICED
+    cat $OUT_DIR/meta.before_tr_splicing_append \
+        $OUT_DIR/trans_splicing_fix/fixed_tr.stable_ids.meta |
+      grep -P '^#CONF\tTR_TRANS_SPLICED\t' |
+      cut -f 3 |
+      perl -pe 's/,/\n/g' |
+      sort | uniq |
+      perl -pe 's/\n/,/g' |
+      perl -pe 's/,$//' |
+      awk -F "\t" '{OFS="\t"; print "#CONF", "TR_TRANS_SPLICED", $1}' |
+      cat >> $OUT_DIR/meta
 
     # checking for uknown xrefs
     if [ -f "$OUT_DIR/functional_annotation.json" ]; then

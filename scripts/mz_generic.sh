@@ -220,7 +220,15 @@ backup_relink $DBNAME $CMD with_meta $DATA_DIR/bup
 
 
 # mark trans_spliced transcripts
-TR_TRANS_SPLICED="$(get_meta_conf $META_FILE_RAW 'TR_TRANS_SPLICED')"
+#    manual
+TR_TRANS_SPLICED_RAW="$(get_meta_conf $META_FILE_RAW 'TR_TRANS_SPLICED')"
+if [ -n "$TR_TRANS_SPLICED_RAW" ]; then
+  mark_tr_trans_spliced $CMD_W $DBNAME "$TR_TRANS_SPLICED_RAW" raw
+  backup_relink $DBNAME $CMD tr_spliced_marks_raw $DATA_DIR/bup
+fi
+
+#    generated
+TR_TRANS_SPLICED="$(get_meta_conf $META_FILE 'TR_TRANS_SPLICED')"
 if [ -n "$TR_TRANS_SPLICED" ]; then
   mark_tr_trans_spliced $CMD_W $DBNAME "$TR_TRANS_SPLICED"
   backup_relink $DBNAME $CMD tr_spliced_marks $DATA_DIR/bup
