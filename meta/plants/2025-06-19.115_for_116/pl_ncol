@@ -119,5 +119,5 @@ annotation.provider_url	https://www.ncbi.nlm.nih.gov/refseq/annotation_euk/Nymph
 # transplicing mRNAs related effects
 # $CMD_W -D prepl_nymphaea_colorata_gcf008831285v2rs_core_63_116_1 -e 'update meta_coord set max_length = 473147 where table_name = "transcript"'
 #
-# $CMD_W -D prepl_nymphaea_colorata_gcf008831285v2rs_core_63_116_1 -e insert into seq_region_attrib select seq_region_id, "11", 1 from seq_region where name = "NC_037468.1";'
+# $CMD_W -D prepl_nymphaea_colorata_gcf008831285v2rs_core_63_116_1 -e 'insert into seq_region_attrib select seq_region_id, "11", 1 from seq_region where name = "NC_037468.1";'
 #
