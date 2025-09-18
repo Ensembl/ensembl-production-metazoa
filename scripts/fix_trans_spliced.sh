@@ -142,35 +142,43 @@ cat \
   perl -pe 's/\n/|/' | perl -pe 's/\|$//' |
   cat > ${WDIR}/seed.pat
 
-zcat ${WDIR}/raw.gff3.gz |
-  grep -v '#' |
-  grep -Pf ${WDIR}/seed.pat |
-  cut -f 9 |
-  perl -pe 's/^(?:.+;?)?(ID=[^;]+).*/$1/' |
-  sort | uniq > ${WDIR}/seed.ids
+SEEDS_CNT=$(cat ${WDIR}/seed.pat | wc -l)
 
-# gen pat once again and get all the features for further preprocessing
-cat ${WDIR}/seed.ids |
-  cut -f 2 -d '=' |
-  sort | uniq |
-  awk '{print "[\\t;]ID="$1"(?:;|$)"; print "[\\t;]Parent=(?:[^;]+,)?"$1"(?:[,;]|$)";} ' |
-  perl -pe 's/\n/|/' | perl -pe 's/\|$//' |
-  cat > ${WDIR}/seed.interest.pat
+if [ "$SEEDS_CNT" -gt 0 ]; then
+  zcat ${WDIR}/raw.gff3.gz |
+    grep -v '#' |
+    grep -Pf ${WDIR}/seed.pat |
+    cut -f 9 |
+    perl -pe 's/^(?:.+;?)?(ID=[^;]+).*/$1/' |
+    sort | uniq > ${WDIR}/seed.ids
 
-zcat ${WDIR}/raw.gff3.gz |
-  grep -v '#' |
-  grep -Pf ${WDIR}/seed.interest.pat |
-  cat > ${WDIR}/features.gff3.tr_spliced
+  # gen pat once again and get all the features for further preprocessing
+  cat ${WDIR}/seed.ids |
+    cut -f 2 -d '=' |
+    sort | uniq |
+    awk '{print "[\\t;]ID="$1"(?:;|$)"; print "[\\t;]Parent=(?:[^;]+,)?"$1"(?:[,;]|$)";} ' |
+    perl -pe 's/\n/|/' | perl -pe 's/\|$//' |
+    cat > ${WDIR}/seed.interest.pat
 
-# fix
-zcat ${WDIR}/raw.gff3.gz |
-    python $TRIM_SCPRIPT \
-        --features_of_interest ${WDIR}/features.gff3.tr_spliced \
-        $TRIM_EXPR 2>  ${WDIR}/fix.stderr |
+  zcat ${WDIR}/raw.gff3.gz |
+    grep -v '#' |
+    grep -Pf ${WDIR}/seed.interest.pat |
+    cat > ${WDIR}/features.gff3.tr_spliced
+
+  # fix
+  zcat ${WDIR}/raw.gff3.gz |
+      python $TRIM_SCPRIPT \
+          --features_of_interest ${WDIR}/features.gff3.tr_spliced \
+          $TRIM_EXPR 2>  ${WDIR}/fix.stderr |
+      cat
+
+  tail ${WDIR}/fix.stderr >> /dev/stderr
+  cat ${WDIR}/fix.stderr |
+      grep -P '^#CONF\tTR_TRANS_SPLICED\t' |
+      cat > ${WDIR}/fixed_tr.stable_ids.meta
+else
+  echo "no trans-splicing related artifacts found..." >> /dev/stderr
+  echo -n > ${WDIR}/fixed_tr.stable_ids.meta
+  zcat ${WDIR}/raw.gff3.gz |
     cat
-
-tail ${WDIR}/fix.stderr >> /dev/stderr
-cat ${WDIR}/fix.stderr |
-    grep -P '^#CONF\tTR_TRANS_SPLICED\t' |
-    cat > ${WDIR}/fixed_tr.stable_ids.meta
-
+fi # SEEDS_CNT
