@@ -21,7 +21,7 @@ for line in open(jsonl_file):
         # RefSeq
         data.update(
             _ANNOTATION_PROVIDER_NAME_ = "NCBI RefSeq",
-            _ANNOTATION_SOURCE_ = "RefSeq",
+            _ANNOTATION_SOURCE_ = "refseq",
             _ANNOTATION_SOURCE_SFX_ = "rs",
             _LOAD_GFF3_ANALYSIS_NAME_ = "refseq_import_visible",
         )
@@ -32,19 +32,21 @@ for line in open(jsonl_file):
             data.update(
                 _REFSEQ_ANN_NAME_ = "",
                 _ANNOTATION_PROVIDER_NAME_ = data.get("_ASSEMBLY_PROVIDER_NAME_", ""),
-                _ANNOTATION_SOURCE_ = "GenBank",
+                _ANNOTATION_SOURCE_ = "genbank",
                 _ANNOTATION_SOURCE_SFX_ = "gb",
                 _LOAD_GFF3_ANALYSIS_NAME_ = "gff3_genes",
             )
         else:
             # assume community
             data.update(
+                _REFSEQ_ANN_REPORT_URL_ = "COMMUNITY_PROVIDER_URL_PLACEHOLDER",
                 _REFSEQ_ANN_NAME_ = "",
-                _ANNOTATION_PROVIDER_NAME_ = "COMMUNITY_PROVIDER_PLACEHOLDER",
-                _ANNOTATION_SOURCE_ = "Community",
+                _ANNOTATION_PROVIDER_NAME_ = "COMMUNITY_PROVIDER_NAME_PLACEHOLDER",
+                _ANNOTATION_SOURCE_ = "community",
                 _ANNOTATION_SOURCE_SFX_ = "cm",
                 _LOAD_GFF3_ANALYSIS_NAME_ = "gff3_genes",
                 _ANNOTATION_GFF3_ = "COMMUNITY_GFF3_PLACEHOLDER",
+                _ANNOTATION_PEP_ = "COMMUNITY_PEP_PLACEHOLDER",
             )
     # report url
     ann_report_url = data.get("_REFSEQ_ANN_REPORT_URL_", "")
