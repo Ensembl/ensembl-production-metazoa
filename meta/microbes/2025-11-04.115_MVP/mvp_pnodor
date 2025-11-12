@@ -6,35 +6,35 @@
 #  * uncomment "species.production_name" below
 # # updated, prev was _PREV_CORE_NAME_
 # species.production_name	_PROD_NAME_
-species.common_name	_COMMON_NAME_
+species.common_name	
 #no CONF	TAXON_ID	_TAXON_ID_
 
-# _GENOME_ACCESSION_
-# https://www.ncbi.nlm.nih.gov/assembly/_GENOME_ACCESSION_
-# _GENOME_FTP_URL_
-# Assembly provider: _ASSEMBLY_PROVIDER_NAME_
-# Annotation provider: _ANNOTATION_PROVIDER_NAME_
-# RefSeq Annotation Name: _REFSEQ_ANN_NAME_
-# RefSeq Annotation URL: _REFSEQ_ANN_REPORT_URL_
+# GCA_016801405.1
+# https://www.ncbi.nlm.nih.gov/assembly/GCA_016801405.1
+# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/016/801/405/GCA_016801405.1_ASM1680140v1
+# Assembly provider: Curtin University of Technology
+# Annotation provider: FungiDB
+# RefSeq Annotation Name: 
+# RefSeq Annotation URL: https://fungidb.org/common/downloads/Current_Release/PnodorumSN15
 
-#CONF	ASM_URL	_GENOME_FTP_URL_
+#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/016/801/405/GCA_016801405.1_ASM1680140v1
 
 #activate the below option (remove 'no ') to allow loading core with no annotation / gff3
 #no CONF	IGNORE_MISSING_GFF3	YES
 
 # Community GFF3 loading
-#CONF_IF_ANNOTATION_GFF3_	ASM_SINGLE	_ANNOTATION_GFF3_
-#CONF_IF_ANNOTATION_GFF3_	DATA_INIT	cat $(basename _ANNOTATION_GFF3_) | _MY_GFF3_FILTER_ | cat > fixed.gff3
-#CONF_IF_ANNOTATION_GFF3_	GFF_FILE	fixed.gff3
+#CONF	ASM_SINGLE	http://fungidb.org/common/downloads/Current_Release/PnodorumSN15/gff/data/FungiDB-68_PnodorumSN15.gff
+#CONF	DATA_INIT	cat $(basename http://fungidb.org/common/downloads/Current_Release/PnodorumSN15/gff/data/FungiDB-68_PnodorumSN15.gff) | perl -pe 's/(ID=[^;]+)-[Cc][Dd][Ss]\d+;/$1;/ if m/\tCDS\t/' > fixed.gff3
+#CONF	GFF_FILE	fixed.gff3
 
-#CONF_IF_ANNOTATION_PEP_	ASM_SINGLE	_ANNOTATION_PEP_
-#CONF_IF_ANNOTATION_PEP_	DATA_INIT	cat $(basename _ANNOTATION_PEP_) | _MY_PEP_FILTER_ | cat > pep.faa
-#CONF_IF_ANNOTATION_PEP_	PEP_FILE	pep.faa
+#CONF	ASM_SINGLE	http://fungidb.org/common/downloads/Current_Release/PnodorumSN15/fasta/data/FungiDB-68_PnodorumSN15_AnnotatedProteins.fasta
+#CONF	DATA_INIT	cat $(basename http://fungidb.org/common/downloads/Current_Release/PnodorumSN15/fasta/data/FungiDB-68_PnodorumSN15_AnnotatedProteins.fasta) > pep.faa
+#CONF	PEP_FILE	pep.faa
 
 # RefSeq related defaults
 #no CONF	GCF_TO_GCA	1
-#CONF	ANNOTATION_SOURCE_SFX	_ANNOTATION_SOURCE_SFX_
-species.annotation_source	_ANNOTATION_SOURCE_
+#CONF	ANNOTATION_SOURCE_SFX	cm
+species.annotation_source	Community
 
 # fix missing CDS IDs in the gff3 before filtration and post-filtration check
 #CONF	FIX_MISSING_CDS_ID	NO
@@ -76,16 +76,16 @@ species.annotation_source	_ANNOTATION_SOURCE_
 
 
 # Assembly metadata
-assembly.accession	_GENOME_ACCESSION_
+assembly.accession	GCA_016801405.1
 
 # Provider metadata
-#CONF	GFF3_LOAD_SOURCE_NAME	_ANNOTATION_SOURCE_
+#CONF	GFF3_LOAD_SOURCE_NAME	Community
 
-assembly.provider_name	_ASSEMBLY_PROVIDER_NAME_
-assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/_GENOME_ACCESSION_
+assembly.provider_name	Curtin University of Technology
+assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_016801405.1
 
-annotation.provider_name	_ANNOTATION_PROVIDER_NAME_
-annotation.provider_url	_REFSEQ_ANN_REPORT_URL_
+annotation.provider_name	FungiDB
+annotation.provider_url	https://fungidb.org/common/downloads/Current_Release/PnodorumSN15
 
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
 #  to change the lower allowed length [default 5000]: -min_slice_length 1000
@@ -102,13 +102,13 @@ annotation.provider_url	_REFSEQ_ANN_REPORT_URL_
 #CONF	RNA_FEAT_PARAMS	-cmscan_threshold 1e-6 -taxonomic_lca 1
 #  resources:  -splitdump_resource_class 32Gb_mem
 
-#CONF	RUN_RNA_GENES	NO
+#CONF	RUN_RNA_GENES	YES
 
 # or
 # using 'vb' context, otherwise ('eg' context) needs special "ena*" database
-#no CONF	RNA_GENE_PARAMS	-run_context vb -score_threshold 65
+#CONF	RNA_GENE_PARAMS	-run_context vb -score_threshold 65
 #  m.b. updated maximum_per_hit_name { 'pre_miRNA' => 100, 'ribozyme' => 100 }
-# species.stable_id_prefix	ENSLOC
+species.stable_id_prefix	ENSLOC
 
 
 # load UniProt gene names and descriptions

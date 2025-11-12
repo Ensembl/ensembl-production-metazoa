@@ -24,11 +24,11 @@ species.common_name	_COMMON_NAME_
 
 # Community GFF3 loading
 #CONF_IF_ANNOTATION_GFF3_	ASM_SINGLE	_ANNOTATION_GFF3_
-#CONF_IF_ANNOTATION_GFF3_	DATA_INIT	cat $(basename _ANNOTATION_GFF3_) | _MY_GFF3_FILTER_ | cat > fixed.gff3
+#CONF_IF_ANNOTATION_GFF3_	DATA_INIT	cat $(basename _ANNOTATION_GFF3_) | perl -pe 's/(ID=[^;]+)-[Cc][Dd][Ss]\d+;/$1;/ if m/\tCDS\t/' > fixed.gff3
 #CONF_IF_ANNOTATION_GFF3_	GFF_FILE	fixed.gff3
 
 #CONF_IF_ANNOTATION_PEP_	ASM_SINGLE	_ANNOTATION_PEP_
-#CONF_IF_ANNOTATION_PEP_	DATA_INIT	cat $(basename _ANNOTATION_PEP_) | _MY_PEP_FILTER_ | cat > pep.faa
+#CONF_IF_ANNOTATION_PEP_	DATA_INIT	cat $(basename _ANNOTATION_PEP_) > pep.faa
 #CONF_IF_ANNOTATION_PEP_	PEP_FILE	pep.faa
 
 # RefSeq related defaults
@@ -102,13 +102,13 @@ annotation.provider_url	_REFSEQ_ANN_REPORT_URL_
 #CONF	RNA_FEAT_PARAMS	-cmscan_threshold 1e-6 -taxonomic_lca 1
 #  resources:  -splitdump_resource_class 32Gb_mem
 
-#CONF	RUN_RNA_GENES	NO
+#CONF	RUN_RNA_GENES	YES
 
 # or
 # using 'vb' context, otherwise ('eg' context) needs special "ena*" database
-#no CONF	RNA_GENE_PARAMS	-run_context vb -score_threshold 65
+#CONF	RNA_GENE_PARAMS	-run_context vb -score_threshold 65
 #  m.b. updated maximum_per_hit_name { 'pre_miRNA' => 100, 'ribozyme' => 100 }
-# species.stable_id_prefix	ENSLOC
+species.stable_id_prefix	ENSLOC
 
 
 # load UniProt gene names and descriptions
