@@ -2981,7 +2981,7 @@ function fix_gene_ids_after_rna_pipeline () {
   local MAX_GENE_PFX=$(echo $MAX_GENE | perl -pe 's/\d+$//')
   local MAX_GENE_NUM_PRE=$(( $(echo $MAX_GENE | perl -pe 's/[^\d]+0*(\d+)$/$1/') + 1 ))
   local GENE_COUNT=$(( $($CMD -D $DBNAME -e 'select count(*) from gene' -N) + 1 ))
-  local MAX_GENE_NUM=$(python -c "print max($MAX_GENE_NUM_PRE, $GENE_COUNT) + 100")
+  local MAX_GENE_NUM=$(python -c "print( max($MAX_GENE_NUM_PRE, $GENE_COUNT) + 100)")
   # TODO: get max ids from old_core_db:
 
   echo "Updating gene ids produced by rna pipelines $MAX_GENE $MAX_GENE_PFX $MAX_GENE_NUM" >> /dev/stderr

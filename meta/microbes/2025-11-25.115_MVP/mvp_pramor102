@@ -6,29 +6,29 @@
 #  * uncomment "species.production_name" below
 # # updated, prev was _PREV_CORE_NAME_
 # species.production_name	_PROD_NAME_
-species.common_name	
+species.common_name	Sudden oak death agent
 #no CONF	TAXON_ID	_TAXON_ID_
 
-# GCA_018691715.1
-# https://www.ncbi.nlm.nih.gov/assembly/GCA_018691715.1
-# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/018/691/715/GCA_018691715.1_ASM1869171v1
-# Assembly provider: University of Pretoria
+# GCA_020800215.1
+# https://www.ncbi.nlm.nih.gov/assembly/GCA_020800215.1
+# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/020/800/215/GCA_020800215.1_PR-102_v3_p
+# Assembly provider: USDA ARS
 # Annotation provider: FungiDB
 # RefSeq Annotation Name: 
-# RefSeq Annotation URL: http://fungidb.org/common/downloads/Current_Release/PcinnamomiGKB4
+# RefSeq Annotation URL: https://fungidb.org/common/downloads/Current_Release/PramorumPr-102
 
-#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/018/691/715/GCA_018691715.1_ASM1869171v1
+#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/020/800/215/GCA_020800215.1_PR-102_v3_p
 
 #activate the below option (remove 'no ') to allow loading core with no annotation / gff3
 #no CONF	IGNORE_MISSING_GFF3	YES
 
 # Community GFF3 loading
-#CONF	ASM_SINGLE	http://fungidb.org/common/downloads/Current_Release/PcinnamomiGKB4/gff/data/FungiDB-68_PcinnamomiGKB4.gff
-#CONF	DATA_INIT	cat $(basename http://fungidb.org/common/downloads/Current_Release/PcinnamomiGKB4/gff/data/FungiDB-68_PcinnamomiGKB4.gff) | perl -pe 's/(ID=[^;]+)-[Cc][Dd][Ss]\d+;/$1;/ if m/\tCDS\t/' > fixed.gff3
+#CONF	ASM_SINGLE	https://fungidb.org/common/downloads/Current_Release/PramorumPr-102/gff/data/FungiDB-68_PramorumPr-102.gff
+#CONF	DATA_INIT	cat $(basename https://fungidb.org/common/downloads/Current_Release/PramorumPr-102/gff/data/FungiDB-68_PramorumPr-102.gff) | perl -pe 's/(ID=[^;]+)-[Cc][Dd][Ss]\d+;/$1;/ if m/\tCDS\t/' |  perl -pe 's/ID=exon_[^;]+;// if m/exon/' > fixed.gff3
 #CONF	GFF_FILE	fixed.gff3
 
-#CONF	ASM_SINGLE	http://fungidb.org/common/downloads/Current_Release/PcinnamomiGKB4/fasta/data/FungiDB-68_PcinnamomiGKB4_AnnotatedProteins.fasta
-#CONF	DATA_INIT	cat $(basename http://fungidb.org/common/downloads/Current_Release/PcinnamomiGKB4/fasta/data/FungiDB-68_PcinnamomiGKB4_AnnotatedProteins.fasta) > pep.faa
+#CONF	ASM_SINGLE	https://fungidb.org/common/downloads/Current_Release/PramorumPr-102/fasta/data/FungiDB-68_PramorumPr-102_AnnotatedProteins.fasta
+#CONF	DATA_INIT	cat $(basename https://fungidb.org/common/downloads/Current_Release/PramorumPr-102/fasta/data/FungiDB-68_PramorumPr-102_AnnotatedProteins.fasta) > pep.faa
 #CONF	PEP_FILE	pep.faa
 
 # RefSeq related defaults
@@ -76,16 +76,16 @@ species.annotation_source	community
 
 
 # Assembly metadata
-assembly.accession	GCA_018691715.1
+assembly.accession	GCA_020800215.1
 
 # Provider metadata
 #CONF	GFF3_LOAD_SOURCE_NAME	community
 
-assembly.provider_name	University of Pretoria
-assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_018691715.1
+assembly.provider_name	USDA ARS
+assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_020800215.1
 
 annotation.provider_name	FungiDB
-annotation.provider_url	http://fungidb.org/common/downloads/Current_Release/PcinnamomiGKB4
+annotation.provider_url	https://fungidb.org/common/downloads/Current_Release/PramorumPr-102
 
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
 #  to change the lower allowed length [default 5000]: -min_slice_length 1000
