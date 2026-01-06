@@ -6,29 +6,29 @@
 #  * uncomment "species.production_name" below
 # # updated, prev was _PREV_CORE_NAME_
 # species.production_name	_PROD_NAME_
-species.common_name	Lettuce downy mildew
+species.common_name	Corn smut
 #no CONF	TAXON_ID	_TAXON_ID_
 
-# GCA_004359215.2
-# https://www.ncbi.nlm.nih.gov/assembly/GCA_004359215.2
-# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/004/359/215/GCA_004359215.2_BlacSF5v2
-# Assembly provider: UC Davis Genome Center
+# GCA_000328475.2
+# https://www.ncbi.nlm.nih.gov/assembly/GCA_000328475.2
+# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/328/475/GCA_000328475.2_Umaydis521_2.0
+# Assembly provider: Broad Institute
 # Annotation provider: FungiDB
 # RefSeq Annotation Name: 
-# RefSeq Annotation URL: https://fungidb.org/common/downloads/Current_Release/BlactucaeSF5
+# RefSeq Annotation URL: https://fungidb.org/common/downloads/Current_Release/Umaydis521
 
-#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/004/359/215/GCA_004359215.2_BlacSF5v2
+#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/328/475/GCA_000328475.2_Umaydis521_2.0
 
 #activate the below option (remove 'no ') to allow loading core with no annotation / gff3
 #no CONF	IGNORE_MISSING_GFF3	YES
 
 # Community GFF3 loading
-#CONF	ASM_SINGLE	http://fungidb.org/common/downloads/Current_Release/BlactucaeSF5/gff/data/FungiDB-68_BlactucaeSF5.gff
-#CONF	DATA_INIT	cat $(basename http://fungidb.org/common/downloads/Current_Release/BlactucaeSF5/gff/data/FungiDB-68_BlactucaeSF5.gff) | perl -pe 's/(ID=[^;]+)-[Cc][Dd][Ss]\d+;/$1;/ if m/\tCDS\t/' > fixed.gff3
+#CONF	ASM_SINGLE	http://fungidb.org/common/downloads/Current_Release/Umaydis521/gff/data/FungiDB-68_Umaydis521.gff
+#CONF	DATA_INIT	cat $(basename http://fungidb.org/common/downloads/Current_Release/Umaydis521/gff/data/FungiDB-68_Umaydis521.gff) | perl -pe 's/(ID=[^;]+)-[Cc][Dd][Ss]\d+;/$1;/ if m/\tCDS\t/' > fixed.gff3
 #CONF	GFF_FILE	fixed.gff3
 
-#CONF	ASM_SINGLE	http://fungidb.org/common/downloads/Current_Release/BlactucaeSF5/fasta/data/FungiDB-68_BlactucaeSF5_AnnotatedProteins.fasta
-#CONF	DATA_INIT	cat $(basename http://fungidb.org/common/downloads/Current_Release/BlactucaeSF5/fasta/data/FungiDB-68_BlactucaeSF5_AnnotatedProteins.fasta) > pep.faa
+#CONF	ASM_SINGLE	http://fungidb.org/common/downloads/Current_Release/Umaydis521/fasta/data/FungiDB-68_Umaydis521_AnnotatedProteins.fasta
+#CONF	DATA_INIT	cat $(basename http://fungidb.org/common/downloads/Current_Release/Umaydis521/fasta/data/FungiDB-68_Umaydis521_AnnotatedProteins.fasta) > pep.faa
 #CONF	PEP_FILE	pep.faa
 
 # RefSeq related defaults
@@ -76,16 +76,16 @@ species.annotation_source	community
 
 
 # Assembly metadata
-assembly.accession	GCA_004359215.2
+assembly.accession	GCA_000328475.2
 
 # Provider metadata
 #CONF	GFF3_LOAD_SOURCE_NAME	community
 
-assembly.provider_name	UC Davis Genome Center
-assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_004359215.2
+assembly.provider_name	Broad Institute
+assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000328475.2
 
 annotation.provider_name	FungiDB
-annotation.provider_url	https://fungidb.org/common/downloads/Current_Release/BlactucaeSF5
+annotation.provider_url	https://fungidb.org/common/downloads/Current_Release/Umaydis521
 
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
 #  to change the lower allowed length [default 5000]: -min_slice_length 1000
