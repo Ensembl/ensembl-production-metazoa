@@ -43,7 +43,7 @@ cat | gzip - > ${WDIR}/raw.gff3.gz
 zcat ${WDIR}/raw.gff3.gz |
   awk -F "\t" '$3 == "gene"' |
   cut -f 1,9 |
-  perl -pe 's/\t(?:[^\t]+;?)?(ID=[^;]+).*/\t$1/' |
+  perl -pe 's/\t.*?(?<=\t|;)(ID=[^;]+).*/\t$1/' |
   sort | uniq -c | sort -nr |
   awk '$1 > 1 {print $2"\t"$3}' | 
   cat > ${WDIR}/duplicated.gene.reg_ids
