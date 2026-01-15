@@ -3439,7 +3439,7 @@ function prepare_metada () {
           cat $OUT_DIR/validated.gff3.orig |
             perl -pe '
                 my @f=split /\t/;
-                s/Parent=([^;\r\n]+)(?:;|$)/Parent=$1;ID=cds:$1/ if ($f[2] =~ m/^CDS$/i && $f[8] !~ m/(^|;)ID=/i);
+                s/Parent=([^;\r\n]+)(;|$)/Parent=$1;ID=cds:$1$2/ if ($f[2] =~ m/^CDS$/i && $f[8] !~ m/(^|;)ID=/i);
               ' > $OUT_DIR/validated.gff3
         else
           echo "Not trying to fix CDs with missing IDs" >> /dev/stderr
