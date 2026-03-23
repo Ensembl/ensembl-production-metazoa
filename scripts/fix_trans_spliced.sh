@@ -139,32 +139,57 @@ cat \
   cat - ${WDIR}/exon.ex.parents.ids |
   sort | uniq |
   awk '{print "[\\t;]ID="$1"(?:;|$)"; print "[\\t;]Parent=(?:[^;]+,)?"$1"(?:[,;]|$)";} ' |
-  perl -pe 's/\n/|/' | perl -pe 's/\|$//' |
   cat > ${WDIR}/seed.pat
 
 SEEDS_CNT=$(cat ${WDIR}/seed.pat | wc -w)
 
+# Split into 300-pattern chunks and make valid regex lines
+split -l 300 ${WDIR}/seed.pat ${WDIR}/seed.chunk.
+for f in ${WDIR}/seed.chunk.*; do
+    paste -sd'|' "$f" > "${f}.pat"
+    rm "$f"
+done
+
+# Only run if seeds exist
 if [ "$SEEDS_CNT" -gt 0 ]; then
-  zcat ${WDIR}/raw.gff3.gz |
-    grep -v '#' |
-    grep -Pf ${WDIR}/seed.pat |
-    cut -f 9 |
+    tmpfile="${WDIR}/seed.ids.tmp"
+    > "$tmpfile"
+
+    # Loop over chunked pattern files
+    for f in ${WDIR}/seed.chunk.*.pat; do
+        zcat ${WDIR}/raw.gff3.gz |
+        grep -v '^#' |
+        grep -Pf "$f" >> "$tmpfile"
+    done
+
+    # Extract ID= field, deduplicate
+    cut -f 9 "$tmpfile" |
     perl -pe 's/^(?:.+;?)?(ID=[^;]+).*/$1/' |
-    sort | uniq > ${WDIR}/seed.ids
+    sort -u > "${WDIR}/seed.ids"
 
-  # gen pat once again and get all the features for further preprocessing
-  cat ${WDIR}/seed.ids |
-    cut -f 2 -d '=' |
-    sort | uniq |
-    awk '{print "[\\t;]ID="$1"(?:;|$)"; print "[\\t;]Parent=(?:[^;]+,)?"$1"(?:[,;]|$)";} ' |
-    perl -pe 's/\n/|/' | perl -pe 's/\|$//' |
-    cat > ${WDIR}/seed.interest.pat
+    rm "$tmpfile"
 
-  zcat ${WDIR}/raw.gff3.gz |
-    grep -v '#' |
-    grep -Pf ${WDIR}/seed.interest.pat |
-    cat > ${WDIR}/features.gff3.tr_spliced
+  cut -f2 -d '=' "${WDIR}/seed.ids" | sort -u > ${WDIR}/ids.list
+  awk -F'\t' 'NR==FNR { ids[$0]; next }
+  !/^#/ {
+    split($9, a, ";")
+    id=""; parent=""
 
+    for(i in a){
+        if(a[i] ~ /^ID=/) id=substr(a[i],4)
+        if(a[i] ~ /^Parent=/) parent=substr(a[i],8)
+    }
+
+    if(id in ids) print
+    else {
+        n=split(parent,p,",")
+        for(j=1;j<=n;j++){
+            if(p[j] in ids){ print; break }
+        }
+    }
+  }
+  ' ${WDIR}/ids.list <(zcat ${WDIR}/raw.gff3.gz) \
+  > ${WDIR}/features.gff3.tr_spliced
   # fix
   zcat ${WDIR}/raw.gff3.gz |
       python $TRIM_SCPRIPT \
