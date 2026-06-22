@@ -142,7 +142,7 @@ cat \
   perl -pe 's/\n/|/' | perl -pe 's/\|$//' |
   cat > ${WDIR}/seed.pat
 
-SEEDS_CNT=$(cat ${WDIR}/seed.pat | wc -l)
+SEEDS_CNT=$(cat ${WDIR}/seed.pat | wc -w)
 
 if [ "$SEEDS_CNT" -gt 0 ]; then
   zcat ${WDIR}/raw.gff3.gz |
