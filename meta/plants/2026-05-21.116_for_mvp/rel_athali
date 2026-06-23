@@ -43,7 +43,7 @@ species.annotation_source	genbank
 #CONF	STOP_AFTER_CONF	NO
 
 # disabling default [transcript -> mRNA] gff3 feature type conversion
-#CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna
+#CONF	GFF_STATS_OPTIONS	--rule_options no_tr2mrna,ignore_mt_gene_cds,ignore_mt_gene_exon
 
 #CONF	GFF_PARSER_CONF_PATCH	NO
 #CONF	GFF_PARSER_PFX_TRIM	NO
@@ -73,7 +73,7 @@ species.annotation_source	genbank
 
 # Assembly metadata
 assembly.accession	GCA_978657495.1
-assembly.ploidy	1
+# assembly.ploidy	2
 
 # Provider metadata
 #CONF	GFF3_LOAD_SOURCE_NAME	genbank
