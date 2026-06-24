@@ -53,7 +53,7 @@ species.annotation_source	genbank
 
 #CONF	GFF3_LOAD_LOGIC_NAME	gff3_genes
 
-#CONF	GFF_LOADER_OPTIONS	--external_db_map_name default.txt --xref_display_db_default Ensembl_Plants -division EnsemblPlants --manifest_integrity_rc_name 32GB --load_sequence_data_rc_name 64GB
+#CONF	GFF_LOADER_OPTIONS	--external_db_map_name default.txt --xref_display_db_default Ensembl_Plants -division EnsemblPlants --manifest_integrity_rc_name 32GB --load_sequence_data_rc_name 64GB --check_manifest 0
 #  default: --external_db_map_name default.txt --xref_display_db_default Ensembl_Plants -division EnsemblPlants
 #  minimal: --external_db_map_name minimal.txt --skip_unknown_xref_source 1
 #  resources: --manifest_integrity_rc_name 32GB --load_sequence_data_rc_name 64GB
@@ -61,6 +61,7 @@ species.annotation_source	genbank
 #  chunking: --sequence_data_chunck 100_000_000
 #  add to ignore manifest integrity check: --check_manifest 0
 #  add (if there's a need) for sequences not from INSDC / GenBank / RefSeq: --unversion_scaffolds 0
+#  add to use shift based model correction (very slow, rarely helpful): --skip_fix_models 0
 
 #no CONF	ORDERED_CS_TAG	chromosome
 
