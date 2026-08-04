@@ -257,9 +257,8 @@ REPBASE_FILE_NEW=$REPBASE_OUT_DIR/repbase.lib
 
 DISABLE_REPBASE_NAME_UPCAST=$(get_meta_conf $META_FILE_RAW DISABLE_REPBASE_NAME_UPCAST)
 if [ -z "${DISABLE_REPBASE_NAME_UPCAST}" \
-     -o "x${DISABLE_REPBASE_NAME_UPCAST}" != "xYES" \
-     -o "x${DISABLE_REPBASE_NAME_UPCAST}" != "x1"
-   ]; then
+     -o \( "x${DISABLE_REPBASE_NAME_UPCAST}" != "xYES" \
+     -a "x${DISABLE_REPBASE_NAME_UPCAST}" != "x1" \) ]; then
   REPBASE_SPECIES_NAME=$(cat $REPBASE_OUT_DIR/_repbase_species_name)
 else
   REPBASE_SPECIES_NAME_NEW=$(cat $REPBASE_OUT_DIR/_repbase_species_name)
