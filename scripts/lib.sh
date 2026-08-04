@@ -3375,12 +3375,15 @@ function prepare_metada () {
           >> /dev/stderr || return false || exit 0
 
       # deal with trans-splicing
+      local FIX_TRANS_SPLICED_PARAMS=$(get_meta_conf $META_RAW FIX_TRANS_SPLICED_PARAMS)
+
       mkdir -p $OUT_DIR/trans_splicing_fix
       cat $OUT_DIR/no_fasta.gff3 |
         $SCRIPTS/ensembl-production-metazoa/scripts/fix_trans_spliced.sh \
             $OUT_DIR/trans_splicing_fix \
+            $SCRIPTS/ensembl-production-metazoa/scripts/gff3_filter_by_id.py \
             $SCRIPTS/ensembl-production-metazoa/scripts/fix_trans_spliced.py \
-            "$GFF_PARSER_PFX_TRIM" |
+            "$GFF_PARSER_PFX_TRIM" "$FIX_TRANS_SPLICED_PARAMS" |
         cat - > $OUT_DIR/no_fasta.splicing_fixed.gff3
       # get list from $OUT_DIR/trans_splicing_fix/fixed_tr.stable_ids.meta
       # append to #CONF TR_TRANS_SPLICED
