@@ -24,7 +24,7 @@ species.common_name	_COMMON_NAME_
 
 # Community GFF3 loading
 #CONF_IF_ANNOTATION_GFF3_	ASM_SINGLE	_ANNOTATION_GFF3_
-#CONF_IF_ANNOTATION_GFF3_	DATA_INIT	zcat $(basename '_ANNOTATION_GFF3_') | awk -F '\t' '{OFS="\t"; gsub(/ID=gene:/,"ID=",$9); gsub(/Parent=gene:/,"Parent=",$9)}' > fixed.gff3
+#CONF_IF_ANNOTATION_GFF3_	DATA_INIT	zcat $(basename '_ANNOTATION_GFF3_') | awk -F'\t' '{OFS="\t"; gsub(/ID=gene:/,"ID=",$9); gsub(/Parent=gene:/,"Parent=",$9)}1' > fixed.gff3
 #CONF_IF_ANNOTATION_GFF3_	GFF_FILE	fixed.gff3
 
 #CONF_IF_ANNOTATION_PEP_	ASM_SINGLE	_ANNOTATION_PEP_
