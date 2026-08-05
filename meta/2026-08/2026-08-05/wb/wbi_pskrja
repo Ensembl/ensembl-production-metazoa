@@ -14,8 +14,8 @@ species.common_name
 # https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/014/338/405/GCA_014338405.1_P_miyazaki_1.0.pg.lrna
 # Assembly provider: The Genome Institute
 # Annotation provider: WormBase Parasite
-# RefSeq Annotation Name: https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/paragonimus_skrjabini_miyazakii/PRJNA245325
-# RefSeq Annotation URL: https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/paragonimus_skrjabini_miyazakii/PRJNA245325
+# RefSeq Annotation Name: https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/paragonimus_skrjabinimiyazakii/PRJNA245325
+# RefSeq Annotation URL: https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/paragonimus_skrjabinimiyazakii/PRJNA245325
 
 #CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/014/338/405/GCA_014338405.1_P_miyazaki_1.0.pg.lrna
 
@@ -23,12 +23,12 @@ species.common_name
 #no CONF	IGNORE_MISSING_GFF3	YES
 
 # Community GFF3 loading
-#CONF	ASM_SINGLE	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/paragonimus_skrjabini_miyazakii/PRJNA245325/paragonimus_skrjabini_miyazakii.PRJNA245325.WBPS19.annotations.gff3.gz
-#CONF	DATA_INIT	zcat $(basename 'https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/paragonimus_skrjabini_miyazakii/PRJNA245325/paragonimus_skrjabini_miyazakii.PRJNA245325.WBPS19.annotations.gff3.gz') | awk -F '\t' '{OFS="\t"; gsub(/ID=gene:/,"ID=",$9); gsub(/Parent=gene:/,"Parent=",$9)}' > fixed.gff3
+#CONF	ASM_SINGLE	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/paragonimus_skrjabinimiyazakii/PRJNA245325/paragonimus_skrjabinimiyazakii.PRJNA245325.WBPS19.annotations.gff3.gz
+#CONF	DATA_INIT	zcat $(basename 'https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/paragonimus_skrjabinimiyazakii/PRJNA245325/paragonimus_skrjabinimiyazakii.PRJNA245325.WBPS19.annotations.gff3.gz') | awk -F '\t' '{OFS="\t"; gsub(/ID=gene:/,"ID=",$9); gsub(/Parent=gene:/,"Parent=",$9)}' > fixed.gff3
 #CONF	GFF_FILE	fixed.gff3
 
-#CONF	ASM_SINGLE	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/paragonimus_skrjabini_miyazakii/PRJNA245325/paragonimus_skrjabini_miyazakii.PRJNA245325.WBPS19.protein.fa.gz
-#CONF	DATA_INIT	zcat $(basename 'https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/paragonimus_skrjabini_miyazakii/PRJNA245325/paragonimus_skrjabini_miyazakii.PRJNA245325.WBPS19.protein.fa.gz') | perl -pe 's/^>/>cds:/ if /^>/;' > pep.faa
+#CONF	ASM_SINGLE	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/paragonimus_skrjabinimiyazakii/PRJNA245325/paragonimus_skrjabinimiyazakii.PRJNA245325.WBPS19.protein.fa.gz
+#CONF	DATA_INIT	zcat $(basename 'https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/paragonimus_skrjabinimiyazakii/PRJNA245325/paragonimus_skrjabinimiyazakii.PRJNA245325.WBPS19.protein.fa.gz') | perl -pe 's/^>/>cds:/ if /^>/;' > pep.faa
 #CONF	PEP_FILE	pep.faa
 
 # RefSeq related defaults
@@ -85,7 +85,7 @@ assembly.provider_name	The Genome Institute
 assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_014338405.1
 
 annotation.provider_name	WormBase Parasite
-annotation.provider_url	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/paragonimus_skrjabini_miyazakii/PRJNA245325
+annotation.provider_url	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/paragonimus_skrjabinimiyazakii/PRJNA245325
 
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
 #  to change the lower allowed length [default 5000]: -min_slice_length 1000
@@ -102,13 +102,13 @@ annotation.provider_url	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/re
 #CONF	RNA_FEAT_PARAMS	-cmscan_threshold 1e-6 -taxonomic_lca 1
 #  resources:  -splitdump_resource_class 32Gb_mem
 
-#CONF	RUN_RNA_GENES	NO
+#CONF	RUN_RNA_GENES	YES
 
 # or
 # using 'vb' context, otherwise ('eg' context) needs special "ena*" database
-#no CONF	RNA_GENE_PARAMS	-run_context vb -score_threshold 65
+#CONF	RNA_GENE_PARAMS	-run_context vb -score_threshold 65
 #  m.b. updated maximum_per_hit_name { 'pre_miRNA' => 100, 'ribozyme' => 100 }
-# species.stable_id_prefix	ENSLOC
+species.stable_id_prefix	ENSLOC
 
 
 # load UniProt gene names and descriptions
