@@ -71,7 +71,6 @@ cat $METACONF_DIR/wb.genomes.lst |
   grep -vP '^\s*$' |
   awk -F "\t" '{print NF}' |
   sort | uniq -c
-    188 10
 
 # gen configs
 python3 ./ensembl-production-metazoa/scripts/tmpl2meta.py   \
