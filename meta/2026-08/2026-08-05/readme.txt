@@ -57,7 +57,10 @@ cat acc_gff3_pep.tsv |
 cat genomes.lst.raw acc_gff3_pep.tsv |
    awk -F "\t" '(NF > 5) {stash[$5] = $0} NF == 5 {OFS="\t"; print stash[$1], $2, $3, $4;}' |
    cut -f 1-6,9,16-18 |
-   awk -F "\t" '{abbr = $4; if (seen[abbr]) {$4 = abbr""seen[abbr];}; seen[abbr]++; OFS="\t"; print}'> wb.genomes.lst
+   awk -F "\t" '{abbr = $4; if (seen[abbr]) {$4 = abbr""seen[abbr];}; seen[abbr]++; OFS="\t"; print}' |
+   cat - anno_provider_name.tsv |
+   awk -F "\t" '(NF > 5) {stash[$5] = $0} NF == 2 {OFS="\t"; print stash[$1], $2;}' |
+   cat > wb.genomes.lst
 
 # check for duplicated abbrebs
 cut -f 4 wb.genomes.lst | sort | uniq | wc -l
@@ -68,7 +71,6 @@ cat $METACONF_DIR/wb.genomes.lst |
   grep -vP '^\s*$' |
   awk -F "\t" '{print NF}' |
   sort | uniq -c
-    188 10
 
 # gen configs
 python3 ./ensembl-production-metazoa/scripts/tmpl2meta.py   \

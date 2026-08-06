@@ -31,6 +31,11 @@ species.common_name	Root-knot nematode
 #CONF	DATA_INIT	zcat $(basename 'https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/meloidogyne_javanica/PRJNA340324/meloidogyne_javanica.PRJNA340324.WBPS19.protein.fa.gz') | perl -pe 's/^>/>cds:/ if /^>/;' > pep.faa
 #CONF	PEP_FILE	pep.faa
 
+# Get seq region synonyms
+#CONF	DATA_INIT	zcat GCA_003693625.1*_genomic.fna.gz | perl -ne 'print "$1\t$2\twormbase_id\n" if m/^>(\S+).*, contig: ([^,]+),/;' > gb2wb_sr_syns.tsv
+#CONF	SR_SYNS_FILE	gb2wb_sr_syns.tsv
+
+
 # RefSeq related defaults
 #no CONF	GCF_TO_GCA	1
 #CONF	ANNOTATION_SOURCE_SFX	wb
@@ -85,7 +90,7 @@ assembly.provider_name	University of Hull
 assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_003693625.1
 
 annotation.provider_name	WormBase Parasite
-annotation.provider_url	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/meloidogyne_javanica/PRJNA340324
+annotation.provider_url	https://doi.org/10.1016/j.molbiopara.2016.11.005
 
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
 #  to change the lower allowed length [default 5000]: -min_slice_length 1000
