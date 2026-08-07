@@ -33,8 +33,10 @@ species.common_name
 
 # Get seq region synonyms
 # >KE124775.1 Ancylostoma ceylanicum unplaced genomic scaffold A_ceylanicum-1.0_Cont1, whole genome shotgun sequence
+# ##sequence-region   ANCCEYDFT_Contig1 1 2168175
 #
-#CONF	DATA_INIT	zcat GCA_000402015.1*_genomic.fna.gz | perl -ne 'print "$1\t$2\twormbase_id\n" if m/^>(\S+).* scaffold ([^,]+), /;' > gb2wb_sr_syns.tsv
+#CONF	DATA_INIT	zcat GCA_000402015.1*_genomic.fna.gz | perl -ne 'print "$1\t$2\twormbase_id\n" if m/^>(\S+).* scaffold ([^,]+), /;' > gb2wb_sr_syns.tsv.pre
+#CONF	DATA_INIT	cat gb2wb_sr_syns.tsv.pre | perl -pe 's/A_ceylanicum-1.0_Cont/ANCCEYDFT_Contig/' > gb2wb_sr_syns.tsv
 #CONF	SR_SYNS_FILE	gb2wb_sr_syns.tsv
 
 
