@@ -24,7 +24,7 @@ species.common_name
 
 # Community GFF3 loading
 #CONF	ASM_SINGLE	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/ancylostoma_ceylanicum/PRJNA72583/ancylostoma_ceylanicum.PRJNA72583.WBPS19.annotations.gff3.gz
-#CONF	DATA_INIT	zcat $(basename 'https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/ancylostoma_ceylanicum/PRJNA72583/ancylostoma_ceylanicum.PRJNA72583.WBPS19.annotations.gff3.gz') | awk -F'\t' '{OFS="\t"; gsub(/ID=gene:/,"ID=",$9); gsub(/Parent=gene:/,"Parent=",$9)}1' > fixed.gff3
+#CONF	DATA_INIT	zcat $(basename 'https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/ancylostoma_ceylanicum/PRJNA72583/ancylostoma_ceylanicum.PRJNA72583.WBPS19.annotations.gff3.gz') | awk -F'\t' '{OFS="\t"; gsub(/ID=(gene:)+/,"ID=",$9); gsub(/Parent=(gene:)+/,"Parent=",$9)}1' > fixed.gff3
 #CONF	GFF_FILE	fixed.gff3
 
 #CONF	ASM_SINGLE	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/ancylostoma_ceylanicum/PRJNA72583/ancylostoma_ceylanicum.PRJNA72583.WBPS19.protein.fa.gz
@@ -32,7 +32,11 @@ species.common_name
 #CONF	PEP_FILE	pep.faa
 
 # Get seq region synonyms
-#CONF	DATA_INIT	zcat GCA_000402015.1*_genomic.fna.gz | perl -ne 'print "$1\t$2\twormbase_id\n" if m/^>(\S+).*, contig: ([^,]+),/;' > gb2wb_sr_syns.tsv
+# >KE124775.1 Ancylostoma ceylanicum unplaced genomic scaffold A_ceylanicum-1.0_Cont1, whole genome shotgun sequence
+# ##sequence-region   ANCCEYDFT_Contig1 1 2168175
+#
+#CONF	DATA_INIT	zcat GCA_000402015.1*_genomic.fna.gz | perl -ne 'print "$1\t$2\twormbase_id\n" if m/^>(\S+).* scaffold ([^,]+), /;' > gb2wb_sr_syns.tsv.pre
+#CONF	DATA_INIT	cat gb2wb_sr_syns.tsv.pre | perl -pe 's/A_ceylanicum-1.0_Cont/ANCCEYDFT_Contig/' > gb2wb_sr_syns.tsv
 #CONF	SR_SYNS_FILE	gb2wb_sr_syns.tsv
 
 
@@ -60,7 +64,7 @@ species.annotation_source	wormbase
 
 #CONF	GFF3_LOAD_LOGIC_NAME	gff3_genes
 
-#CONF	GFF_LOADER_OPTIONS	--external_db_map_name default.txt --manifest_integrity_rc_name 32GB --load_sequence_data_rc_name 64GB
+#CONF	GFF_LOADER_OPTIONS	--external_db_map_name default.txt --manifest_integrity_rc_name 32GB --load_sequence_data_rc_name 64GB --check_manifest 0
 #  default: --external_db_map_name default.txt
 #  flybase: --external_db_map_name default.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
 #  minimal: --external_db_map_name minimal.txt --skip_unknown_xref_source 1
