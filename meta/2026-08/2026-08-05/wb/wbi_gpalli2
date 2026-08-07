@@ -24,7 +24,7 @@ species.common_name
 
 # Community GFF3 loading
 #CONF	ASM_SINGLE	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/globodera_pallida/PRJNA702104/globodera_pallida.PRJNA702104.WBPS19.annotations.gff3.gz
-#CONF	DATA_INIT	zcat $(basename 'https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/globodera_pallida/PRJNA702104/globodera_pallida.PRJNA702104.WBPS19.annotations.gff3.gz') | awk -F'\t' '{OFS="\t"; gsub(/ID=gene:/,"ID=",$9); gsub(/Parent=gene:/,"Parent=",$9)}1' > fixed.gff3
+#CONF	DATA_INIT	zcat $(basename 'https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/globodera_pallida/PRJNA702104/globodera_pallida.PRJNA702104.WBPS19.annotations.gff3.gz') | awk -F'\t' '{OFS="\t"; gsub(/ID=(gene:)+/,"ID=",$9); gsub(/Parent=(gene:)+/,"Parent=",$9)}1' > fixed.gff3
 #CONF	GFF_FILE	fixed.gff3
 
 #CONF	ASM_SINGLE	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/globodera_pallida/PRJNA702104/globodera_pallida.PRJNA702104.WBPS19.protein.fa.gz
