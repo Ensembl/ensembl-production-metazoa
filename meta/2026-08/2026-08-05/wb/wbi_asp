@@ -32,7 +32,11 @@ species.common_name
 #CONF	PEP_FILE	pep.faa
 
 # Get seq region synonyms
-#CONF	DATA_INIT	zcat GCA_943334845.2*_genomic.fna.gz | perl -ne 'print "$1\t$2\twormbase_id\n" if m/^>(\S+).*, contig: ([^,]+),/;' > gb2wb_sr_syns.tsv
+# ##sequence-region   auanemaC10019 1 389
+# C10019        unplaced-scaffold       na      na      CALQYR020000008.1        <>      na      Primary Assembly        399     na
+#
+#CONF	DATA_INIT	cat GCA_943334845.2*_assembly_report.txt | awk -F'\t' '($0 !~ /^#/) {OFS="\t"; print $5, $1, "wormbase_id" }' > gb2wb_sr_syns.tsv.pre
+#CONF	DATA_INIT	cat gb2wb_sr_syns.tsv.pre | perl -pe 's/\tC(\d+)\t/\tauanemaC$1\t/' > gb2wb_sr_syns.tsv
 #CONF	SR_SYNS_FILE	gb2wb_sr_syns.tsv
 
 
@@ -60,7 +64,7 @@ species.annotation_source	wormbase
 
 #CONF	GFF3_LOAD_LOGIC_NAME	gff3_genes
 
-#CONF	GFF_LOADER_OPTIONS	--external_db_map_name default.txt --manifest_integrity_rc_name 32GB --load_sequence_data_rc_name 64GB
+#CONF	GFF_LOADER_OPTIONS	--external_db_map_name default.txt --manifest_integrity_rc_name 32GB --load_sequence_data_rc_name 64GB --check_manifest 0
 #  default: --external_db_map_name default.txt
 #  flybase: --external_db_map_name default.txt --no_feature_version_defaults 1 --no_contig_ena_attrib 1
 #  minimal: --external_db_map_name minimal.txt --skip_unknown_xref_source 1
