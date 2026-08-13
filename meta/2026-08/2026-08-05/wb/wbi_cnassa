@@ -89,7 +89,7 @@ assembly.accession	GCA_958299035.1
 assembly.provider_name	inrae centre val de loire
 assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_958299035.1
 
-annotation.provider_name	inrae centre val de loire
+annotation.provider_name	WormBase Parasite
 annotation.provider_url	https://doi.org/10.1016/j.molbiopara.2016.11.005
 
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000

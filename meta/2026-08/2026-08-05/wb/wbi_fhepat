@@ -89,7 +89,7 @@ assembly.accession	GCA_002763495.2
 assembly.provider_name	The Genome Institute
 assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_002763495.2
 
-annotation.provider_name	The Genome Institute
+annotation.provider_name	WormBase Parasite
 annotation.provider_url	https://doi.org/10.1016/j.molbiopara.2016.11.005
 
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
