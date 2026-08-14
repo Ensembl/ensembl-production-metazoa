@@ -36,7 +36,7 @@ species.common_name
 # C10019        unplaced-scaffold       na      na      CALQYR020000008.1        <>      na      Primary Assembly        399     na
 #
 #CONF	DATA_INIT	cat GCA_943334845.2*_assembly_report.txt | awk -F'\t' '($0 !~ /^#/) {OFS="\t"; print $5, $1, "wormbase_id" }' > gb2wb_sr_syns.tsv.pre
-#CONF	DATA_INIT	cat gb2wb_sr_syns.tsv.pre | perl -pe 's/\tC(\d+)\t/\tauanemaC$1\t/' > gb2wb_sr_syns.tsv
+#CONF	DATA_INIT	cat gb2wb_sr_syns.tsv.pre | perl -pe 's/\tC(\d+)\t/\tauanemaC$1\t/; s/\tscaffold(\d+)\t/\tauanemascaffold$1\t/;' > gb2wb_sr_syns.tsv
 #CONF	SR_SYNS_FILE	gb2wb_sr_syns.tsv
 
 
