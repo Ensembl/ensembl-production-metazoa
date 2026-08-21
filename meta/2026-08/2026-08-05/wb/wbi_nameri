@@ -11,13 +11,13 @@ species.common_name	New world hookworm
 
 # GCA_000507365.1
 # https://www.ncbi.nlm.nih.gov/assembly/GCA_000507365.1
-# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/507/365/GCA_000507365.1_N__americanus_v1
+# https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/507/365/GCA_000507365.1_N_americanus_v1
 # Assembly provider: The Genome Institute at Washington University
 # Annotation provider: WormBase Parasite
 # RefSeq Annotation Name: https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/necator_americanus/PRJNA72135
 # RefSeq Annotation URL: https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/necator_americanus/PRJNA72135
 
-#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/507/365/GCA_000507365.1_N__americanus_v1
+#CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/507/365/GCA_000507365.1_N_americanus_v1
 
 #activate the below option (remove 'no ') to allow loading core with no annotation / gff3
 #no CONF	IGNORE_MISSING_GFF3	YES
