@@ -82,7 +82,7 @@ assembly.accession	GCF_026898425.1
 #CONF	GFF3_LOAD_SOURCE_NAME	refseq
 
 assembly.provider_name	Rahul Vivek Rane
-assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_026898425.1
+assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_026898425.1/
 
 annotation.provider_name	NCBI RefSeq
 annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Galleria_mellonella/GCF_026898425.1-RS_2022_12

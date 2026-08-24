@@ -87,7 +87,7 @@ assembly.accession	GCA_900004735.1
 #CONF	GFF3_LOAD_SOURCE_NAME	WormBase
 
 assembly.provider_name	IMPAM-UBA-CONICET
-assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_900004735.1
+assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_900004735.1/
 
 annotation.provider_name	WormBase Parasite
 annotation.provider_url	https://doi.org/10.1016/j.molbiopara.2016.11.005
