@@ -87,7 +87,7 @@ assembly.accession	GCA_000236345.1
 #CONF	GFF3_LOAD_SOURCE_NAME	WormBase
 
 assembly.provider_name	Department of Parasitology, Zhongshan School of Medicine, Sun Yat-sen University
-assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000236345.1
+assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000236345.1/
 
 annotation.provider_name	WormBase Parasite
 annotation.provider_url	https://doi.org/10.1016/j.molbiopara.2016.11.005

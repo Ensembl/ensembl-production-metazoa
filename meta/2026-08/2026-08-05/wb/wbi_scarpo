@@ -87,7 +87,7 @@ assembly.accession	GCA_000757645.3
 #CONF	GFF3_LOAD_SOURCE_NAME	WormBase
 
 assembly.provider_name	California Institute of Technology
-assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000757645.3
+assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_000757645.3/
 
 annotation.provider_name	WormBase Parasite
 annotation.provider_url	https://doi.org/10.1016/j.molbiopara.2016.11.005
