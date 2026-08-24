@@ -19,8 +19,10 @@ for line in open(jsonl_file):
     anno_provider = data.get("_ANNOTATION_PROVIDER_NAME_", "") or ""
     if acc.startswith("GCF_"):
         # RefSeq
+        if not anno_provider:
+            anno_provider = "NCBI RefSeq"
         data.update(
-            _ANNOTATION_PROVIDER_NAME_ = "NCBI RefSeq",
+            _ANNOTATION_PROVIDER_NAME_ = anno_provider,
             _ANNOTATION_SOURCE_ = "refseq",
             _ANNOTATION_SOURCE_SFX_ = "rs",
             _LOAD_GFF3_ANALYSIS_NAME_ = "refseq_import_visible",
@@ -52,7 +54,7 @@ for line in open(jsonl_file):
     ann_report_url = data.get("_REFSEQ_ANN_REPORT_URL_", "")
     if not ann_report_url:
         data.update(
-            _REFSEQ_ANN_REPORT_URL_ = f"https://www.ncbi.nlm.nih.gov/datasets/genome/{acc}"
+            _REFSEQ_ANN_REPORT_URL_ = f"https://www.ncbi.nlm.nih.gov/datasets/genome/{acc}/"
         )
     #
     sci_name = data["scientific_name"].lower()
