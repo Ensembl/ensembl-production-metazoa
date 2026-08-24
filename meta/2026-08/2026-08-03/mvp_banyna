@@ -82,7 +82,7 @@ assembly.accession	GCF_947172395.1
 #CONF	GFF3_LOAD_SOURCE_NAME	refseq
 
 assembly.provider_name	WELLCOME SANGER INSTITUTE
-assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_947172395.1
+assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_947172395.1/
 
 annotation.provider_name	NCBI RefSeq
 annotation.provider_url	https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Bicyclus_anynana/GCF_947172395.1-RS_2022_12

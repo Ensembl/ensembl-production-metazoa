@@ -15,7 +15,7 @@ species.common_name	Beet armyworm
 # Assembly provider: ROTHAMSTED RESEARCH
 # Annotation provider: ROTHAMSTED RESEARCH
 # RefSeq Annotation Name: 
-# RefSeq Annotation URL: https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_902829305.4
+# RefSeq Annotation URL: https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_902829305.4/
 
 #CONF	ASM_URL	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/902/829/305/GCA_902829305.4_PGI_SPEXI_v6
 
@@ -82,10 +82,10 @@ assembly.accession	GCA_902829305.4
 #CONF	GFF3_LOAD_SOURCE_NAME	genbank
 
 assembly.provider_name	ROTHAMSTED RESEARCH
-assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_902829305.4
+assembly.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_902829305.4/
 
 annotation.provider_name	ROTHAMSTED RESEARCH
-annotation.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_902829305.4
+annotation.provider_url	https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_902829305.4/
 
 #no CONF	REPEAT_MODELER_OPTIONS	-max_seq_length 19000000
 #  to change the lower allowed length [default 5000]: -min_slice_length 1000
