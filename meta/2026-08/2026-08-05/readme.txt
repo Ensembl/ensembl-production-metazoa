@@ -74,7 +74,7 @@ cat $METACONF_DIR/wb.genomes.lst |
 
 # gen configs
 python3 ./ensembl-production-metazoa/scripts/tmpl2meta.py   \
-  --template $METACONF_DIR/wormbase_import.tmpl \
+  --template ./ensembl-production-metazoa/meta/wormbase_import.tmpl \
   --param_table $METACONF_DIR/wb.genomes.lst \
   --output_dir $METACONF_DIR/wb \
   --out_file_pfx wbi_ \
