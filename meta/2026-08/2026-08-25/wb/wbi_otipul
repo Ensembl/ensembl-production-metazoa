@@ -124,3 +124,8 @@ species.stable_id_prefix	ENSLOC
 #
 # FINALIZE
 #
+# fixing duplicated RNA feature derived gene's ID
+# $CMD_W -D premz_oscheius_tipulae_gca900184235v1wb_core_64_116_1 -e 'update gene set stable_id = replace(stable_id, "ENSLOC000", "ENSLOC001") where analysis_id = 10'
+# $CMD_W -D premz_oscheius_tipulae_gca900184235v1wb_core_64_116_1 -e 'update transcript set stable_id = replace(stable_id, "ENSLOC000", "ENSLOC001") where analysis_id = 10'
+# $CMD_W -D premz_oscheius_tipulae_gca900184235v1wb_core_64_116_1 -e ' update exon e, transcript t, exon_transcript et set e.stable_id = replace(e.stable_id, "ENSLOC000", "ENSLOC001") where t.transcript_id = et.transcript_id and e.exon_id = et.exon_id and t.analysis_id = 10'
+#
