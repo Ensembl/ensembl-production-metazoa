@@ -54,6 +54,10 @@ cat acc_gff3_pep.tsv |
 
 
 # create genomes.lst, rename to genomes.lst.raw
+cat wb.acc.lst |
+  xargs -n 1 |
+  ../../../../ensembl-production-metazoa/scripts/template/gen_template.sh > genomes.lst.raw
+
 cat genomes.lst.raw acc_gff3_pep.tsv |
    awk -F "\t" '(NF > 5) {stash[$5] = $0} NF == 5 {OFS="\t"; print stash[$1], $2, $3, $4;}' |
    cut -f 1-6,9,16-18 |
