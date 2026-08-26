@@ -24,8 +24,15 @@ species.common_name
 
 # Community GFF3 loading
 #CONF	ASM_SINGLE	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/trichuris_muris/PRJEB126/trichuris_muris.PRJEB126.WBPS19.annotations.gff3.gz
-#CONF	DATA_INIT	zcat $(basename 'https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/trichuris_muris/PRJEB126/trichuris_muris.PRJEB126.WBPS19.annotations.gff3.gz') | awk -F'\t' '{OFS="\t"; gsub(/ID=(gene:)+/,"ID=",$9); gsub(/Parent=(gene:)+/,"Parent=",$9)}1' > fixed.gff3
+#
+# gettting rid of CDS "Name=" fields
+# TMUE_LG1  WormBase  CDS  28916323  28916480  .  -  2  ID=CDS:TMUE_1000006007;Parent=Transcript:TMUE_1000006007.1;Name=TMUE_1000006007;prediction_status=Partially_confirmed;wormpep=TMP:TMP06401
+# TMUE_LG1        WormBase        CDS     28916535        28916613        .       -       0       ID=CDS:TMUE_1000006007;Parent=Transcript:TMUE_1000006007.1
+#
+#CONF	DATA_INIT	zcat $(basename 'https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/trichuris_muris/PRJEB126/trichuris_muris.PRJEB126.WBPS19.annotations.gff3.gz') | awk -F'\t' '{OFS="\t"; gsub(/ID=(gene:)+/,"ID=",$9); gsub(/Parent=(gene:)+/,"Parent=",$9)}1' | perl -pe 's/;Name=[^;]+;/;/ if m/\tCDS\t/' > fixed.gff3
 #CONF	GFF_FILE	fixed.gff3
+
+
 
 #CONF	ASM_SINGLE	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/trichuris_muris/PRJEB126/trichuris_muris.PRJEB126.WBPS19.protein.fa.gz
 #CONF	DATA_INIT	zcat $(basename 'https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/trichuris_muris/PRJEB126/trichuris_muris.PRJEB126.WBPS19.protein.fa.gz') | perl -pe 's/^>/>cds:/ if /^>/;' > pep.faa
