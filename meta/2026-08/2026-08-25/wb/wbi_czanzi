@@ -24,7 +24,11 @@ species.common_name
 
 # Community GFF3 loading
 #CONF	ASM_SINGLE	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/caenorhabditis_zanzibari/PRJEB12596/caenorhabditis_zanzibari.PRJEB12596.WBPS19.annotations.gff3.gz
-#CONF	DATA_INIT	zcat $(basename 'https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/caenorhabditis_zanzibari/PRJEB12596/caenorhabditis_zanzibari.PRJEB12596.WBPS19.annotations.gff3.gz') | awk -F'\t' '{OFS="\t"; gsub(/ID=(gene:)+/,"ID=",$9); gsub(/Parent=(gene:)+/,"Parent=",$9)}1' > fixed.gff3
+#CONF	DATA_INIT	zcat $(basename 'https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/caenorhabditis_zanzibari/PRJEB12596/caenorhabditis_zanzibari.PRJEB12596.WBPS19.annotations.gff3.gz') | awk -F'\t' '{OFS="\t"; gsub(/ID=(gene:)+/,"ID=",$9); gsub(/Parent=(gene:)+/,"Parent=",$9)}1' > fixed.gff3.pre
+# removing CSP26.scaffold01643 from gff3:
+# ##sequence-region CSP26.scaffold01643 1 2780
+# CSP26.scaffold01643  WormBase_imported  gene  2383  2826  .  -  .  ID=CSP26.g14418;Name=CSP26.g14418;biotype=nontranslating_CDS
+#CONF	DATA_INIT	cat fixed.gff3.pre | grep -v CSP26.scaffold01643 > fixed.gff3
 #CONF	GFF_FILE	fixed.gff3
 
 #CONF	ASM_SINGLE	https://ftp.ebi.ac.uk/pub/databases/wormbase/parasite/releases/WBPS19/species/caenorhabditis_zanzibari/PRJEB12596/caenorhabditis_zanzibari.PRJEB12596.WBPS19.protein.fa.gz
@@ -32,7 +36,8 @@ species.common_name
 #CONF	PEP_FILE	pep.faa
 
 # Get seq region synonyms
-#CONF	DATA_INIT	zcat GCA_900536285.3*_genomic.fna.gz | perl -ne 'print "$1\t$2\twormbase_id\n" if m/^>(\S+).*, contig: ([^,]+),/;' > gb2wb_sr_syns.tsv
+#CONF	DATA_INIT	cat GCA_*_assembly_report.txt | awk -F'\t' '($0 !~ /^#/) {OFS="\t"; print $5, $1, "wormbase_id" }' > gb2wb_sr_syns.tsv.pre
+#CONF	DATA_INIT	cat gb2wb_sr_syns.tsv.pre | perl -pe 's/\tscaffold/\t/' > gb2wb_sr_syns.tsv
 #CONF	SR_SYNS_FILE	gb2wb_sr_syns.tsv
 
 
