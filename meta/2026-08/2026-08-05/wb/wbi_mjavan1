@@ -32,7 +32,10 @@ species.common_name	Root-knot nematode
 #CONF	PEP_FILE	pep.faa
 
 # Get seq region synonyms
-#CONF	DATA_INIT	zcat GCA_900003945.1*_genomic.fna.gz | perl -ne 'print "$1\t$2\twormbase_id\n" if m/^>(\S+).*, contig: ([^,]+),/;' > gb2wb_sr_syns.tsv
+# ##sequence-region M.Javanica_Scaff1 1 109859
+# >CEWN01000001.1 Meloidogyne javanica genome assembly, contig: Meloidogyne_javanica_scaffold_1, whole genome shotgun sequence
+#CONF	DATA_INIT	zcat GCA_900003945.1*_genomic.fna.gz | perl -ne 'print "$1\t$2\twormbase_id\n" if m/^>(\S+).*, contig: ([^,]+),/;' > gb2wb_sr_syns.tsv.pre
+#CONF	DATA_INIT	cat gb2wb_sr_syns.tsv.pre | perl -pe 's/\tMeloidogyne_javanica_scaffold_/\tM.Javanica_Scaff/' > gb2wb_sr_syns.tsv
 #CONF	SR_SYNS_FILE	gb2wb_sr_syns.tsv
 
 
