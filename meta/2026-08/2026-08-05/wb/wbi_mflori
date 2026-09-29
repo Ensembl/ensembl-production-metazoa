@@ -32,7 +32,10 @@ species.common_name
 #CONF	PEP_FILE	pep.faa
 
 # Get seq region synonyms
-#CONF	DATA_INIT	zcat GCA_000751915.1*_genomic.fna.gz | perl -ne 'print "$1\t$2\twormbase_id\n" if m/^>(\S+).*, contig: ([^,]+),/;' > gb2wb_sr_syns.tsv
+# ##sequence-region nMf.1.1.scaf00001 1 40762
+# >CCDZ01000001.1 Meloidogyne floridensis genome assembly nMf_1_1, contig nMf_1_1_scaf00001, whole genome shotgun sequence
+#CONF	DATA_INIT	zcat GCA_000751915.1*_genomic.fna.gz | perl -ne 'print "$1\t$2\twormbase_id\n" if m/^>(\S+).*, contig ([^,]+),/;' > gb2wb_sr_syns.tsv.pre
+#CONF	DATA_INIT	cat gb2wb_sr_syns.tsv.pre | perl -pe 's/nMf_1_1_/nMf\.1\.1\./' > gb2wb_sr_syns.tsv
 #CONF	SR_SYNS_FILE	gb2wb_sr_syns.tsv
 
 
@@ -100,7 +103,7 @@ annotation.provider_url	https://doi.org/10.1016/j.molbiopara.2016.11.005
 #  add to use redat: -redatrepeatmasker 1
 
 # to ignore empty de novo repeat libraries
-#no CONF	IGNORE_EMPTY_REP_LIB	YES
+#CONF	IGNORE_EMPTY_REP_LIB	YES
 
 
 # rna features and genes
